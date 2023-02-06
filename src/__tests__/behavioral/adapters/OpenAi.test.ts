@@ -1,13 +1,22 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import { Configuration, OpenAIApi } from 'openai'
-import { OpenAi } from '../../../bots/adapters/OpenAi'
+import {
+	MESSAGE_RESPONSE_ERROR_MESSAGE,
+	OpenAi,
+} from '../../../bots/adapters/OpenAi'
 import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
+import { SprucebotLlmBot } from '../../../llm.types'
+import PromptGenerator from '../../../PromptGenerator'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import SpyConfiguration from '../../support/SpyConfiguration'
 
 export default class OpenAiTest extends AbstractLlmTest {
+	private static openAi: OpenAi
+	private static bot: SprucebotLlmBot
 	protected static async beforeEach() {
 		await super.beforeEach()
+		this.openAi = this.OpenAi()
+		this.bot = this.Bot()
 	}
 
 	@test()
@@ -17,11 +26,6 @@ export default class OpenAiTest extends AbstractLlmTest {
 		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
 			parameters: ['apiKey'],
 		})
-	}
-
-	@test()
-	protected static async canCreateOneWithKey() {
-		new OpenAi(generateId())
 	}
 
 	@test()
@@ -49,13 +53,41 @@ export default class OpenAiTest extends AbstractLlmTest {
 	protected static async canSendMessage() {
 		this.setupSpys()
 
-		const adapter = this.OpenAi()
-		const bot = this.Bot()
+		const message = generateId()
+		await this.openAi.sendMessage(this.bot, message)
 
-		await adapter.sendMessage(bot, 'hello')
+		const prompt = new PromptGenerator(this.bot)
+		const expected = await prompt.generate(message)
 
-		assert.isEqual(SpyOpenAiApi.lastMessage, 'hello')
+		assert.isEqual(SpyOpenAiApi.lastMessage, expected)
 		assert.isEqual(SpyOpenAiApi.lastModel, 'text-davinci-003')
+	}
+
+	@test()
+	protected static async returnsResponseFromSendMessage() {
+		SpyOpenAiApi.responseMessage = generateId()
+		await this.assertResponseEquals(SpyOpenAiApi.responseMessage)
+	}
+
+	@test()
+	protected static async trimsResponseMessage() {
+		SpyOpenAiApi.responseMessage = ' hello world '
+		await this.assertResponseEquals('hello world')
+	}
+
+	@test()
+	protected static async noResponseReturnsDefaultErrorMesssage() {
+		SpyOpenAiApi.responseMessage = false
+		await this.assertResponseEquals(MESSAGE_RESPONSE_ERROR_MESSAGE)
+	}
+
+	private static async assertResponseEquals(expected: string) {
+		const response = await this.sendRandomMessage()
+		assert.isEqual(response, expected)
+	}
+
+	private static async sendRandomMessage() {
+		return await this.openAi.sendMessage(this.bot, generateId())
 	}
 
 	private static OpenAi(key?: string) {

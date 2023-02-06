@@ -25,6 +25,7 @@ export default class SprucebotLlmBotImpl<
 	private youAre: string
 	private stateSchema?: StateSchema
 	private state?: Partial<State>
+	private isDone = false
 
 	public constructor(options: BotOptions<StateSchema, State>) {
 		const { adapter, youAre, stateSchema, state } = options
@@ -39,8 +40,12 @@ export default class SprucebotLlmBotImpl<
 			: undefined
 	}
 
-	public isDone(): boolean {
-		return false
+	public markAsDone(): void {
+		this.isDone = true
+	}
+
+	public getIsDone(): boolean {
+		return this.isDone
 	}
 
 	public serialize(): PromptOptions<StateSchema, State> {
@@ -51,9 +56,9 @@ export default class SprucebotLlmBotImpl<
 		}
 	}
 
-	public async sendMessage(message: string): Promise<void> {
+	public async sendMessage(message: string): Promise<string> {
 		assertOptions({ message }, ['message'])
-		await this.adapter.sendMessage(this, message)
+		return await this.adapter.sendMessage(this, message)
 	}
 
 	public async updateState(newState: Partial<State>): Promise<void> {

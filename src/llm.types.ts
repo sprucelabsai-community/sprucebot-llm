@@ -19,14 +19,15 @@ export interface SprucebotLlmBot<
 	StateSchema extends Schema = Schema,
 	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
 > extends MercuryEventEmitter<LlmBotContract> {
-	isDone(): boolean
-	sendMessage(message: string): Promise<void>
+	markAsDone(): void
+	getIsDone(): boolean
+	sendMessage(message: string): Promise<string>
 	serialize(): PromptOptions<StateSchema, State>
 	updateState(state: Partial<State>): Promise<void>
 }
 
 export interface LlmAdapter {
-	sendMessage(bot: SprucebotLlmBot<Schema>, message: string): Promise<void>
+	sendMessage(bot: SprucebotLlmBot<Schema>, message: string): Promise<string>
 }
 
 export interface PromptOptions<

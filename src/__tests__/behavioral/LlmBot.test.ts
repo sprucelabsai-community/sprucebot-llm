@@ -119,7 +119,16 @@ export default class LlmBotTest extends AbstractLlmTest {
 
 	@test()
 	protected static async knowsWhenDone() {
-		assert.isFalse(this.bot.isDone())
+		assert.isFalse(this.bot.getIsDone())
+		this.bot.markAsDone()
+		assert.isTrue(this.bot.getIsDone())
+	}
+
+	@test()
+	protected static async sendMessageReturnsResponseFromAdapter() {
+		this.adapter.messageResponse = generateId()
+		const response = await this.bot.sendMessage(generateId())
+		assert.isEqual(response, this.adapter.messageResponse)
 	}
 
 	private static async updateState(updates: Record<string, any>) {
