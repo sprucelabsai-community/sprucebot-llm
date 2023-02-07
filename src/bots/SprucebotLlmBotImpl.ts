@@ -67,7 +67,7 @@ export default class SprucebotLlmBotImpl<
 			message,
 		})
 
-		const response = await this.adapter.sendMessage(this, message)
+		const response = await this.adapter.sendMessage(this)
 
 		this.messages.push({
 			from: 'You',

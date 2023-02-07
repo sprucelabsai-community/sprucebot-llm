@@ -28,7 +28,7 @@ export interface SprucebotLlmBot<
 }
 
 export interface LlmAdapter {
-	sendMessage(bot: SprucebotLlmBot<Schema>, message: string): Promise<string>
+	sendMessage(bot: SprucebotLlmBot<Schema>): Promise<string>
 }
 
 export interface PromptOptions<

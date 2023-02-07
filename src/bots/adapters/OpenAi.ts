@@ -14,12 +14,9 @@ export class OpenAi implements LlmAdapter {
 		this.api = new OpenAi.OpenAIApi(config)
 	}
 
-	public async sendMessage(
-		bot: SprucebotLlmBot,
-		message: string
-	): Promise<string> {
+	public async sendMessage(bot: SprucebotLlmBot): Promise<string> {
 		const generator = new PromptGenerator(bot)
-		const prompt = await generator.generate(message)
+		const prompt = await generator.generate()
 
 		const response = await this.api.createCompletion({
 			prompt,

@@ -1,12 +1,12 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
-import { SprucebotLlmBot } from '../../llm.types'
 import AbstractLlmTest from '../support/AbstractLlmTest'
 import { Car, carSchema } from '../support/schemas/carSchema'
 import { personSchema } from '../support/schemas/personSchema'
 import { personWithDefaultsSchema } from '../support/schemas/personWithDefaultsSchema'
+import { SpyBot } from '../support/SpyBot'
 
 export default class LlmBotTest extends AbstractLlmTest {
-	private static bot: SprucebotLlmBot
+	private static bot: SpyBot
 
 	protected static async beforeEach() {
 		await super.beforeEach()
@@ -29,7 +29,6 @@ export default class LlmBotTest extends AbstractLlmTest {
 		const message = generateId()
 		await this.sendMessage(message)
 		assert.isEqual(this.adapter.lastBot, this.bot)
-		assert.isEqual(this.adapter.lastMessage, message)
 	}
 
 	@test()

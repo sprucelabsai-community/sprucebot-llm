@@ -14,7 +14,7 @@ export default class PromptGenerator {
 		this.bot = bot
 	}
 
-	public async generate(message: string) {
+	public async generate() {
 		const { youAre, stateSchema, state, messages } = this.bot.serialize()
 		const { stateSchemaJson, stateJson } = this.stringifyState(
 			stateSchema,
@@ -25,13 +25,7 @@ export default class PromptGenerator {
 			PROMPT_TEMPLATE,
 			{
 				youAre,
-				messages: [
-					...messages,
-					{
-						from: 'Me',
-						message,
-					},
-				],
+				messages: [...messages],
 				stateSchemaJson,
 				stateJson,
 			},
@@ -79,7 +73,9 @@ export interface TemplateContext {
 	stateSchemaJson?: string
 	stateJson?: string
 }
-export const PROMPT_TEMPLATE = `You are <%= it.youAre %><% if (it.stateSchemaJson) { %>
+export const PROMPT_TEMPLATE = `You are <%= it.youAre %>
+
+For this interaction, every message I send will start with "Me:" and I'll prompt you for your message by starting with "You:". You can only respond as you, never as me.<% if (it.stateSchemaJson) { %>
 
 
 Here is the schema for the state we're going to use for this interaction:
@@ -103,5 +99,4 @@ Let's get started:
 <%= message.from %>: <%= message.message %>
 
 <% }) %>
-
 You:`

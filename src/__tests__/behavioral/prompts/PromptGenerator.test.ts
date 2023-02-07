@@ -1,8 +1,7 @@
 import { normalizeSchemaValues, Schema, SchemaValues } from '@sprucelabs/schema'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import * as Eta from 'eta'
-import SprucebotLlmBotImpl from '../../../bots/SprucebotLlmBotImpl'
-import { BotOptions, LlmMessage, SprucebotLlmBot } from '../../../llm.types'
+import { BotOptions, LlmMessage } from '../../../llm.types'
 import PromptGenerator, {
 	setUndefinedToNull,
 	TemplateContext,
@@ -10,6 +9,7 @@ import PromptGenerator, {
 } from '../../../PromptGenerator'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { personSchema } from '../../support/schemas/personSchema'
+import { SpyBot } from '../../support/SpyBot'
 
 export default class PromptGeneratorTest extends AbstractLlmTest {
 	private static bot: SpyBot
@@ -80,7 +80,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 
 	@test()
 	protected static async includesPastMessages() {
-		const message: LlmMessage[] = [
+		const messages: LlmMessage[] = [
 			{
 				from: 'Me',
 				message: 'Hey there!',
@@ -91,13 +91,13 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 			},
 		]
 
-		this.bot.setMessages(message)
+		this.bot.setMessages(messages)
 
 		const expected = await this.renderMessage({
-			messages: [...message, { from: 'Me', message: 'oy!' }],
+			messages,
 		})
 
-		const actual = await this.prompt.generate('oy!')
+		const actual = await this.prompt.generate()
 
 		assert.isEqual(actual, expected)
 	}
@@ -147,7 +147,13 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 	}
 
 	private static async generate(message: string) {
-		return await this.prompt.generate(message)
+		this.bot.setMessages([
+			{
+				from: 'Me',
+				message,
+			},
+		])
+		return await this.prompt.generate()
 	}
 
 	private static SpyBot<S extends Schema = Schema>(
@@ -158,15 +164,5 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 
 	private static reloadGenerator() {
 		this.prompt = new PromptGenerator(this.bot)
-	}
-}
-
-class SpyBot extends SprucebotLlmBotImpl implements SprucebotLlmBot {
-	public setMessages(messages: LlmMessage[]) {
-		this.messages = messages
-	}
-
-	public async getMessages() {
-		return this.messages
 	}
 }

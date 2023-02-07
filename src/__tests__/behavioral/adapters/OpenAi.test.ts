@@ -5,14 +5,14 @@ import {
 	OpenAi,
 } from '../../../bots/adapters/OpenAi'
 import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
-import { SprucebotLlmBot } from '../../../llm.types'
 import PromptGenerator from '../../../PromptGenerator'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
+import { SpyBot } from '../../support/SpyBot'
 import SpyConfiguration from '../../support/SpyConfiguration'
 
 export default class OpenAiTest extends AbstractLlmTest {
 	private static openAi: OpenAi
-	private static bot: SprucebotLlmBot
+	private static bot: SpyBot
 	protected static async beforeEach() {
 		await super.beforeEach()
 		this.openAi = this.OpenAi()
@@ -54,10 +54,16 @@ export default class OpenAiTest extends AbstractLlmTest {
 		this.setupSpys()
 
 		const message = generateId()
-		await this.openAi.sendMessage(this.bot, message)
+		this.bot.setMessages([
+			{
+				from: 'Me',
+				message,
+			},
+		])
+		await this.openAi.sendMessage(this.bot)
 
 		const prompt = new PromptGenerator(this.bot)
-		const expected = await prompt.generate(message)
+		const expected = await prompt.generate()
 
 		assert.isEqual(SpyOpenAiApi.lastMessage, expected)
 		assert.isEqual(SpyOpenAiApi.lastModel, 'text-davinci-003')
@@ -87,7 +93,13 @@ export default class OpenAiTest extends AbstractLlmTest {
 	}
 
 	private static async sendRandomMessage() {
-		return await this.openAi.sendMessage(this.bot, generateId())
+		this.bot.setMessages([
+			{
+				from: 'Me',
+				message: generateId(),
+			},
+		])
+		return await this.openAi.sendMessage(this.bot)
 	}
 
 	private static OpenAi(key?: string) {

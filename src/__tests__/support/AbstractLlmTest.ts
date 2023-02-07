@@ -1,9 +1,9 @@
 import { Schema } from '@sprucelabs/schema'
 import AbstractSpruceTest from '@sprucelabs/test-utils'
-import SprucebotLlmBotImpl from '../../bots/SprucebotLlmBotImpl'
 import SprucebotLlmFactory from '../../bots/SprucebotLlmFactory'
 import { BotOptions } from '../../llm.types'
 import SpyAdapter from './SpyAdapter'
+import { SpyBot } from './SpyBot'
 
 export default abstract class AbstractLlmTest extends AbstractSpruceTest {
 	protected static bots: SprucebotLlmFactory
@@ -17,11 +17,12 @@ export default abstract class AbstractLlmTest extends AbstractSpruceTest {
 
 	protected static Bot<S extends Schema>(
 		options?: Partial<BotOptions<S>>
-	): SprucebotLlmBotImpl {
+	): SpyBot {
 		return this.bots.Bot({
 			youAre: 'a bot',
 			adapter: this.adapter,
+			Class: SpyBot,
 			...options,
-		}) as SprucebotLlmBotImpl
+		}) as SpyBot
 	}
 }
