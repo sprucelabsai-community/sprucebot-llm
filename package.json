@@ -32,7 +32,7 @@
     "watch.lint": "concurrently 'yarn lint' \"chokidar 'src/**/*' -c 'yarn lint.tsc'\"",
     "watch.rebuild": "yarn clean.all && yarn && yarn watch.build.dev",
     "watch.tsc": "tsc -w",
-    "chat": "node ./build/cli.js"
+    "chat": "node ./build/chat.js"
   },
   "dependencies": {
     "@sprucelabs/error": "^5.0.576",
