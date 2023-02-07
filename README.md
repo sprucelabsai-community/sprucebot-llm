@@ -52,13 +52,11 @@ const skill = SprucebotLlmFactory.Skill({
     weAreDoneWhen: `I say I don't want to hear anymore jokes.`
 })
 
-
 const bot = bots.Bot({
     adapter,
     youAre: `a bot named Sprucebot. You are in test mode, so don't forget to let me know while we're chatting!`,
     skill,
 })
-
 
 do {
     const input = await rl.question('Message > ')
