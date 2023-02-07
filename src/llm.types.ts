@@ -13,6 +13,7 @@ export interface BotOptions<
 	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
 > extends PromptOptions<StateSchema, State> {
 	adapter: LlmAdapter
+	Class?: new (...opts: any[]) => SprucebotLlmBot<Schema, State>
 }
 
 export interface SprucebotLlmBot<
@@ -22,7 +23,7 @@ export interface SprucebotLlmBot<
 	markAsDone(): void
 	getIsDone(): boolean
 	sendMessage(message: string): Promise<string>
-	serialize(): PromptOptions<StateSchema, State>
+	serialize(): SerializedBot<StateSchema, State>
 	updateState(state: Partial<State>): Promise<void>
 }
 
@@ -42,6 +43,13 @@ export interface PromptOptions<
 	state?: Partial<State>
 }
 
+export interface SerializedBot<
+	StateSchema extends Schema = Schema,
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+> extends PromptOptions<Schema, State> {
+	messages: LlmMessage[]
+}
+
 export const llmBotContract = buildEventContract({
 	eventSignatures: {
 		'did-update-state': {},
@@ -49,3 +57,8 @@ export const llmBotContract = buildEventContract({
 })
 
 export type LlmBotContract = typeof llmBotContract
+
+export interface LlmMessage {
+	from: 'Me' | 'You'
+	message: string
+}

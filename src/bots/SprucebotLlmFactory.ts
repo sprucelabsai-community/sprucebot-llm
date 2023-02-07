@@ -8,7 +8,10 @@ export default class SprucebotLlmFactory {
 
 	public Bot(options: BotOptions): SprucebotLlmBot {
 		assertOptions(options, ['youAre', 'adapter'])
-		return new SprucebotLlmBotImpl(options)
+
+		const { Class } = options
+
+		return Class ? new Class(options) : new SprucebotLlmBotImpl(options)
 	}
 
 	public getInstance() {

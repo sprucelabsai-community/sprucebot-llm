@@ -4,7 +4,7 @@ import {
 	Schema,
 } from '@sprucelabs/schema'
 import * as Eta from 'eta'
-import { SprucebotLlmBot } from './llm.types'
+import { LlmMessage, SprucebotLlmBot } from './llm.types'
 
 export default class PromptGenerator {
 	private bot: SprucebotLlmBot
@@ -15,7 +15,7 @@ export default class PromptGenerator {
 	}
 
 	public async generate(message: string) {
-		const { youAre, stateSchema, state } = this.bot.serialize()
+		const { youAre, stateSchema, state, messages } = this.bot.serialize()
 		const { stateSchemaJson, stateJson } = this.stringifyState(
 			stateSchema,
 			state
@@ -26,6 +26,7 @@ export default class PromptGenerator {
 			{
 				youAre,
 				messages: [
+					...messages,
 					{
 						from: 'Me',
 						message,
@@ -71,13 +72,10 @@ export function setUndefinedToNull(obj: Record<string, any>) {
 		}
 	}
 }
-interface TemplateMessage {
-	from: string
-	message: string
-}
+
 export interface TemplateContext {
 	youAre: string
-	messages: TemplateMessage[]
+	messages: LlmMessage[]
 	stateSchemaJson?: string
 	stateJson?: string
 }
@@ -103,6 +101,7 @@ Let's get started:
 
 <% it.messages.forEach((message) => { %>
 <%= message.from %>: <%= message.message %>
+
 <% }) %>
 
 You:`

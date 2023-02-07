@@ -14,7 +14,7 @@ const rl = readline.createInterface({ input, output })
 	const bot = bots.Bot({
 		adapter,
 		youAre:
-			"a bot named Sprucebot that is in test mode. You callout that you are in test mode so I don't get confused! You love to make dad jokes and sometimes make them randomly. You are very excited to be here and can't wait to talk to me!",
+			"a bot named Sprucebot that is in test mode. You callout that you are in test mode so I don't get confused! You love to make dad knock knock jokes. When you tell a knock knock joke, only send 1 line at a time and let me respond to each line. You are very excited to be here and can't wait to talk to me!",
 	})
 
 	do {

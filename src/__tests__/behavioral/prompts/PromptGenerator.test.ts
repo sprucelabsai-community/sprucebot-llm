@@ -1,7 +1,8 @@
 import { normalizeSchemaValues, Schema, SchemaValues } from '@sprucelabs/schema'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import * as Eta from 'eta'
-import { BotOptions, SprucebotLlmBot } from '../../../llm.types'
+import SprucebotLlmBotImpl from '../../../bots/SprucebotLlmBotImpl'
+import { BotOptions, LlmMessage, SprucebotLlmBot } from '../../../llm.types'
 import PromptGenerator, {
 	setUndefinedToNull,
 	TemplateContext,
@@ -11,12 +12,12 @@ import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { personSchema } from '../../support/schemas/personSchema'
 
 export default class PromptGeneratorTest extends AbstractLlmTest {
-	private static bot: SprucebotLlmBot
+	private static bot: SpyBot
 	private static prompt: PromptGenerator
 
 	protected static async beforeEach() {
 		await super.beforeEach()
-		this.bot = this.Bot()
+		this.bot = this.SpyBot()
 		this.reloadGenerator()
 	}
 
@@ -77,6 +78,30 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 		})
 	}
 
+	@test()
+	protected static async includesPastMessages() {
+		const message: LlmMessage[] = [
+			{
+				from: 'Me',
+				message: 'Hey there!',
+			},
+			{
+				from: 'You',
+				message: 'What the??',
+			},
+		]
+
+		this.bot.setMessages(message)
+
+		const expected = await this.renderMessage({
+			messages: [...message, { from: 'Me', message: 'oy!' }],
+		})
+
+		const actual = await this.prompt.generate('oy!')
+
+		assert.isEqual(actual, expected)
+	}
+
 	private static async renderMessage(context: Partial<TemplateContext>) {
 		return await Eta.render(
 			PROMPT_TEMPLATE,
@@ -110,18 +135,38 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 			state,
 		} = options
 
-		this.bot = this.Bot(botOptions)
+		this.bot = this.SpyBot<S>(botOptions)
 		this.reloadGenerator()
 
 		if (state) {
 			await this.bot.updateState(state)
 		}
 
-		const prompt = await this.prompt.generate(message)
+		const prompt = await this.generate(message)
 		assert.isEqual(prompt, expected)
+	}
+
+	private static async generate(message: string) {
+		return await this.prompt.generate(message)
+	}
+
+	private static SpyBot<S extends Schema = Schema>(
+		options?: Partial<BotOptions<S, SchemaValues<S, false>>>
+	): SpyBot {
+		return this.Bot({ ...options, Class: SpyBot }) as SpyBot
 	}
 
 	private static reloadGenerator() {
 		this.prompt = new PromptGenerator(this.bot)
+	}
+}
+
+class SpyBot extends SprucebotLlmBotImpl implements SprucebotLlmBot {
+	public setMessages(messages: LlmMessage[]) {
+		this.messages = messages
+	}
+
+	public async getMessages() {
+		return this.messages
 	}
 }

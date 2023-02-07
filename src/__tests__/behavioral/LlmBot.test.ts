@@ -27,7 +27,7 @@ export default class LlmBotTest extends AbstractLlmTest {
 	@test()
 	protected static async sendsItselfToTheLlmAdapter() {
 		const message = generateId()
-		await this.bot.sendMessage(message)
+		await this.sendMessage(message)
 		assert.isEqual(this.adapter.lastBot, this.bot)
 		assert.isEqual(this.adapter.lastMessage, message)
 	}
@@ -51,6 +51,7 @@ export default class LlmBotTest extends AbstractLlmTest {
 			youAre,
 			stateSchema: personSchema,
 			state,
+			messages: [],
 		})
 	}
 
@@ -127,8 +128,31 @@ export default class LlmBotTest extends AbstractLlmTest {
 	@test()
 	protected static async sendMessageReturnsResponseFromAdapter() {
 		this.adapter.messageResponse = generateId()
-		const response = await this.bot.sendMessage(generateId())
+		const message = generateId()
+		const response = await this.sendMessage(message)
 		assert.isEqual(response, this.adapter.messageResponse)
+	}
+
+	@test()
+	protected static async tracksMessageHistory() {
+		const message = generateId()
+		this.adapter.messageResponse = generateId()
+		await this.sendMessage(message)
+		const { messages } = this.bot.serialize()
+		assert.isEqualDeep(messages, [
+			{
+				from: 'Me',
+				message,
+			},
+			{
+				from: 'You',
+				message: this.adapter.messageResponse,
+			},
+		])
+	}
+
+	private static async sendMessage(message: string) {
+		return await this.bot.sendMessage(message)
 	}
 
 	private static async updateState(updates: Record<string, any>) {

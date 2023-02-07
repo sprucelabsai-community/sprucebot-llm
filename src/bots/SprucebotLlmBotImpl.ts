@@ -10,7 +10,8 @@ import {
 	LlmAdapter,
 	llmBotContract,
 	LlmBotContract,
-	PromptOptions,
+	LlmMessage,
+	SerializedBot,
 	SprucebotLlmBot,
 } from '../llm.types'
 
@@ -26,6 +27,7 @@ export default class SprucebotLlmBotImpl<
 	private stateSchema?: StateSchema
 	private state?: Partial<State>
 	private isDone = false
+	protected messages: LlmMessage[] = []
 
 	public constructor(options: BotOptions<StateSchema, State>) {
 		const { adapter, youAre, stateSchema, state } = options
@@ -48,17 +50,31 @@ export default class SprucebotLlmBotImpl<
 		return this.isDone
 	}
 
-	public serialize(): PromptOptions<StateSchema, State> {
+	public serialize(): SerializedBot<StateSchema, State> {
 		return {
 			youAre: this.youAre,
 			stateSchema: this.stateSchema,
 			state: this.state,
+			messages: this.messages,
 		}
 	}
 
 	public async sendMessage(message: string): Promise<string> {
 		assertOptions({ message }, ['message'])
-		return await this.adapter.sendMessage(this, message)
+
+		this.messages.push({
+			from: 'Me',
+			message,
+		})
+
+		const response = await this.adapter.sendMessage(this, message)
+
+		this.messages.push({
+			from: 'You',
+			message: response,
+		})
+
+		return response
 	}
 
 	public async updateState(newState: Partial<State>): Promise<void> {
