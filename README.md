@@ -32,9 +32,11 @@ yarn add @sprucelabs/sprucebot-llm
 Create a file called `chat.ts` and add the following to get started:
 
 ```ts
-
+import { stdin as input, stdout as output } from 'node:process'
+import * as readline from 'node:readline/promises'
 import dotenv from 'dotenv'
 import { OpenAi } from './bots/adapters/OpenAi'
+import SprucebotLlmFactory from './bots/SprucebotLlmFactory'
 
 dotenv.config()
 
