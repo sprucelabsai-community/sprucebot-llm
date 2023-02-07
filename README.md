@@ -13,8 +13,8 @@ A Typescript library for leveraging Large Langage Models (like GPT-3) to do... a
 * Unlimited use cases*
     * Skill architecture for extensibility
     * Tune Skills to do any job
-* Only support GPT-3 for now (more adapters based on demand)
-    * Adapter Interface to create your own adapters
+* Adapter Interface to create your own adapters
+    * Only support GPT-3 for now (more adapters based on demand)
 * Fully typed
 
 
