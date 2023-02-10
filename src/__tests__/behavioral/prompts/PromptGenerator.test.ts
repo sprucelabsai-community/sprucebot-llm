@@ -45,7 +45,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 			],
 		})
 
-		await this.assertMessageGeneratsPrompt({
+		await this.assertMessageGeneratesPrompt({
 			options: {
 				youAre,
 			},
@@ -69,7 +69,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 			stateJson: JSON.stringify(state),
 		})
 
-		await this.assertMessageGeneratsPrompt({
+		await this.assertMessageGeneratesPrompt({
 			options: {
 				stateSchema: personSchema,
 			},
@@ -118,6 +118,8 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 			youAre:
 				'A bot that is always in a good mood. You love complementing people and making sure they are happy!',
 			skill,
+			stateSchema: personSchema,
+			state: {},
 		})
 
 		this.reloadGenerator()
@@ -144,7 +146,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 		)
 	}
 
-	private static async assertMessageGeneratsPrompt<S extends Schema>(options: {
+	private static async assertMessageGeneratesPrompt<S extends Schema>(options: {
 		options: Partial<BotOptions<S>>
 		message?: string
 		expected: string

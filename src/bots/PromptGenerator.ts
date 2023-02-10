@@ -74,15 +74,17 @@ export interface TemplateContext {
 }
 
 export const PROMPT_BOUNDARY = '*****'
-export const DONE_TOKEN = `${PROMPT_BOUNDARY}DONE${PROMPT_BOUNDARY}`
+export const DONE_TOKEN = `____ DONE ____`
 
 export const PROMPT_TEMPLATE = `You are <%= it.youAre %>
 
 
-For this interaction, every message I send will start with "__Me__:" and I'll prompt you for your message by starting with "__You__:". Whenever you answer, only answer after "__You__:" and stop before "__Me__:"
+For this interaction, every message I send will start with "__Me__:" and I'll prompt you for your response by starting with "__You__:".
+
+__Me__: Do you understand?
+__You__: Yes
 
 <% if (it.stateSchemaJson) { %>
-
 
 Here is the schema that defines the state for this conversation:
 
@@ -96,14 +98,24 @@ Here is the current state, which is based on the schema above:
 
 After each message, send the state in the form:
 
-${PROMPT_BOUNDARY} <%= it.stateJson %> ${PROMPT_BOUNDARY}<% } %>
+${PROMPT_BOUNDARY} <%= it.stateJson %> ${PROMPT_BOUNDARY}
+
+When asking me about a "select" field, make sure I only pick a valid choice by showing me their labels! Don't forget to update the state as we go when you attach it to every message you send!<% } %>
 
 <% if (it.skill) { %>
 	
 Your primary objective for this conversation is <%= it.skill.yourJobIfYouChooseToAcceptItIs %>
-<% if (it.skill.weAreDoneWhen) { %>
-We are done when <%= it.skill.weAreDoneWhen %> At that point, send the message: ${DONE_TOKEN} so I know we have reached our primary objective.
+<% if (!it.stateSchemaJson && it.skill.weAreDoneWhen) { %>
+We are done when <%= it.skill.weAreDoneWhen %> At that point, send me the following message so I know we are done:
+
+${DONE_TOKEN}
 <% } %>
+<% } %>
+<% if (it.stateSchemaJson) { %>
+
+Once you have asked about every field in the schema, send me the following message:
+
+${DONE_TOKEN}
 <% } %>
 
 Let's get started:

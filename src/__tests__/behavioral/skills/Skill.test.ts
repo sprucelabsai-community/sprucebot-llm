@@ -19,7 +19,7 @@ export default class SkillTest extends AbstractLlmTest {
 		//@ts-ignore
 		const err = assert.doesThrow(() => this.bots.Skill())
 		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-			parameters: ['yourJobIfYouChooseToAcceptItIs', 'weAreDoneWhen'],
+			parameters: ['yourJobIfYouChooseToAcceptItIs'],
 		})
 	}
 

@@ -198,8 +198,48 @@ export default class LlmBotTest extends AbstractLlmTest {
 		assert.isEqual(response, this.parser.response.message)
 	}
 
+	@test()
+	protected static async enheritesStateSchemaFromSkillWhenSerializing() {
+		const skill = this.Skill({
+			stateSchema: personSchema,
+		})
+
+		this.bot = this.Bot({
+			skill,
+		})
+
+		const { stateSchema } = this.serialize()
+		assert.isEqualDeep(stateSchema, personSchema)
+	}
+
+	@test('inherits state from skill when serializing', {
+		favoriteColor: 'blue',
+	})
+	@test('inherits state from skill when serializing 2', {
+		firstName: generateId(),
+	})
+	protected static async inheritsStateFromSkillWhenSerializing(
+		skillState: Record<string, any>
+	) {
+		const skill = this.Skill({
+			stateSchema: personSchema,
+			state: skillState,
+		})
+
+		this.bot = this.Bot({
+			skill,
+		})
+
+		const { state } = this.bot.serialize()
+		assert.isEqualDeep(state, skillState)
+	}
+
 	private static async sendMessage(message: string) {
 		return await this.bot.sendMessage(message)
+	}
+
+	private static serialize() {
+		return this.bot.serialize()
 	}
 
 	private static async updateState(updates: Record<string, any>) {

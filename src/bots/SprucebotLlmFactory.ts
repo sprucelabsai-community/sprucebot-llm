@@ -21,7 +21,7 @@ export default class SprucebotLlmFactory {
 	}
 
 	public Skill(options: SkillOptions): SprucebotLLmSkill {
-		assertOptions(options, ['yourJobIfYouChooseToAcceptItIs', 'weAreDoneWhen'])
+		assertOptions(options, ['yourJobIfYouChooseToAcceptItIs'])
 		return new SprucebotLlmSkillImpl(options)
 	}
 

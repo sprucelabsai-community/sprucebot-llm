@@ -18,6 +18,8 @@ export class OpenAi implements LlmAdapter {
 		const generator = new PromptGenerator(bot)
 		const prompt = await generator.generate()
 
+		console.log(prompt)
+
 		const response = await this.api.createCompletion({
 			prompt,
 			model: 'text-davinci-003',

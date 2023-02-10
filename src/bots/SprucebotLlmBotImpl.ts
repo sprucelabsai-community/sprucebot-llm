@@ -55,12 +55,13 @@ export default class SprucebotLlmBotImpl<
 	}
 
 	public serialize(): SerializedBot<StateSchema, State> {
+		const skill = this.skill?.serialize()
 		return {
 			youAre: this.youAre,
-			stateSchema: this.stateSchema,
-			state: this.state,
+			stateSchema: this.stateSchema ?? skill?.stateSchema,
+			state: this.state ?? skill?.state,
 			messages: this.messages,
-			skill: this.skill?.serialize(),
+			skill,
 		}
 	}
 

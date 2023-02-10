@@ -66,7 +66,7 @@ export interface SkillOptions<
 	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
 > {
 	yourJobIfYouChooseToAcceptItIs: string
-	weAreDoneWhen: string
+	weAreDoneWhen?: string
 	pleaseKeepInMindThat?: string[]
 	stateSchema?: StateSchema
 	state?: Partial<State>
