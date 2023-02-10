@@ -72,6 +72,10 @@ export interface TemplateContext {
 	stateSchemaJson?: string
 	stateJson?: string
 }
+
+export const PROMPT_BOUNDARY = '||||||||||'
+export const DONE_TOKEN = `${PROMPT_BOUNDARY}DONE${PROMPT_BOUNDARY}`
+
 export const PROMPT_TEMPLATE = `You are <%= it.youAre %>
 
 For this interaction, every message I send will start with "__Me__:" and I'll prompt you for your message by starting with "__You__:". Whenever you answer, only answer after "__You__:" and stop before "__Me__:"
@@ -91,13 +95,13 @@ Here is the current state, which is based on the schema above:
 
 After each message, send the state in the form:
 
------- <%= it.stateJson %> ------<% } %>
+${PROMPT_BOUNDARY} <%= it.stateJson %> ${PROMPT_BOUNDARY}<% } %>
 
 <% if (it.skill) { %>
 	
 Your primary objective for this conversation is <%= it.skill.yourJobIfYouChooseToAcceptItIs %>
 <% if (it.skill.weAreDoneWhen) { %>
-We are done when <%= it.skill.weAreDoneWhen %> At that point, send the message: ||||| done ||||| so I know we have reached our primary objective.
+We are done when <%= it.skill.weAreDoneWhen %> At that point, send the message: ${DONE_TOKEN} so I know we have reached our primary objective.
 <% } %>
 <% } %>
 

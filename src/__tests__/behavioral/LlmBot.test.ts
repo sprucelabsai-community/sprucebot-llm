@@ -4,15 +4,20 @@ import { Car, carSchema } from '../support/schemas/carSchema'
 import { personSchema } from '../support/schemas/personSchema'
 import { personWithDefaultsSchema } from '../support/schemas/personWithDefaultsSchema'
 import { SpyBot } from '../support/SpyBot'
+import ResponseParser, { ParsedResponse } from './prompts/ResponseParser'
 
 export default class LlmBotTest extends AbstractLlmTest {
 	private static bot: SpyBot
+	private static parser: FakeResponseParser
 
 	protected static async beforeEach() {
 		await super.beforeEach()
 		this.bot = this.Bot({
 			stateSchema: personSchema,
 		})
+
+		this.parser = new FakeResponseParser()
+		ResponseParser.setInstance(this.parser)
 	}
 
 	@test()
@@ -151,6 +156,27 @@ export default class LlmBotTest extends AbstractLlmTest {
 		])
 	}
 
+	@test()
+	protected static async isDoneWhenParsesSaysSo() {
+		this.parser.response.isDone = true
+		await this.sendMessage(generateId())
+		assert.isTrue(this.bot.getIsDone())
+	}
+
+	@test()
+	protected static async notDoneUntilDone() {
+		this.parser.response.isDone = false
+		await this.sendMessage(generateId())
+		assert.isFalse(this.bot.getIsDone())
+	}
+
+	@test()
+	protected static async botActuallySendsResponseToParser() {
+		this.adapter.messageResponse = generateId()
+		await this.sendMessage(generateId())
+		assert.isEqual(this.parser.parsedMessage, this.adapter.messageResponse)
+	}
+
 	private static async sendMessage(message: string) {
 		return await this.bot.sendMessage(message)
 	}
@@ -161,5 +187,19 @@ export default class LlmBotTest extends AbstractLlmTest {
 
 	private static assertStateEquals(expected: Record<string, any>) {
 		assert.isEqualDeep(this.bot.serialize().state, expected)
+	}
+}
+
+class FakeResponseParser extends ResponseParser {
+	public response: ParsedResponse = {
+		isDone: false,
+		state: undefined,
+	}
+	public parsedMessage?: string
+	public parse(response: string): ParsedResponse {
+		this.parsedMessage = response
+		return {
+			...this.response,
+		}
 	}
 }

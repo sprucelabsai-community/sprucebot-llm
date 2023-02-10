@@ -1,7 +1,7 @@
 import { buildSchema, Schema, SchemaPartialValues } from '@sprucelabs/schema'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import SprucebotLlmSkillImpl from '../../../bots/SprucebotLlmSkillImpl'
-import { SkillOptions, SprucebotLLmSkill } from '../../../llm.types'
+import { SprucebotLLmSkill } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { personSchema } from '../../support/schemas/personSchema'
 

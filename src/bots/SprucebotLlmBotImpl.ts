@@ -5,6 +5,7 @@ import {
 	Schema,
 	SchemaValues,
 } from '@sprucelabs/schema'
+import ResponseParser from '../__tests__/behavioral/prompts/ResponseParser'
 import {
 	BotOptions,
 	LlmAdapter,
@@ -77,6 +78,11 @@ export default class SprucebotLlmBotImpl<
 			from: 'You',
 			message: response,
 		})
+
+		const parser = ResponseParser.getInstance()
+		const parsedResponse = parser.parse(response)
+
+		this.isDone = parsedResponse.isDone
 
 		return response
 	}
