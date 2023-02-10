@@ -4,7 +4,7 @@ A Typescript library for leveraging Large Langage Models (like GPT-3) to do... a
 * Has memory
     * Remembers past messages to build context
     * Configure how much of the conversation your bot should remember*
-* Manages state
+* [Manages state](#adding-state-to-your-conversation)
     * The state builds as the conversation continues
     * Invoke callbacks whenever state changes
 * Connect to 3rd party API's*
