@@ -6,7 +6,7 @@ A Typescript library for leveraging Large Langage Models (like GPT-3) to do... a
     * Configure how much of the conversation your bot should remember*
 * Manages state
     * The state builds as the conversation continues
-    * Invoke callbacks whenever state changes*
+    * Invoke callbacks whenever state changes
 * Connect to 3rd party API's*
     * Pull in data in real time
     * Have your bot respond generated responses
@@ -43,6 +43,7 @@ const rl = readline.createInterface({ input, output })
 
 ;(async () => {
 	console.clear()
+
 	const adapter = new OpenAi(process.env.OPEN_AI_API_KEY!)
 	const bots = SprucebotLlmFactory.Factory()
 
@@ -76,3 +77,48 @@ const rl = readline.createInterface({ input, output })
 
 
 ```
+
+### Adding state to your conversation
+This library depends on [`@sprucelabs/spruce-schema`](https://github.com/sprucelabsai/spruce-schema) to handle the structure and validation rules around your state.
+```ts
+const skill = bots.Skill({
+	yourJobIfYouChooseToAcceptItIs:
+		'to collect some information from me! You are a receptionist with 20 years experience and are very focused on getting answers needed to complete my profile',
+	stateSchema: buildSchema({
+		id: 'profile',
+		fields: {
+			firstName: {
+				type: 'text',
+				label: 'First name',
+			},
+			lastName: {
+				type: 'text',
+				label: 'Last name',
+			},
+			favoriteColor: {
+				type: 'select',
+				options: {
+					choices: [
+						{ label: 'Red', value: 'red' },
+						{ label: 'Blue', value: 'blue' },
+						{ label: 'Green', value: 'green' },
+					],
+				},
+			},
+		},
+	})
+
+```
+
+### Listening to state changes
+
+If you supply a `stateSchema` then your bot will work through it until the state is completely updated. While the conversation is taking place, if the state changes, the skill will emit `did-update-state`
+
+```ts
+await skill.on('did-update-state', () => {
+	console.log('we are making progress!')
+	console.log(JSON.stringif(this.skill.getState()))
+})
+
+```
+
