@@ -1,7 +1,7 @@
 import { buildSchema, Schema, SchemaPartialValues } from '@sprucelabs/schema'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import SprucebotLlmSkillImpl from '../../../bots/SprucebotLlmSkillImpl'
-import { SprucebotLLmSkill } from '../../../llm.types'
+import { LlmCallbackMap, SprucebotLLmSkill } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { personSchema } from '../../support/schemas/personSchema'
 
@@ -40,9 +40,13 @@ export default class SkillTest extends AbstractLlmTest {
 
 		this.skill = this.Skill(options)
 
-		const serialized = this.skill.serialize()
+		const serialized = this.serialize()
 
 		assert.isEqualDeep(serialized, options)
+	}
+
+	private static serialize() {
+		return this.skill.serialize()
 	}
 
 	@test()
@@ -135,6 +139,22 @@ export default class SkillTest extends AbstractLlmTest {
 		this.assertStateEquals({
 			age: 21,
 		})
+	}
+
+	@test()
+	protected static async passesPlaceholdersThroughToSerializedSkill() {
+		const callbacks: LlmCallbackMap = {
+			favoriteColorOptions: {
+				cb: () => 'Taco, Burrito, Cheezy Crunch',
+				useThisWhenever: 'you are asking for a persons favorite color',
+			},
+		}
+
+		this.skill = this.Skill({
+			callbacks,
+		})
+
+		assert.isEqualDeep(this.serialize().callbacks, callbacks)
 	}
 
 	private static assertStateEquals(expected: SchemaPartialValues<Schema>) {

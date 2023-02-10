@@ -70,6 +70,7 @@ export interface SkillOptions<
 	pleaseKeepInMindThat?: string[]
 	stateSchema?: StateSchema
 	state?: Partial<State>
+	callbacks?: LlmCallbackMap
 }
 
 export interface SprucebotLLmSkill<
@@ -85,3 +86,12 @@ export interface SerializedSkill<
 	StateSchema extends Schema = Schema,
 	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
 > extends SkillOptions<StateSchema, State> {}
+
+export interface LlmCallbackMap {
+	[key: string]: LlmCallback
+}
+
+export interface LlmCallback {
+	cb: () => string | Promise<string>
+	useThisWhenever: string
+}

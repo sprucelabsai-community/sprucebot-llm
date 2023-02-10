@@ -1,4 +1,5 @@
 import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/PromptGenerator'
+import { LlmCallbackMap } from '../../../llm.types'
 
 export default class ResponseParser {
 	private static instance: ResponseParser = new ResponseParser()
@@ -11,9 +12,18 @@ export default class ResponseParser {
 		return this.instance
 	}
 
-	public parse(response: string): ParsedResponse {
+	public async parse(
+		response: string,
+		callbacks?: LlmCallbackMap
+	): Promise<ParsedResponse> {
 		let message = response.replace(DONE_TOKEN, '').trim()
 		let state: Record<string, any> | undefined
+
+		for (const key of Object.keys(callbacks || {})) {
+			if (message.includes(key)) {
+				await callbacks?.[key]?.cb()
+			}
+		}
 
 		const { match, fullMatch } = this.parseState(message)
 

@@ -354,7 +354,7 @@ class FakeResponseParser extends ResponseParser {
 		state: undefined,
 	}
 	public lastMessage?: string
-	public parse(message: string): ParsedResponse {
+	public async parse(message: string): Promise<ParsedResponse> {
 		this.lastMessage = message
 		return {
 			message,

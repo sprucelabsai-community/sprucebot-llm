@@ -1,5 +1,10 @@
-import { test, assert } from '@sprucelabs/test-utils'
-import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/PromptGenerator'
+import { test, assert, generateId } from '@sprucelabs/test-utils'
+import {
+	CALLBACK_BOUNDARY,
+	DONE_TOKEN,
+	STATE_BOUNDARY,
+} from '../../../bots/PromptGenerator'
+import { LlmCallbackMap } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import ResponseParser, { ParsedResponse } from './ResponseParser'
 
@@ -64,6 +69,53 @@ export default class ResponseParserTest extends AbstractLlmTest {
 		})
 	}
 
+	@test('can handle single callback 1', 'favoriteColors')
+	@test('can handle single callback 2', 'tacoBravo')
+	protected static async callsCallbacksWhenPlaceholdersFoundInResponse(
+		key: string
+	) {
+		let wasHit = false
+
+		await this.parse(renderPlaceholder(key), {
+			[key]: {
+				cb: () => {
+					wasHit = true
+					return ''
+				},
+				useThisWhenever: 'you are asking for my favorite color.',
+			},
+		})
+
+		assert.isTrue(wasHit)
+	}
+
+	@test()
+	protected static async canCallSecondPlacehloder() {
+		let wasHit = false
+
+		await this.parse(renderPlaceholder('taco'), {
+			favoriteColors: {
+				cb: () => {
+					return ''
+				},
+				useThisWhenever: generateId(),
+			},
+			taco: {
+				cb: () => {
+					wasHit = true
+					return ''
+				},
+				useThisWhenever: generateId(),
+			},
+		})
+
+		assert.isTrue(wasHit)
+	}
+
+	private static async parse(message: string, callbacks?: LlmCallbackMap) {
+		return await this.parser.parse(message, callbacks)
+	}
+
 	private static generateStateSchema(input: Record<string, any>) {
 		return `${STATE_BOUNDARY} ${JSON.stringify(input)} ${STATE_BOUNDARY}`
 	}
@@ -84,11 +136,18 @@ export default class ResponseParserTest extends AbstractLlmTest {
 		})
 	}
 
-	private static parsingEquals(message: string, expected: ParsedResponse) {
-		const results = this.parser.parse(message)
+	private static async parsingEquals(
+		message: string,
+		expected: ParsedResponse
+	) {
+		const results = await this.parse(message)
 		assert.isEqualDeep(results, expected)
 	}
 }
+function renderPlaceholder(key: string): string {
+	return `${CALLBACK_BOUNDARY} ${key} ${CALLBACK_BOUNDARY}`
+}
+
 function removeTokens(message: string): string {
 	return message.replace(DONE_TOKEN, '').trim()
 }
