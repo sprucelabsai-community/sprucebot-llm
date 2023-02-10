@@ -1,4 +1,5 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import { SkillOptions } from '../../llm.types'
 import AbstractLlmTest from '../support/AbstractLlmTest'
 import { Car, carSchema } from '../support/schemas/carSchema'
 import { personSchema } from '../support/schemas/personSchema'
@@ -69,7 +70,7 @@ export default class LlmBotTest extends AbstractLlmTest {
 
 		await this.updateState(newState)
 
-		this.assertStateEquals(newState)
+		this.assertSerializedStateEquals(newState)
 	}
 
 	@test()
@@ -94,7 +95,7 @@ export default class LlmBotTest extends AbstractLlmTest {
 			...newState,
 		}
 
-		this.assertStateEquals(expected)
+		this.assertSerializedStateEquals(expected)
 	}
 
 	@test()
@@ -103,7 +104,7 @@ export default class LlmBotTest extends AbstractLlmTest {
 			stateSchema: personWithDefaultsSchema,
 		})
 
-		this.assertStateEquals({
+		this.assertSerializedStateEquals({
 			firstName: 'John',
 			lastName: 'Doe',
 		})
@@ -200,12 +201,8 @@ export default class LlmBotTest extends AbstractLlmTest {
 
 	@test()
 	protected static async enheritesStateSchemaFromSkillWhenSerializing() {
-		const skill = this.Skill({
+		this.setupBotWithSkill({
 			stateSchema: personSchema,
-		})
-
-		this.bot = this.Bot({
-			skill,
 		})
 
 		const { stateSchema } = this.serialize()
@@ -221,17 +218,117 @@ export default class LlmBotTest extends AbstractLlmTest {
 	protected static async inheritsStateFromSkillWhenSerializing(
 		skillState: Record<string, any>
 	) {
-		const skill = this.Skill({
+		this.setupBotWithSkill({
 			stateSchema: personSchema,
 			state: skillState,
 		})
+
+		const { state } = this.bot.serialize()
+		assert.isEqualDeep(state, skillState)
+	}
+
+	private static setupBotWithSkill(options: Partial<SkillOptions>) {
+		const skill = this.Skill(options)
 
 		this.bot = this.Bot({
 			skill,
 		})
 
-		const { state } = this.bot.serialize()
-		assert.isEqualDeep(state, skillState)
+		return skill
+	}
+
+	@test('inherits state from bot when parsing response', {
+		favoriteColor: 'red',
+	})
+	@test('inherits state from bot when parsing response 2', {
+		firstName: generateId(),
+	})
+	protected static async stateIsSentBackToBotWhenParsing(
+		state: Record<string, any>
+	) {
+		this.bot = this.Bot({
+			stateSchema: personSchema,
+		})
+
+		await this.sendMessageWithResponseState(state)
+
+		this.assertSerializedStateEquals(state)
+	}
+
+	@test()
+	protected static async emitsDidUpdateStateWhenStateIsUpdated() {
+		this.bot = this.Bot({
+			stateSchema: personSchema,
+		})
+
+		let wasHit = false
+		await this.bot.on('did-update-state', () => {
+			wasHit = true
+		})
+
+		await this.sendMessageWithResponseState({
+			favoriteColor: 'blue',
+		})
+
+		assert.isTrue(wasHit)
+	}
+
+	@test()
+	protected static async shouldNotEmitUpdateItNoStatePassed() {
+		let wasHit = false
+		await this.bot.on('did-update-state', () => {
+			wasHit = true
+		})
+
+		await this.sendRandomMessage()
+		assert.isFalse(wasHit)
+	}
+
+	@test('sets state in response to skill if skill has state 1', {
+		favoriteColor: 'blue',
+	})
+	@test('sets state in response to skill if skill has state 2', {
+		firstName: generateId(),
+	})
+	protected static async setsStateInResponseToSkillIfSkillHasState(
+		state: Record<string, any>
+	) {
+		const skill = this.setupBotWithSkill({
+			stateSchema: personSchema,
+		})
+
+		await this.sendMessageWithResponseState(state)
+		assert.isEqualDeep(skill.serialize().state, state)
+		assert.isUndefined(this.bot.getState())
+	}
+
+	@test()
+	protected static async doesntEmitDidChangeOnSkillIfStateIsNotOnSkill() {
+		const skill = this.setupBotWithSkill({})
+
+		let wasHit = false
+		await skill.on('did-update-state', () => {
+			wasHit = true
+		})
+
+		await this.sendRandomMessage()
+
+		assert.isFalse(wasHit)
+	}
+
+	private static async sendMessageWithResponseState(
+		state: Record<string, any>
+	) {
+		this.setStateInResponse(state)
+		await this.sendRandomMessage()
+	}
+
+	private static async sendRandomMessage() {
+		await this.sendMessage(generateId())
+	}
+
+	private static setStateInResponse(state: Record<string, any>) {
+		this.parser.response.state = state
 	}
 
 	private static async sendMessage(message: string) {
@@ -246,7 +343,7 @@ export default class LlmBotTest extends AbstractLlmTest {
 		await this.bot.updateState(updates)
 	}
 
-	private static assertStateEquals(expected: Record<string, any>) {
+	private static assertSerializedStateEquals(expected?: Record<string, any>) {
 		assert.isEqualDeep(this.bot.serialize().state, expected)
 	}
 }

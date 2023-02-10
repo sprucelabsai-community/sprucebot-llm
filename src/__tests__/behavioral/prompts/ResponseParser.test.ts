@@ -1,5 +1,5 @@
 import { test, assert } from '@sprucelabs/test-utils'
-import { DONE_TOKEN } from '../../../bots/PromptGenerator'
+import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/PromptGenerator'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import ResponseParser, { ParsedResponse } from './ResponseParser'
 
@@ -7,7 +7,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
 	private static parser: ResponseParser
 	protected static async beforeEach() {
 		await super.beforeEach()
-		this.parser = new ResponseParser()
+		this.parser = ResponseParser.getInstance()
 	}
 
 	@test()
@@ -34,6 +34,38 @@ export default class ResponseParserTest extends AbstractLlmTest {
 		assert.isInstanceOf(instance, ResponseParser)
 		const instance2 = ResponseParser.getInstance()
 		assert.isEqual(instance, instance2)
+	}
+
+	@test('parses state 1', {
+		hello: 'world',
+	})
+	@test('parses state 2', {
+		what: 'the??',
+	})
+	protected static async parsesStateWithNothingElse(
+		input: Record<string, any>
+	) {
+		const state = this.generateStateSchema(input)
+		this.parsingEquals(state, {
+			isDone: false,
+			state: input,
+			message: '',
+		})
+	}
+
+	@test()
+	protected static async removesStateFromResponse() {
+		const state = this.generateStateSchema({ hello: 'world' })
+		const message = `hello ${state} world`
+		this.parsingEquals(message, {
+			isDone: false,
+			state: { hello: 'world' },
+			message: 'hello  world',
+		})
+	}
+
+	private static generateStateSchema(input: Record<string, any>) {
+		return `${STATE_BOUNDARY} ${JSON.stringify(input)} ${STATE_BOUNDARY}`
 	}
 
 	private static assertDone(message: string) {

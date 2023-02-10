@@ -27,7 +27,7 @@ export default class SprucebotLlmBotImpl<
 	private adapter: LlmAdapter
 	private youAre: string
 	private stateSchema?: StateSchema
-	private state?: Partial<State>
+	protected state?: Partial<State>
 	private isDone = false
 	protected messages: LlmMessage[] = []
 	private skill?: SprucebotLLmSkill
@@ -76,9 +76,15 @@ export default class SprucebotLlmBotImpl<
 		const response = await this.adapter.sendMessage(this)
 
 		const parser = ResponseParser.getInstance()
-		const { isDone, message: parsedResponse } = parser.parse(response)
+		const { isDone, message: parsedResponse, state } = parser.parse(response)
 
 		this.isDone = isDone
+
+		if (this.stateSchema && state) {
+			await this.updateState(state as Partial<State>)
+		} else if (state) {
+			await this.skill?.updateState(state)
+		}
 
 		this.messages.push({
 			from: 'You',

@@ -73,7 +73,7 @@ export interface TemplateContext {
 	stateJson?: string
 }
 
-export const PROMPT_BOUNDARY = '*****'
+export const STATE_BOUNDARY = '*****'
 export const DONE_TOKEN = `____ DONE ____`
 
 export const PROMPT_TEMPLATE = `You are <%= it.youAre %>
@@ -98,7 +98,7 @@ Here is the current state, which is based on the schema above:
 
 After each message, send the state in the form:
 
-${PROMPT_BOUNDARY} <%= it.stateJson %> ${PROMPT_BOUNDARY}
+${STATE_BOUNDARY} <%= it.stateJson %> ${STATE_BOUNDARY}
 
 When asking me about a "select" field, make sure I only pick a valid choice by showing me their labels! Don't forget to update the state as we go when you attach it to every message you send!<% } %>
 
