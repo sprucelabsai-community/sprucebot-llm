@@ -51,6 +51,7 @@ export default class LlmBotTest extends AbstractLlmTest {
 			stateSchema: personSchema,
 			state,
 			messages: [],
+			skill: undefined,
 		})
 	}
 

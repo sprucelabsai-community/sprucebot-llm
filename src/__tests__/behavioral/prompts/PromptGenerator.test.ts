@@ -1,12 +1,12 @@
 import { normalizeSchemaValues, Schema, SchemaValues } from '@sprucelabs/schema'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import * as Eta from 'eta'
-import { BotOptions, LlmMessage } from '../../../llm.types'
 import PromptGenerator, {
 	setUndefinedToNull,
 	TemplateContext,
 	PROMPT_TEMPLATE,
-} from '../../../PromptGenerator'
+} from '../../../bots/PromptGenerator'
+import { BotOptions, LlmMessage } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { personSchema } from '../../support/schemas/personSchema'
 import { SpyBot } from '../../support/SpyBot'
@@ -97,9 +97,31 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 			messages,
 		})
 
-		const actual = await this.prompt.generate()
+		const actual = await this.generate()
 
 		assert.isEqual(actual, expected)
+	}
+
+	@test()
+	protected static async writeFullPromptToLogForReading() {
+		const skill = this.Skill({
+			yourJobIfYouChooseToAcceptItIs:
+				'to tell the best knock knock jokes you can think of! ',
+			pleaseKeepInMindThat: [
+				'our audience is PG, so keep it light and friendly!',
+				'You should never laugh at someone who does not get the joke.',
+			],
+			weAreDoneWhen: 'you have told 3 jokes!',
+		})
+
+		this.bot = this.Bot({
+			youAre:
+				'A bot that is always in a good mood. You love complementing people and making sure they are happy!',
+			skill,
+		})
+
+		this.reloadGenerator()
+		this.log(await this.generate())
 	}
 
 	private static async renderMessage(context: Partial<TemplateContext>) {
@@ -146,13 +168,15 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 		assert.isEqual(prompt, expected)
 	}
 
-	private static async generate(message: string) {
-		this.bot.setMessages([
-			{
-				from: 'Me',
-				message,
-			},
-		])
+	private static async generate(message?: string) {
+		if (message) {
+			this.bot.setMessages([
+				{
+					from: 'Me',
+					message,
+				},
+			])
+		}
 		return await this.prompt.generate()
 	}
 

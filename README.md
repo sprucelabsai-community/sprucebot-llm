@@ -10,9 +10,9 @@ A Typescript library for leveraging Large Langage Models (like GPT-3) to do... a
 * Connect to 3rd party API's*
     * Pull in data in real time
     * Have your bot respond generated responses
-* Unlimited use cases*
+* Unlimited use cases
     * Skill architecture for extensibility
-    * Tune Skills to do any job
+    * Leverage Skills to get your bot to complete any task!
 * Adapter Interface to create your own adapters
     * Only support GPT-3 for now (more adapters based on demand)
 * Fully typed
@@ -43,19 +43,21 @@ dotenv.config()
 const adapter = new OpenAi(process.env.OPEN_AI_API_KEY)
 const bots = SprucebotLlmFactory.Factory()
 
-const skill = SprucebotLlmFactory.Skill({
-    yourJobIfYouChooseToAcceptItIs: 'to tell me funny knock knock jokes.',
+const skill = bots.Skill({
+    yourJobIfYouChooseToAcceptItIs: 'to tell knock knock jokes!',
     pleaseKeepInMindThat: [
-        `you are never supposed to laugh when someone does't get your jokes.`,
-        `the audience for this can be anyone, so keep it PG.`
+        'our audience is younger, so keep it PG!',
+        'you should never laugh when someone does not get the joke.',
+        "after each joke, you should tell me how many jokes you have left to tell before we're done.",
     ],
-    weAreDoneWhen: `I say I don't want to hear anymore jokes.`
+    weAreDoneWhen: 'you have told 3 jokes!',
 })
 
 const bot = bots.Bot({
     adapter,
-    youAre: `a bot named Sprucebot. You are in test mode, so don't forget to let me know while we're chatting!`,
     skill,
+    youAre:
+        "a bot named Sprucebot that is in test mode. At the start of every conversation, you introduce yourself and announce that you are in test mode so I don't get confused! You are young, hip, and adorable. You say things like, 'Jeepers' and 'Golly' because you are so cute!",
 })
 
 do {

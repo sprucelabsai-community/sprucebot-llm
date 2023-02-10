@@ -1,7 +1,7 @@
 import { Schema } from '@sprucelabs/schema'
-import AbstractSpruceTest from '@sprucelabs/test-utils'
+import AbstractSpruceTest, { generateId } from '@sprucelabs/test-utils'
 import SprucebotLlmFactory from '../../bots/SprucebotLlmFactory'
-import { BotOptions } from '../../llm.types'
+import { BotOptions, SkillOptions } from '../../llm.types'
 import SpyAdapter from './SpyAdapter'
 import { SpyBot } from './SpyBot'
 
@@ -24,5 +24,13 @@ export default abstract class AbstractLlmTest extends AbstractSpruceTest {
 			Class: SpyBot,
 			...options,
 		}) as SpyBot
+	}
+
+	protected static Skill(options?: Partial<SkillOptions>) {
+		return this.bots.Skill({
+			weAreDoneWhen: generateId(),
+			yourJobIfYouChooseToAcceptItIs: generateId(),
+			...options,
+		})
 	}
 }

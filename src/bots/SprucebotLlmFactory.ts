@@ -1,7 +1,13 @@
 import { assertOptions } from '@sprucelabs/schema'
 import SpruceError from '../errors/SpruceError'
-import { BotOptions, SprucebotLlmBot } from '../llm.types'
+import {
+	BotOptions,
+	SkillOptions,
+	SprucebotLlmBot,
+	SprucebotLLmSkill,
+} from '../llm.types'
 import SprucebotLlmBotImpl from './SprucebotLlmBotImpl'
+import SprucebotLlmSkillImpl from './SprucebotLlmSkillImpl'
 
 export default class SprucebotLlmFactory {
 	private instance?: SprucebotLlmBot
@@ -14,7 +20,12 @@ export default class SprucebotLlmFactory {
 		return Class ? new Class(options) : new SprucebotLlmBotImpl(options)
 	}
 
-	public getInstance() {
+	public Skill(options: SkillOptions): SprucebotLLmSkill {
+		assertOptions(options, ['yourJobIfYouChooseToAcceptItIs', 'weAreDoneWhen'])
+		return new SprucebotLlmSkillImpl(options)
+	}
+
+	public getBotInstance() {
 		if (!this.instance) {
 			throw new SpruceError({
 				code: 'NO_BOT_INSTANCE_SET',
@@ -23,7 +34,7 @@ export default class SprucebotLlmFactory {
 		return this.instance
 	}
 
-	public setInstance(bot: SprucebotLlmBot) {
+	public setBotInstance(bot: SprucebotLlmBot) {
 		this.instance = bot
 	}
 

@@ -5,7 +5,7 @@ import {
 	OpenAi,
 } from '../../../bots/adapters/OpenAi'
 import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
-import PromptGenerator from '../../../PromptGenerator'
+import PromptGenerator from '../../../bots/PromptGenerator'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { SpyBot } from '../../support/SpyBot'
 import SpyConfiguration from '../../support/SpyConfiguration'

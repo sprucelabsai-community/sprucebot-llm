@@ -8,18 +8,19 @@ import {
 import {
 	BotOptions,
 	LlmAdapter,
-	llmBotContract,
-	LlmBotContract,
+	llmEventContract,
+	LlmEventContract,
 	LlmMessage,
 	SerializedBot,
 	SprucebotLlmBot,
+	SprucebotLLmSkill,
 } from '../llm.types'
 
 export default class SprucebotLlmBotImpl<
 		StateSchema extends Schema = Schema,
 		State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
 	>
-	extends AbstractEventEmitter<LlmBotContract>
+	extends AbstractEventEmitter<LlmEventContract>
 	implements SprucebotLlmBot<StateSchema, State>
 {
 	private adapter: LlmAdapter
@@ -28,15 +29,17 @@ export default class SprucebotLlmBotImpl<
 	private state?: Partial<State>
 	private isDone = false
 	protected messages: LlmMessage[] = []
+	private skill?: SprucebotLLmSkill
 
 	public constructor(options: BotOptions<StateSchema, State>) {
-		const { adapter, youAre, stateSchema, state } = options
+		const { adapter, youAre, stateSchema, state, skill } = options
 
-		super(llmBotContract)
+		super(llmEventContract)
 
 		this.adapter = adapter
 		this.youAre = youAre
 		this.stateSchema = stateSchema
+		this.skill = skill
 		this.state = stateSchema
 			? ({ ...defaultSchemaValues(stateSchema), ...state } as Partial<State>)
 			: undefined
@@ -56,6 +59,7 @@ export default class SprucebotLlmBotImpl<
 			stateSchema: this.stateSchema,
 			state: this.state,
 			messages: this.messages,
+			skill: this.skill?.serialize(),
 		}
 	}
 

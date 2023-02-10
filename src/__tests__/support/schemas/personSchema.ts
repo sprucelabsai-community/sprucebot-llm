@@ -1,4 +1,4 @@
-import { buildSchema } from '@sprucelabs/schema';
+import { buildSchema } from '@sprucelabs/schema'
 
 export const personSchema = buildSchema({
 	id: 'person',
@@ -31,4 +31,6 @@ export const personSchema = buildSchema({
 			},
 		},
 	},
-});
+})
+
+export type PersonSchema = typeof personSchema

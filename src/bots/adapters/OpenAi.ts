@@ -1,7 +1,7 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { Configuration, OpenAIApi } from 'openai'
 import { LlmAdapter, SprucebotLlmBot } from '../../llm.types'
-import PromptGenerator from '../../PromptGenerator'
+import PromptGenerator from '../PromptGenerator'
 
 export class OpenAi implements LlmAdapter {
 	public static Configuration = Configuration
@@ -22,6 +22,7 @@ export class OpenAi implements LlmAdapter {
 			prompt,
 			model: 'text-davinci-003',
 			max_tokens: 100,
+			stop: ['__Me__:'],
 		})
 
 		return (

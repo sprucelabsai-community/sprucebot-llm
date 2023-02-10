@@ -27,25 +27,25 @@ export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
 
 	@test()
 	protected static cantGetInstanceUntilOneIsSet() {
-		const err = assert.doesThrow(() => this.bots.getInstance())
+		const err = assert.doesThrow(() => this.bots.getBotInstance())
 		errorAssert.assertError(err, 'NO_BOT_INSTANCE_SET')
 	}
 
 	@test()
 	protected static async canGetBotInstance() {
 		this.setInstance()
-		this.bots.getInstance()
+		this.bots.getBotInstance()
 	}
 
 	@test()
 	protected static getInstanceReturnsBot() {
 		const bot = this.setInstance()
-		assert.isEqual(this.bots.getInstance(), bot)
+		assert.isEqual(this.bots.getBotInstance(), bot)
 	}
 
 	private static setInstance() {
 		const bot = this.Bot()
-		this.bots.setInstance(bot)
+		this.bots.setBotInstance(bot)
 		return bot
 	}
 

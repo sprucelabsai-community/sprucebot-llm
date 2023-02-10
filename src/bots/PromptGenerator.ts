@@ -4,7 +4,7 @@ import {
 	Schema,
 } from '@sprucelabs/schema'
 import * as Eta from 'eta'
-import { LlmMessage, SprucebotLlmBot } from './llm.types'
+import { LlmMessage, SprucebotLlmBot } from '../llm.types'
 
 export default class PromptGenerator {
 	private bot: SprucebotLlmBot
@@ -15,7 +15,7 @@ export default class PromptGenerator {
 	}
 
 	public async generate() {
-		const { youAre, stateSchema, state, messages } = this.bot.serialize()
+		const { stateSchema, state, ...rest } = this.bot.serialize()
 		const { stateSchemaJson, stateJson } = this.stringifyState(
 			stateSchema,
 			state
@@ -24,10 +24,9 @@ export default class PromptGenerator {
 		return await this.eta.render(
 			PROMPT_TEMPLATE,
 			{
-				youAre,
-				messages: [...messages],
 				stateSchemaJson,
 				stateJson,
+				...rest,
 			},
 			{
 				async: true,
@@ -75,10 +74,12 @@ export interface TemplateContext {
 }
 export const PROMPT_TEMPLATE = `You are <%= it.youAre %>
 
-For this interaction, every message I send will start with "Me:" and I'll prompt you for your message by starting with "You:". You can only respond as you, never as me.<% if (it.stateSchemaJson) { %>
+For this interaction, every message I send will start with "__Me__:" and I'll prompt you for your message by starting with "__You__:". Whenever you answer, only answer after "__You__:" and stop before "__Me__:"
+
+<% if (it.stateSchemaJson) { %>
 
 
-Here is the schema for the state we're going to use for this interaction:
+Here is the schema that defines the state for this conversation:
 
 <%= it.stateSchemaJson %>
 
@@ -92,11 +93,18 @@ After each message, send the state in the form:
 
 ------ <%= it.stateJson %> ------<% } %>
 
+<% if (it.skill) { %>
+	
+Your primary objective for this conversation is <%= it.skill.yourJobIfYouChooseToAcceptItIs %>
+<% if (it.skill.weAreDoneWhen) { %>
+We are done when <%= it.skill.weAreDoneWhen %> At that point, send the message: ||||| done ||||| so I know we have reached our primary objective.
+<% } %>
+<% } %>
 
 Let's get started:
 
 <% it.messages.forEach((message) => { %>
-<%= message.from %>: <%= message.message %>
+__<%= message.from %>__: <%= message.message %>
 
 <% }) %>
-You:`
+__You__:`

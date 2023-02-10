@@ -62,7 +62,7 @@
 			"runtimeArgs": [
 				"--inspect-brk",
 				"--trace-warnings",
-				"${workspaceFolder}/build/cli.js",
+				"${workspaceFolder}/build/chat.js",
 			],
 			"cwd": "${workspaceFolder}",
 			"console": "integratedTerminal",

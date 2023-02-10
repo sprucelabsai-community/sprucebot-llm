@@ -4,22 +4,19 @@ import {
 } from '@sprucelabs/mercury-types'
 import { Schema, SchemaValues } from '@sprucelabs/schema'
 
-interface SprucebotLlmSkills {}
-
-export type SprucebotLlmSkillName = keyof SprucebotLlmSkills
-
 export interface BotOptions<
 	StateSchema extends Schema = Schema,
 	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
-> extends PromptOptions<StateSchema, State> {
+> extends Omit<PromptOptions<StateSchema, State>, 'skill'> {
 	adapter: LlmAdapter
 	Class?: new (...opts: any[]) => SprucebotLlmBot<Schema, State>
+	skill?: SprucebotLLmSkill<Schema>
 }
 
 export interface SprucebotLlmBot<
 	StateSchema extends Schema = Schema,
 	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
-> extends MercuryEventEmitter<LlmBotContract> {
+> extends MercuryEventEmitter<LlmEventContract> {
 	markAsDone(): void
 	getIsDone(): boolean
 	sendMessage(message: string): Promise<string>
@@ -41,6 +38,7 @@ export interface PromptOptions<
 	youAre: string
 	stateSchema?: StateSchema
 	state?: Partial<State>
+	skill?: SerializedSkill<Schema>
 }
 
 export interface SerializedBot<
@@ -50,15 +48,40 @@ export interface SerializedBot<
 	messages: LlmMessage[]
 }
 
-export const llmBotContract = buildEventContract({
+export const llmEventContract = buildEventContract({
 	eventSignatures: {
 		'did-update-state': {},
 	},
 })
 
-export type LlmBotContract = typeof llmBotContract
+export type LlmEventContract = typeof llmEventContract
 
 export interface LlmMessage {
 	from: 'Me' | 'You'
 	message: string
 }
+
+export interface SkillOptions<
+	StateSchema extends Schema = Schema,
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+> {
+	yourJobIfYouChooseToAcceptItIs: string
+	weAreDoneWhen: string
+	pleaseKeepInMindThat?: string[]
+	stateSchema?: StateSchema
+	state?: Partial<State>
+}
+
+export interface SprucebotLLmSkill<
+	StateSchema extends Schema = Schema,
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+> extends MercuryEventEmitter<LlmEventContract> {
+	getState(): Partial<State> | undefined
+	serialize(): SerializedSkill<StateSchema, State>
+	updateState(state: Partial<State>): Promise<void>
+}
+
+export interface SerializedSkill<
+	StateSchema extends Schema = Schema,
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+> extends SkillOptions<StateSchema, State> {}
