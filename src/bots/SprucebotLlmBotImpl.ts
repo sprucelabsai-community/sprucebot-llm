@@ -74,17 +74,17 @@ export default class SprucebotLlmBotImpl<
 
 		const response = await this.adapter.sendMessage(this)
 
+		const parser = ResponseParser.getInstance()
+		const { isDone, message: parsedResponse } = parser.parse(response)
+
+		this.isDone = isDone
+
 		this.messages.push({
 			from: 'You',
-			message: response,
+			message: parsedResponse,
 		})
 
-		const parser = ResponseParser.getInstance()
-		const parsedResponse = parser.parse(response)
-
-		this.isDone = parsedResponse.isDone
-
-		return response
+		return parsedResponse
 	}
 
 	public async updateState(newState: Partial<State>): Promise<void> {

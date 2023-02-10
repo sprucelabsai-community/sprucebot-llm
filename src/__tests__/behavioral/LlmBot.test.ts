@@ -174,7 +174,28 @@ export default class LlmBotTest extends AbstractLlmTest {
 	protected static async botActuallySendsResponseToParser() {
 		this.adapter.messageResponse = generateId()
 		await this.sendMessage(generateId())
-		assert.isEqual(this.parser.parsedMessage, this.adapter.messageResponse)
+		assert.isEqual(this.parser.lastMessage, this.adapter.messageResponse)
+	}
+
+	@test()
+	protected static async tracksTheResponseWithTokensRemoved() {
+		this.parser.response.message = generateId()
+
+		const message = generateId()
+		const response = await this.sendMessage(message)
+
+		assert.isEqualDeep(this.bot.getMessages(), [
+			{
+				from: 'Me',
+				message,
+			},
+			{
+				from: 'You',
+				message: this.parser.response.message,
+			},
+		])
+
+		assert.isEqual(response, this.parser.response.message)
 	}
 
 	private static async sendMessage(message: string) {
@@ -191,14 +212,16 @@ export default class LlmBotTest extends AbstractLlmTest {
 }
 
 class FakeResponseParser extends ResponseParser {
-	public response: ParsedResponse = {
+	public response: Partial<ParsedResponse> = {
 		isDone: false,
 		state: undefined,
 	}
-	public parsedMessage?: string
-	public parse(response: string): ParsedResponse {
-		this.parsedMessage = response
+	public lastMessage?: string
+	public parse(message: string): ParsedResponse {
+		this.lastMessage = message
 		return {
+			message,
+			isDone: false,
 			...this.response,
 		}
 	}

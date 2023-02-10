@@ -15,10 +15,12 @@ export default class ResponseParser {
 		return {
 			isDone: response.includes(DONE_TOKEN),
 			state: undefined,
+			message: response.replace(DONE_TOKEN, '').trim(),
 		}
 	}
 }
 export interface ParsedResponse {
 	isDone: boolean
 	state?: Record<string, any>
+	message: string
 }

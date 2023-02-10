@@ -6,7 +6,7 @@ export class SpyBot extends SprucebotLlmBotImpl implements SprucebotLlmBot {
 		this.messages = messages
 	}
 
-	public async getMessages() {
+	public getMessages() {
 		return this.messages
 	}
 }

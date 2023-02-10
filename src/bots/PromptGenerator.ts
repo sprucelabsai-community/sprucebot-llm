@@ -73,10 +73,11 @@ export interface TemplateContext {
 	stateJson?: string
 }
 
-export const PROMPT_BOUNDARY = '||||||||||'
+export const PROMPT_BOUNDARY = '*****'
 export const DONE_TOKEN = `${PROMPT_BOUNDARY}DONE${PROMPT_BOUNDARY}`
 
 export const PROMPT_TEMPLATE = `You are <%= it.youAre %>
+
 
 For this interaction, every message I send will start with "__Me__:" and I'll prompt you for your message by starting with "__You__:". Whenever you answer, only answer after "__You__:" and stop before "__Me__:"
 

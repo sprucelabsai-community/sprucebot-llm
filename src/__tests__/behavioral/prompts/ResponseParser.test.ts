@@ -40,6 +40,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
 		this.parsingEquals(message, {
 			isDone: true,
 			state: undefined,
+			message: removeTokens(message),
 		})
 	}
 
@@ -47,6 +48,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
 		this.parsingEquals(message, {
 			isDone: false,
 			state: undefined,
+			message: removeTokens(message),
 		})
 	}
 
@@ -54,4 +56,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
 		const results = this.parser.parse(message)
 		assert.isEqualDeep(results, expected)
 	}
+}
+function removeTokens(message: string): string {
+	return message.replace(DONE_TOKEN, '').trim()
 }
