@@ -25,13 +25,13 @@ export default class ResponseParserTest extends AbstractLlmTest {
 
 	@test()
 	protected static async emptyReturnedIfResponseHasNoPlaceholders() {
-		this.assertNotDone('hello world')
-		this.assertNotDone('DONE')
+		await this.assertNotDone('hello world')
+		await this.assertNotDone('DONE')
 	}
 
 	@test()
 	protected static async knowsWhenDone() {
-		this.assertDone(`hey there!!! ${DONE_TOKEN}`)
+		await this.assertDone(`hey there!!! ${DONE_TOKEN}`)
 	}
 
 	@test()
@@ -52,7 +52,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
 		input: Record<string, any>
 	) {
 		const state = this.generateStateSchema(input)
-		this.parsingEquals(state, {
+		await this.parsingEquals(state, {
 			isDone: false,
 			state: input,
 			message: '',
@@ -63,7 +63,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
 	protected static async removesStateFromResponse() {
 		const state = this.generateStateSchema({ hello: 'world' })
 		const message = `hello ${state} world`
-		this.parsingEquals(message, {
+		await this.parsingEquals(message, {
 			isDone: false,
 			state: { hello: 'world' },
 			message: 'hello  world',
@@ -161,16 +161,16 @@ export default class ResponseParserTest extends AbstractLlmTest {
 		return `${STATE_BOUNDARY} ${JSON.stringify(input)} ${STATE_BOUNDARY}`
 	}
 
-	private static assertDone(message: string) {
-		this.parsingEquals(message, {
+	private static async assertDone(message: string) {
+		await this.parsingEquals(message, {
 			isDone: true,
 			state: undefined,
 			message: removeTokens(message),
 		})
 	}
 
-	private static assertNotDone(message: string) {
-		this.parsingEquals(message, {
+	private static async assertNotDone(message: string) {
+		await this.parsingEquals(message, {
 			isDone: false,
 			state: undefined,
 			message: removeTokens(message),
