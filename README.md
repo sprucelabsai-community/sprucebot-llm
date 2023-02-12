@@ -7,7 +7,7 @@ A Typescript library for leveraging Large Langage Models (like GPT-3) to do... a
 * [Manages state](#adding-state-to-your-conversation)
     * The state builds as the conversation continues
     * Invoke callbacks whenever state changes
-* Connect to 3rd party API's*
+* Connect to 3rd party API's
     * Pull in data in real time
     * Have your bot respond generated responses
 * Unlimited use cases
@@ -117,8 +117,32 @@ If you supply a `stateSchema` then your bot will work through it until the state
 ```ts
 await skill.on('did-update-state', () => {
 	console.log('we are making progress!')
-	console.log(JSON.stringif(this.skill.getState()))
+	console.log(JSON.stringify(this.skill.getState()))
 })
 
 ```
+### Pulling from 3rd party api's
 
+The approach to integrating 3rd party api's (as well as dropping in other dynamic data into responses) is straight forward.
+
+```ts
+const skill = bots.Skill({
+	yourJobIfYouChooseToAcceptItIs:
+		"to be be the best appointment taker on the planet. You have a many years of experience. You are going to ask me only 2 questions for this practice run. First, you'll ask me to pick an available time. Then, you'll ask me to pick my favorite color!",
+	callbacks: {
+		availableTimes: {
+			cb: async () => {
+				return ['9am', '10am', '11am', '1pm', '4pm', '5pm', '12am.'].join(
+					'\n'
+				)
+			},
+			useThisWhenever: 'your are showing what times I can pick from.',
+		},
+		favoriteColor: {
+			cb: async () => {
+				return ['red', 'blue', 'green', 'purple'].join('\n')
+			},
+			useThisWhenever: 'your are showing what colors I can pick from.',
+		},
+	},
+})

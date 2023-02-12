@@ -1,3 +1,5 @@
+import renderPlaceholder from '../parsingResponses/renderPlaceholder'
+
 export const STATE_BOUNDARY = '*****'
 export const DONE_TOKEN = `____ DONE ____`
 export const CALLBACK_BOUNDARY = 'xxxxx'
@@ -37,7 +39,16 @@ When asking me about a "select" field, make sure I only pick a valid choice by s
 	
 Your primary objective for this conversation is <%= it.skill.yourJobIfYouChooseToAcceptItIs %>
 <% if (it.skill.callbacks) { %>
-While we are talking
+While we are talking, there are going to be things I don't want you to answer, but instead to respond with a placeholder in the form of ${renderPlaceholder(
+	'example'
+)}.
+
+Here are the placeholders we will be using:
+
+<% Object.keys(it.skill.callbacks).forEach((key) => { %>
+Whenever <%= it.skill.callbacks[key].useThisWhenever %>, respond with ${CALLBACK_BOUNDARY} <%= key %> ${CALLBACK_BOUNDARY}
+
+<% }) %>
 <% } %>
 <% if (!it.stateSchemaJson && it.skill.weAreDoneWhen) { %>
 We are done when <%= it.skill.weAreDoneWhen %> At that point, send me the following message so I know we are done:
@@ -47,7 +58,7 @@ ${DONE_TOKEN}
 <% } %>
 <% if (it.stateSchemaJson) { %>
 
-Once you have asked about every field in the schema, send me the following message:
+Once you have asked about every field in the schema, send me the following message so I know we're done:
 
 ${DONE_TOKEN}
 <% } %>

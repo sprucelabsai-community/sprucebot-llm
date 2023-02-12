@@ -80,7 +80,7 @@ export default class SprucebotLlmBotImpl<
 			isDone,
 			message: parsedResponse,
 			state,
-		} = await parser.parse(response)
+		} = await parser.parse(response, this.skill?.serialize().callbacks)
 
 		this.isDone = isDone
 

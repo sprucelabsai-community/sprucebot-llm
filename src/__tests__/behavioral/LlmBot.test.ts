@@ -1,5 +1,5 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
-import { SkillOptions } from '../../llm.types'
+import { LlmCallbackMap, SkillOptions } from '../../llm.types'
 import ResponseParser, {
 	ParsedResponse,
 } from '../../parsingResponses/ResponseParser'
@@ -229,16 +229,6 @@ export default class LlmBotTest extends AbstractLlmTest {
 		assert.isEqualDeep(state, skillState)
 	}
 
-	private static setupBotWithSkill(options: Partial<SkillOptions>) {
-		const skill = this.Skill(options)
-
-		this.bot = this.Bot({
-			skill,
-		})
-
-		return skill
-	}
-
 	@test('inherits state from bot when parsing response', {
 		favoriteColor: 'red',
 	})
@@ -318,6 +308,32 @@ export default class LlmBotTest extends AbstractLlmTest {
 		assert.isFalse(wasHit)
 	}
 
+	@test()
+	protected static async passesCallbacksToParserOnResponse() {
+		const callbacks = {
+			foo: {
+				cb: () => 'hey',
+				useThisWhenever: 'hey',
+			},
+		}
+		this.setupBotWithSkill({
+			callbacks,
+		})
+
+		await this.sendRandomMessage()
+		assert.isEqual(this.parser.lastCallbacks, callbacks)
+	}
+
+	private static setupBotWithSkill(options: Partial<SkillOptions>) {
+		const skill = this.Skill(options)
+
+		this.bot = this.Bot({
+			skill,
+		})
+
+		return skill
+	}
+
 	private static async sendMessageWithResponseState(
 		state: Record<string, any>
 	) {
@@ -356,8 +372,14 @@ class FakeResponseParser extends ResponseParser {
 		state: undefined,
 	}
 	public lastMessage?: string
-	public async parse(message: string): Promise<ParsedResponse> {
+	public lastCallbacks?: LlmCallbackMap
+
+	public async parse(
+		message: string,
+		callbacks?: LlmCallbackMap
+	): Promise<ParsedResponse> {
 		this.lastMessage = message
+		this.lastCallbacks = callbacks
 		return {
 			message,
 			isDone: false,
