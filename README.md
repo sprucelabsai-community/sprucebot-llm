@@ -7,7 +7,7 @@ A Typescript library for leveraging Large Langage Models (like GPT-3) to do... a
 * [Manages state](#adding-state-to-your-conversation)
     * The state builds as the conversation continues
     * Invoke callbacks whenever state changes
-* Connect to 3rd party API's
+* [Connect to 3rd party API's](pulling-from-3rd-party-apis)
     * Pull in data in real time
     * Have your bot respond generated responses
 * Unlimited use cases
