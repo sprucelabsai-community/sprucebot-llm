@@ -4,8 +4,8 @@ import * as Eta from 'eta'
 import PromptGenerator, {
 	setUndefinedToNull,
 	TemplateContext,
-	PROMPT_TEMPLATE,
 } from '../../../bots/PromptGenerator'
+import { PROMPT_TEMPLATE } from '../../../bots/templates'
 import { BotOptions, LlmMessage } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { personSchema } from '../../support/schemas/personSchema'

@@ -1,18 +1,19 @@
 import { test, assert, generateId } from '@sprucelabs/test-utils'
-import {
-	CALLBACK_BOUNDARY,
-	DONE_TOKEN,
-	STATE_BOUNDARY,
-} from '../../../bots/PromptGenerator'
-import { LlmCallbackMap } from '../../../llm.types'
+import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/templates'
+import { LlmCallback, LlmCallbackMap } from '../../../llm.types'
+import renderPlaceholder from '../../../parsingResponses/renderPlaceholder'
+import ResponseParser, {
+	ParsedResponse,
+} from '../../../parsingResponses/ResponseParser'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
-import ResponseParser, { ParsedResponse } from './ResponseParser'
 
 export default class ResponseParserTest extends AbstractLlmTest {
 	private static parser: ResponseParser
+	private static callbacks: LlmCallbackMap = {}
 	protected static async beforeEach() {
 		await super.beforeEach()
 		this.parser = ResponseParser.getInstance()
+		this.callbacks = {}
 	}
 
 	@test()
@@ -76,15 +77,15 @@ export default class ResponseParserTest extends AbstractLlmTest {
 	) {
 		let wasHit = false
 
-		await this.parse(renderPlaceholder(key), {
-			[key]: {
-				cb: () => {
-					wasHit = true
-					return ''
-				},
-				useThisWhenever: 'you are asking for my favorite color.',
+		this.setCallback(key, {
+			cb: () => {
+				wasHit = true
+				return ''
 			},
+			useThisWhenever: 'you are asking for my favorite color.',
 		})
+
+		await this.parse(renderPlaceholder(key))
 
 		assert.isTrue(wasHit)
 	}
@@ -93,27 +94,67 @@ export default class ResponseParserTest extends AbstractLlmTest {
 	protected static async canCallSecondPlacehloder() {
 		let wasHit = false
 
-		await this.parse(renderPlaceholder('taco'), {
-			favoriteColors: {
-				cb: () => {
-					return ''
-				},
-				useThisWhenever: generateId(),
+		this.setCallback('favoriteColors', {
+			cb: () => {
+				return ''
 			},
-			taco: {
-				cb: () => {
-					wasHit = true
-					return ''
-				},
-				useThisWhenever: generateId(),
-			},
+			useThisWhenever: generateId(),
 		})
+
+		this.setCallback('taco', {
+			cb: () => {
+				wasHit = true
+				return ''
+			},
+			useThisWhenever: generateId(),
+		})
+
+		await this.parse(renderPlaceholder('taco'))
 
 		assert.isTrue(wasHit)
 	}
 
+	@test('callback populate placeholders 1', 'bravo')
+	@test('callback populate placeholders 2', 'taco')
+	protected static async callbacksPopulatePlaceholders(placeholder: string) {
+		const message = renderPlaceholder(placeholder)
+		this.setCallback(placeholder, this.defaultCallback(placeholder))
+		const response = await this.parse(message)
+
+		assert.isEqualDeep(response, {
+			isDone: false,
+			state: undefined,
+			message: placeholder,
+		})
+	}
+
+	@test()
+	protected static async usesBoundariesToFindPlaceholders() {
+		const message = `taco ${renderPlaceholder('taco')} taco`
+		this.setCallback('taco', this.defaultCallback('bravo'))
+		const response = await this.parse(message)
+		assert.isEqual(response.message, 'taco bravo taco')
+	}
+
+	@test()
+	protected static async replacesPlaceholderInTheText() {
+		this.setCallback('personName', this.defaultCallback('Tay'))
+		const p = renderPlaceholder('personName')
+		const response = await this.parse(`hey there ${p}!`)
+		assert.isEqual(response.message, 'hey there Tay!')
+	}
+
+	private static defaultCallback(response: string): LlmCallback {
+		return {
+			cb: () => {
+				return response
+			},
+			useThisWhenever: generateId(),
+		}
+	}
+
 	private static async parse(message: string, callbacks?: LlmCallbackMap) {
-		return await this.parser.parse(message, callbacks)
+		return await this.parser.parse(message, this.callbacks ?? callbacks)
 	}
 
 	private static generateStateSchema(input: Record<string, any>) {
@@ -143,11 +184,11 @@ export default class ResponseParserTest extends AbstractLlmTest {
 		const results = await this.parse(message)
 		assert.isEqualDeep(results, expected)
 	}
-}
-function renderPlaceholder(key: string): string {
-	return `${CALLBACK_BOUNDARY} ${key} ${CALLBACK_BOUNDARY}`
-}
 
+	private static setCallback(key: string, callback: LlmCallback) {
+		this.callbacks[key] = callback
+	}
+}
 function removeTokens(message: string): string {
 	return message.replace(DONE_TOKEN, '').trim()
 }

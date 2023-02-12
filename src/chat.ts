@@ -1,54 +1,36 @@
 import { stdin as input, stdout as output } from 'node:process'
 import * as readline from 'node:readline/promises'
-import { buildSchema } from '@sprucelabs/schema'
 import dotenv from 'dotenv'
 import { OpenAi } from './bots/adapters/OpenAi'
 import SprucebotLlmFactory from './bots/SprucebotLlmFactory'
+import buildJokeSkill from './chat/buildJokeSkill'
+import buildProfileSkill from './chat/buildProfileSkill'
 
 dotenv.config()
 const rl = readline.createInterface({ input, output })
 
 ;(async () => {
 	console.clear()
+
 	const adapter = new OpenAi(process.env.OPEN_AI_API_KEY!)
 	const bots = SprucebotLlmFactory.Factory()
+
 	const skills = {
-		jokes: bots.Skill({
-			yourJobIfYouChooseToAcceptItIs: 'to tell knock knock jokes!',
-			pleaseKeepInMindThat: [
-				'our audience is younger, so keep it PG!',
-				'you should never laugh when someone does not get the joke.',
-				"after each joke, you should tell me how many jokes you have left to tell before we're done.",
-				'you should acknowledge if someone laughs at your joke by saying "Thanks!" or "Glad you thought that was funny"!',
-			],
-			weAreDoneWhen: 'you have told 3 jokes!',
-		}),
-		profile: bots.Skill({
+		jokes: buildJokeSkill(bots),
+		profile: buildProfileSkill(bots),
+		callbacks: bots.Skill({
 			yourJobIfYouChooseToAcceptItIs:
-				'to collect some information from me! You are a receptionist with 20 years experience and are very focused on getting answers needed to complete my profile',
-			stateSchema: buildSchema({
-				id: 'profile',
-				fields: {
-					firstName: {
-						type: 'text',
-						label: 'First name',
+				"to be taking appointments. We're going to practice just the part where you ask me to pick an appointment time.",
+			callbacks: {
+				availableTimes: {
+					cb: async () => {
+						return ['9am', '10am', '11am', '1pm', '4pm', '5pm', '12am.'].join(
+							'\n'
+						)
 					},
-					lastName: {
-						type: 'text',
-						label: 'Last name',
-					},
-					favoriteColor: {
-						type: 'select',
-						options: {
-							choices: [
-								{ label: 'Red', value: 'red' },
-								{ label: 'Blue', value: 'blue' },
-								{ label: 'Green', value: 'green' },
-							],
-						},
-					},
+					useThisWhenever: 'your are showing what times i can pick from.',
 				},
-			}),
+			},
 		}),
 	}
 

@@ -1,5 +1,6 @@
-import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/PromptGenerator'
-import { LlmCallbackMap } from '../../../llm.types'
+import { DONE_TOKEN, STATE_BOUNDARY } from '../bots/templates'
+import { LlmCallbackMap } from '../llm.types'
+import renderPlaceholder from './renderPlaceholder'
 
 export default class ResponseParser {
 	private static instance: ResponseParser = new ResponseParser()
@@ -20,8 +21,10 @@ export default class ResponseParser {
 		let state: Record<string, any> | undefined
 
 		for (const key of Object.keys(callbacks || {})) {
-			if (message.includes(key)) {
-				await callbacks?.[key]?.cb()
+			const match = message.match(renderPlaceholder(key))
+
+			if (match) {
+				message = await this.invokeCallback(callbacks, key, message)
 			}
 		}
 
@@ -37,6 +40,16 @@ export default class ResponseParser {
 			state,
 			message,
 		}
+	}
+
+	private async invokeCallback(
+		callbacks: LlmCallbackMap | undefined,
+		key: string,
+		message: string
+	) {
+		const v = await callbacks?.[key]?.cb()
+		message = message.replace(renderPlaceholder(key), v ?? '').trim()
+		return message
 	}
 
 	private doesIncludeDoneToken(response: string): boolean {

@@ -5,7 +5,6 @@ import {
 	Schema,
 	SchemaValues,
 } from '@sprucelabs/schema'
-import ResponseParser from '../__tests__/behavioral/prompts/ResponseParser'
 import {
 	BotOptions,
 	LlmAdapter,
@@ -16,6 +15,7 @@ import {
 	SprucebotLlmBot,
 	SprucebotLLmSkill,
 } from '../llm.types'
+import ResponseParser from '../parsingResponses/ResponseParser'
 
 export default class SprucebotLlmBotImpl<
 		StateSchema extends Schema = Schema,
