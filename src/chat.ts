@@ -1,10 +1,10 @@
 import { stdin as input, stdout as output } from 'node:process'
 import * as readline from 'node:readline/promises'
-import { buildSchema } from '@sprucelabs/schema'
 import dotenv from 'dotenv'
 import { OpenAi } from './bots/adapters/OpenAi'
 import SprucebotLlmFactory from './bots/SprucebotLlmFactory'
 import buildCallbackSkill from './examples/buildCallbackSkill'
+import buildFileTransformerSkill from './examples/buildFileTransformerSkill'
 import buildJokeSkill from './examples/buildJokeSkill'
 import buildProfileSkill from './examples/buildProfileSkill'
 
@@ -21,30 +21,7 @@ const rl = readline.createInterface({ input, output })
 		jokes: buildJokeSkill(bots),
 		profile: buildProfileSkill(bots),
 		callbacks: buildCallbackSkill(bots),
-		fileTransformer: bots.Skill({
-			yourJobIfYouChooseToAcceptItIs:
-				'is to convert data from one format to another. Since you are a robot, this should be no problem for you! You are going to jump right in by asking me the import and output formats and then the data to convert!',
-			pleaseKeepInMindThat: [
-				'you will need to ask me the format of the input and the desired format of the output.',
-				'last step is to take the data and convert it to the desired format and send it back to me.',
-			],
-			stateSchema: buildSchema({
-				id: 'fileTransformer',
-				fields: {
-					inputFormat: {
-						type: 'text',
-					},
-					outputFormat: {
-						type: 'text',
-					},
-					dataToConvert: {
-						type: 'text',
-					},
-				},
-			}),
-			weAreDoneWhen:
-				'You have converted the input to the desired output format and sent it back to me.',
-		}),
+		fileTransformer: buildFileTransformerSkill(bots),
 	}
 
 	const bot = bots.Bot({
