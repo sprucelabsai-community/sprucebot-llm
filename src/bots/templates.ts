@@ -1,7 +1,7 @@
 import renderPlaceholder from '../parsingResponses/renderPlaceholder'
 
 export const STATE_BOUNDARY = '*****'
-export const DONE_TOKEN = `____ DONE ____`
+export const DONE_TOKEN = `DONE_DONE_DONE`
 export const CALLBACK_BOUNDARY = 'xxxxx'
 
 export const PROMPT_TEMPLATE = `You are <%= it.youAre %>

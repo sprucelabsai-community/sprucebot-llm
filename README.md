@@ -28,6 +28,7 @@ yarn add @sprucelabs/sprucebot-llm
 ```
 
 ### Building your first joke bot
+You can use `sprucebot-llm` inside any Javascript runtime (nodejs, browser).
 
 Create a file called `chat.ts` and add the following to get started:
 
