@@ -11,6 +11,7 @@ import buildProfileSkill from './examples/buildProfileSkill'
 dotenv.config()
 const rl = readline.createInterface({ input, output })
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 ;(async () => {
 	console.clear()
 
