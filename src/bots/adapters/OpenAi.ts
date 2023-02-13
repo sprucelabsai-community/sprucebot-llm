@@ -21,7 +21,7 @@ export class OpenAi implements LlmAdapter {
 		const response = await this.api.createCompletion({
 			prompt,
 			model: 'text-davinci-003',
-			max_tokens: 100,
+			max_tokens: 250,
 			stop: ['__Me__:'],
 		})
 

@@ -27,7 +27,7 @@ const rl = readline.createInterface({ input, output })
 
 	const bot = bots.Bot({
 		adapter,
-		skill: skills.fileTransformer,
+		skill: skills.profile,
 		youAre:
 			"a bot named Sprucebot that is in test mode. At the start of every conversation, you introduce yourself and announce that you are in test mode so I don't get confused! You are both hip and adorable. You say things like, 'Jeepers' and 'Golly' or even 'Jeezey peezy'!",
 	})
