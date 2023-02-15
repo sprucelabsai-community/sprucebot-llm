@@ -3,15 +3,15 @@ import { Configuration, OpenAIApi } from 'openai'
 import { LlmAdapter, SprucebotLlmBot } from '../../llm.types'
 import PromptGenerator from '../PromptGenerator'
 
-export class OpenAi implements LlmAdapter {
+export class OpenAiAdapter implements LlmAdapter {
 	public static Configuration = Configuration
 	public static OpenAIApi = OpenAIApi
 	private api: OpenAIApi
 
 	public constructor(apiKey: string) {
 		assertOptions({ apiKey }, ['apiKey'])
-		const config = new OpenAi.Configuration({ apiKey })
-		this.api = new OpenAi.OpenAIApi(config)
+		const config = new OpenAiAdapter.Configuration({ apiKey })
+		this.api = new OpenAiAdapter.OpenAIApi(config)
 	}
 
 	public async sendMessage(bot: SprucebotLlmBot): Promise<string> {

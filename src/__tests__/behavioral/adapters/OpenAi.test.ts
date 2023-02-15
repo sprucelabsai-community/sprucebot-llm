@@ -2,7 +2,7 @@ import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import { Configuration, OpenAIApi } from 'openai'
 import {
 	MESSAGE_RESPONSE_ERROR_MESSAGE,
-	OpenAi,
+	OpenAiAdapter,
 } from '../../../bots/adapters/OpenAi'
 import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
 import PromptGenerator from '../../../bots/PromptGenerator'
@@ -11,7 +11,7 @@ import { SpyBot } from '../../support/SpyBot'
 import SpyConfiguration from '../../support/SpyConfiguration'
 
 export default class OpenAiTest extends AbstractLlmTest {
-	private static openAi: OpenAi
+	private static openAi: OpenAiAdapter
 	private static bot: SpyBot
 	protected static async beforeEach() {
 		await super.beforeEach()
@@ -22,7 +22,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 	@test()
 	protected static async throwsWhenMissingKey() {
 		//@ts-ignore
-		const err = assert.doesThrow(() => new OpenAi())
+		const err = assert.doesThrow(() => new OpenAiAdapter())
 		errorAssert.assertError(err, 'MISSING_PARAMETERS', {
 			parameters: ['apiKey'],
 		})
@@ -30,8 +30,8 @@ export default class OpenAiTest extends AbstractLlmTest {
 
 	@test()
 	protected static usesOpenAisLibrariesByDefault() {
-		assert.isEqual(OpenAi.Configuration, Configuration)
-		assert.isEqual(OpenAi.OpenAIApi, OpenAIApi)
+		assert.isEqual(OpenAiAdapter.Configuration, Configuration)
+		assert.isEqual(OpenAiAdapter.OpenAIApi, OpenAIApi)
 	}
 
 	@test()
@@ -103,12 +103,12 @@ export default class OpenAiTest extends AbstractLlmTest {
 	}
 
 	private static OpenAi(key?: string) {
-		return new OpenAi(key ?? generateId())
+		return new OpenAiAdapter(key ?? generateId())
 	}
 
 	private static setupSpys() {
-		OpenAi.Configuration = SpyConfiguration
-		OpenAi.OpenAIApi = SpyOpenAiApi
+		OpenAiAdapter.Configuration = SpyConfiguration
+		OpenAiAdapter.OpenAIApi = SpyOpenAiApi
 		SpyConfiguration.options = undefined
 		SpyOpenAiApi.lastMessage = undefined
 		SpyOpenAiApi.lastModel = undefined
