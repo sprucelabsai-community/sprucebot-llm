@@ -1,3 +1,10 @@
+# [1.0.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v0.1.0...v1.0.0) (2023-03-23)
+
+
+### Breaking Changes
+
+* **auto-upgrade:** upgraded packages [upgrade-all] ([35e335e](https://github.com/sprucelabsai-community/sprucebot-llm/commit/35e335e))
+
 # [0.1.0](https://github.com/sprucelabsai/sprucebot-llm/compare/v0.0.4...v0.1.0) (2023-02-15)
 
 
