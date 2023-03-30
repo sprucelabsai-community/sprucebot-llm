@@ -78,7 +78,7 @@
     "prettier": "^2.8.7",
     "ts-node": "^10.9.1",
     "tsc-watch": "^6.0.0",
-    "typescript": "^5.0.2"
+    "typescript": "^5.0.3"
   },
   "jest": {
     "testRunner": "jest-circus/runner",
