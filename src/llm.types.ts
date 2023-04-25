@@ -22,6 +22,7 @@ export interface SprucebotLlmBot<
 	sendMessage(message: string): Promise<string>
 	serialize(): SerializedBot<StateSchema, State>
 	updateState(state: Partial<State>): Promise<void>
+	setSkill(skill: SprucebotLLmSkill<any>): void
 }
 
 export interface LlmAdapter {

@@ -24,13 +24,14 @@ export default class SprucebotLlmBotImpl<
 	extends AbstractEventEmitter<LlmEventContract>
 	implements SprucebotLlmBot<StateSchema, State>
 {
+	public static messageMemoryLimit = 10
 	private adapter: LlmAdapter
 	private youAre: string
 	private stateSchema?: StateSchema
 	protected state?: Partial<State>
 	private isDone = false
 	protected messages: LlmMessage[] = []
-	private skill?: SprucebotLLmSkill
+	protected skill?: SprucebotLLmSkill
 
 	public constructor(options: BotOptions<StateSchema, State>) {
 		const { adapter, youAre, stateSchema, state, skill } = options
@@ -68,7 +69,7 @@ export default class SprucebotLlmBotImpl<
 	public async sendMessage(message: string): Promise<string> {
 		assertOptions({ message }, ['message'])
 
-		this.messages.push({
+		this.trackMessage({
 			from: 'Me',
 			message,
 		})
@@ -90,7 +91,7 @@ export default class SprucebotLlmBotImpl<
 			await this.skill?.updateState(state)
 		}
 
-		this.messages.push({
+		this.trackMessage({
 			from: 'You',
 			message: parsedResponse,
 		})
@@ -98,8 +99,19 @@ export default class SprucebotLlmBotImpl<
 		return parsedResponse
 	}
 
+	private trackMessage(m: LlmMessage) {
+		if (this.messages.length === SprucebotLlmBotImpl.messageMemoryLimit) {
+			this.messages.shift()
+		}
+		this.messages.push(m)
+	}
+
 	public async updateState(newState: Partial<State>): Promise<void> {
 		this.state = { ...this.state!, ...newState }
 		await this.emit('did-update-state')
+	}
+
+	public setSkill(skill: SprucebotLLmSkill<any>) {
+		this.skill = skill
 	}
 }

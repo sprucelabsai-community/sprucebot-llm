@@ -1,4 +1,5 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import SprucebotLlmBotImpl from '../../bots/SprucebotLlmBotImpl'
 import { LlmCallbackMap, SkillOptions } from '../../llm.types'
 import ResponseParser, {
 	ParsedResponse,
@@ -324,6 +325,45 @@ export default class LlmBotTest extends AbstractLlmTest {
 		assert.isEqual(this.parser.lastCallbacks, callbacks)
 	}
 
+	@test()
+	protected static async canSwapSkillMidWayThrough() {
+		this.setupBotWithSkill({})
+		const skill2 = this.Skill()
+		this.bot.setSkill(skill2)
+		assert.isEqual(this.bot.getSkill(), skill2)
+	}
+
+	@test()
+	protected static async defaultLimitsMessagesTo10() {
+		await this.sendRandomMessage()
+		this.assertTotalMessagesTracked(2)
+		await this.sendRandomMessage()
+		this.assertTotalMessagesTracked(4)
+		await this.sendRandomMessage()
+		await this.sendRandomMessage()
+		await this.sendRandomMessage()
+		const body = await this.sendRandomMessage()
+		this.assertTotalMessagesTracked(10)
+		assert.doesInclude(this.bot.getMessages(), { message: body })
+	}
+
+	@test()
+	protected static async canSetMemory() {
+		SprucebotLlmBotImpl.messageMemoryLimit = 5
+		await this.sendRandomMessage()
+		this.assertTotalMessagesTracked(2)
+		await this.sendRandomMessage()
+		this.assertTotalMessagesTracked(4)
+		await this.sendRandomMessage()
+		await this.sendRandomMessage()
+		await this.sendRandomMessage()
+		this.assertTotalMessagesTracked(5)
+	}
+
+	private static assertTotalMessagesTracked(expected: number) {
+		assert.isLength(this.bot.getMessages(), expected)
+	}
+
 	private static setupBotWithSkill(options: Partial<SkillOptions>) {
 		const skill = this.Skill(options)
 
@@ -342,7 +382,9 @@ export default class LlmBotTest extends AbstractLlmTest {
 	}
 
 	private static async sendRandomMessage() {
-		await this.sendMessage(generateId())
+		const body = generateId()
+		await this.sendMessage(body)
+		return body
 	}
 
 	private static setStateInResponse(state: Record<string, any>) {
