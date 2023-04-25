@@ -113,5 +113,6 @@ export default class SprucebotLlmBotImpl<
 
 	public setSkill(skill: SprucebotLLmSkill<any>) {
 		this.skill = skill
+		this.isDone = false
 	}
 }

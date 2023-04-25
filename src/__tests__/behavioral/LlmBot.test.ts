@@ -360,6 +360,13 @@ export default class LlmBotTest extends AbstractLlmTest {
 		this.assertTotalMessagesTracked(5)
 	}
 
+	@test()
+	protected static async settingSkillToBotSetsToNotDone() {
+		this.bot.markAsDone()
+		this.bot.setSkill(this.Skill())
+		assert.isFalse(this.bot.getIsDone())
+	}
+
 	private static assertTotalMessagesTracked(expected: number) {
 		assert.isLength(this.bot.getMessages(), expected)
 	}
