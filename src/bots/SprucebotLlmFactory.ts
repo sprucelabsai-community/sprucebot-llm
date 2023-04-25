@@ -11,13 +11,17 @@ import SprucebotLlmSkillImpl from './SprucebotLlmSkillImpl'
 
 export default class SprucebotLlmFactory {
 	private instance?: SprucebotLlmBot
+	public static FactoryClass?: typeof SprucebotLlmFactory
+	public static BotClass?: new (options: any) => SprucebotLlmBot
 
 	public Bot(options: BotOptions): SprucebotLlmBot {
 		assertOptions(options, ['youAre', 'adapter'])
 
 		const { Class } = options
 
-		return Class ? new Class(options) : new SprucebotLlmBotImpl(options)
+		return new (Class ?? SprucebotLlmFactory.BotClass ?? SprucebotLlmBotImpl)(
+			options
+		)
 	}
 
 	public Skill(options: SkillOptions): SprucebotLLmSkill {
@@ -39,6 +43,6 @@ export default class SprucebotLlmFactory {
 	}
 
 	public static Factory(): SprucebotLlmFactory {
-		return new this()
+		return new (this.FactoryClass ?? this)()
 	}
 }

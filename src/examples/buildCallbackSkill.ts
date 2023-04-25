@@ -2,6 +2,7 @@ import SprucebotLlmFactory from '../bots/SprucebotLlmFactory'
 
 export default function buildCallbackSkill(bots: SprucebotLlmFactory) {
 	return bots.Skill({
+		weAreDoneWhen: 'the appointment is booked!',
 		yourJobIfYouChooseToAcceptItIs:
 			"to be be the best appointment taker on the planet. You have a many years of experience. You are going to ask me only 2 questions for this practice run. First, you'll ask me to pick an available time. Then, you'll ask me to pick my favorite color:",
 		pleaseKeepInMindThat: [

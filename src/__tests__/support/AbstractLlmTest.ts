@@ -13,6 +13,9 @@ export default abstract class AbstractLlmTest extends AbstractSpruceTest {
 		await super.beforeEach()
 		this.adapter = new SpyAdapter()
 		this.bots = SprucebotLlmFactory.Factory()
+
+		delete SprucebotLlmFactory.BotClass
+		delete SprucebotLlmFactory.FactoryClass
 	}
 
 	protected static Bot<S extends Schema>(

@@ -5,6 +5,7 @@ export class SpyBot extends SprucebotLlmBotImpl implements SprucebotLlmBot {
 	public getState() {
 		return this.state
 	}
+	
 	public setMessages(messages: LlmMessage[]) {
 		this.messages = messages
 	}

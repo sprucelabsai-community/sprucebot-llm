@@ -3,6 +3,7 @@ import SprucebotLlmBotImpl from '../../bots/SprucebotLlmBotImpl'
 import SprucebotLlmFactory from '../../bots/SprucebotLlmFactory'
 import { SprucebotLlmBot } from '../../llm.types'
 import AbstractLlmTest from '../support/AbstractLlmTest'
+import { SpyBot } from '../support/SpyBot'
 
 export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
 	@test()
@@ -43,6 +44,24 @@ export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
 		assert.isEqual(this.bots.getBotInstance(), bot)
 	}
 
+	@test()
+	protected static async canSetTheFactoryClass() {
+		SprucebotLlmFactory.FactoryClass = SpyFactory
+		const factory = SprucebotLlmFactory.Factory()
+		assert.isInstanceOf(factory, SpyFactory)
+	}
+
+	@test()
+	protected static async canSetBotClass() {
+		SprucebotLlmFactory.BotClass = SpyBot
+
+		const bot = this.bots.Bot({
+			adapter: this.adapter,
+			youAre: 'a bot',
+		})
+		assert.isInstanceOf(bot, SpyBot)
+	}
+
 	private static setInstance() {
 		const bot = this.Bot()
 		this.bots.setBotInstance(bot)
@@ -53,3 +72,5 @@ export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
 		assert.isInstanceOf(bot, SprucebotLlmBotImpl)
 	}
 }
+
+class SpyFactory extends SprucebotLlmFactory {}
