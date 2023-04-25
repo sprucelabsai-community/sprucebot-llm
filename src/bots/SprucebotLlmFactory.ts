@@ -13,6 +13,7 @@ export default class SprucebotLlmFactory {
 	private instance?: SprucebotLlmBot
 	public static FactoryClass?: typeof SprucebotLlmFactory
 	public static BotClass?: new (options: any) => SprucebotLlmBot
+	public static SkillClass?: new (options: any) => SprucebotLLmSkill
 
 	public Bot(options: BotOptions): SprucebotLlmBot {
 		assertOptions(options, ['youAre', 'adapter'])
@@ -26,7 +27,9 @@ export default class SprucebotLlmFactory {
 
 	public Skill(options: SkillOptions): SprucebotLLmSkill {
 		assertOptions(options, ['yourJobIfYouChooseToAcceptItIs'])
-		return new SprucebotLlmSkillImpl(options)
+		return new (SprucebotLlmFactory.SkillClass ?? SprucebotLlmSkillImpl)(
+			options
+		)
 	}
 
 	public getBotInstance() {

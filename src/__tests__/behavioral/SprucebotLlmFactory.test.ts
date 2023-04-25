@@ -1,6 +1,7 @@
 import { test, assert, errorAssert } from '@sprucelabs/test-utils'
 import SprucebotLlmBotImpl from '../../bots/SprucebotLlmBotImpl'
 import SprucebotLlmFactory from '../../bots/SprucebotLlmFactory'
+import SprucebotLlmSkillImpl from '../../bots/SprucebotLlmSkillImpl'
 import { SprucebotLlmBot } from '../../llm.types'
 import AbstractLlmTest from '../support/AbstractLlmTest'
 import { SpyBot } from '../support/SpyBot'
@@ -63,12 +64,25 @@ export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
 	}
 
 	@test()
+	protected static async canSetSkillClass() {
+		SprucebotLlmFactory.SkillClass = SpySkill
+
+		const skill = this.bots.Skill({
+			yourJobIfYouChooseToAcceptItIs: 'aoeu',
+		})
+
+		assert.isInstanceOf(skill, SpySkill)
+	}
+
+	@test()
 	protected static async resettingFactoryClassResetsClasses() {
 		SprucebotLlmFactory.BotClass = SpyBot
 		SprucebotLlmFactory.FactoryClass = SpyFactory
+		SprucebotLlmFactory.SkillClass = SpySkill
 		SprucebotLlmFactory.reset()
 		assert.isFalsy(SprucebotLlmFactory.BotClass)
 		assert.isFalsy(SprucebotLlmFactory.FactoryClass)
+		assert.isFalsy(SprucebotLlmFactory.SkillClass)
 	}
 
 	private static setInstance() {
@@ -83,3 +97,4 @@ export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
 }
 
 class SpyFactory extends SprucebotLlmFactory {}
+class SpySkill extends SprucebotLlmSkillImpl {}
