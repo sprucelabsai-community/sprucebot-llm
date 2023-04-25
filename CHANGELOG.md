@@ -1,3 +1,10 @@
+# [2.4.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.3.0...v2.4.0) (2023-04-25)
+
+
+### Features
+
+* memory limit and the ability to change skills mid conversation! ([3db26e8](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3db26e8))
+
 # [2.3.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.2.0...v2.3.0) (2023-04-25)
 
 
