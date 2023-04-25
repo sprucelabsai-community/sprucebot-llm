@@ -1,3 +1,10 @@
+# [2.2.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.1.1...v2.2.0) (2023-04-25)
+
+
+### Features
+
+* can reset factory class of all Classes ([50bff74](https://github.com/sprucelabsai-community/sprucebot-llm/commit/50bff74))
+
 ## [2.1.1](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.1.0...v2.1.1) (2023-04-25)
 
 # [2.1.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.0.33...v2.1.0) (2023-04-25)
