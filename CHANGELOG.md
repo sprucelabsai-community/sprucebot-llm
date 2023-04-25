@@ -1,3 +1,10 @@
+# [2.1.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.0.33...v2.1.0) (2023-04-25)
+
+
+### Features
+
+* can now set the classes the factory will use when creating bots! ([2026fc4](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2026fc4))
+
 ## [2.0.33](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.0.32...v2.0.33) (2023-04-24)
 
 ## [2.0.32](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.0.31...v2.0.32) (2023-04-24)
