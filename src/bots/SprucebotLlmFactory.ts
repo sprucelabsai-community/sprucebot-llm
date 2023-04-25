@@ -45,4 +45,9 @@ export default class SprucebotLlmFactory {
 	public static Factory(): SprucebotLlmFactory {
 		return new (this.FactoryClass ?? this)()
 	}
+
+	public static reset() {
+		this.BotClass = undefined
+		this.FactoryClass = undefined
+	}
 }

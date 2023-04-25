@@ -62,6 +62,15 @@ export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
 		assert.isInstanceOf(bot, SpyBot)
 	}
 
+	@test()
+	protected static async resettingFactoryClassResetsClasses() {
+		SprucebotLlmFactory.BotClass = SpyBot
+		SprucebotLlmFactory.FactoryClass = SpyFactory
+		SprucebotLlmFactory.reset()
+		assert.isFalsy(SprucebotLlmFactory.BotClass)
+		assert.isFalsy(SprucebotLlmFactory.FactoryClass)
+	}
+
 	private static setInstance() {
 		const bot = this.Bot()
 		this.bots.setBotInstance(bot)
