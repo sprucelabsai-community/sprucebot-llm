@@ -52,5 +52,6 @@ export default class SprucebotLlmFactory {
 	public static reset() {
 		this.BotClass = undefined
 		this.FactoryClass = undefined
+		this.SkillClass = undefined
 	}
 }
