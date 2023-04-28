@@ -9,7 +9,7 @@
       "@sprucelabs/spruce-test-fixtures"
     ]
   },
-  "version": "2.4.11",
+  "version": "2.4.13",
   "files": [
     "build"
   ],
@@ -55,8 +55,8 @@
   },
   "dependencies": {
     "@sprucelabs/error": "^5.0.605",
-    "@sprucelabs/mercury-event-emitter": "^39.0.32",
-    "@sprucelabs/mercury-types": "^44.0.33",
+    "@sprucelabs/mercury-event-emitter": "^39.0.33",
+    "@sprucelabs/mercury-types": "^44.0.34",
     "@sprucelabs/schema": "^28.6.18",
     "eta": "^2.0.1",
     "openai": "^3.2.1"
