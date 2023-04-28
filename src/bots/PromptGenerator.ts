@@ -10,6 +10,10 @@ import { PROMPT_TEMPLATE } from './templates'
 export default class PromptGenerator {
 	private bot: SprucebotLlmBot
 	private eta = Eta
+	private log =
+		process.env.SHOULD_LOG_GENERATED_PROMPTS === 'true'
+			? console.info
+			: () => {}
 	public constructor(bot: SprucebotLlmBot) {
 		assertOptions({ bot }, ['bot'])
 		this.bot = bot
@@ -22,7 +26,7 @@ export default class PromptGenerator {
 			state
 		)
 
-		return await this.eta.render(
+		const rendered = await this.eta.render(
 			PROMPT_TEMPLATE,
 			{
 				stateSchemaJson,
@@ -34,6 +38,10 @@ export default class PromptGenerator {
 				autoEscape: false,
 			}
 		)
+
+		this.log('Generated prompt:', rendered)
+
+		return rendered
 	}
 
 	private stringifyState(

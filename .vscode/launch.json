@@ -68,5 +68,20 @@
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen"
 		}
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "generate.samples",
+			"runtimeExecutable": "node",
+			"runtimeArgs": [
+				"--inspect-brk",
+				"--trace-warnings",
+				"${workspaceFolder}/build/fineTuningSprucebot/generateSamples.js",
+				"${workspaceFolder}/fineTuning/output.json"
+			],
+			"cwd": "${workspaceFolder}",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen"
+		}
 	]
 }

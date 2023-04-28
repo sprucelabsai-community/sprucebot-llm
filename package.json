@@ -38,6 +38,7 @@
     "clean.dependencies": "rm -rf node_modules/ package-lock.json yarn.lock",
     "clean.dist": "rm -rf build/__tests__ build/esm/__tests__",
     "fix.lint": "eslint --fix --cache '**/*.ts'",
+    "generate.samples": "node ./build/fineTuningSprucebot/generateSamples.js ~/output.json",
     "lint": "eslint --cache '**/*.ts'",
     "lint.tsc": "tsc -p . --noEmit",
     "post.watch.build": "yarn build.copy-files && yarn build.resolve-paths",

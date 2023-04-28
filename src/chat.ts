@@ -7,6 +7,7 @@ import buildCallbackSkill from './examples/buildCallbackSkill'
 import buildFileTransformerSkill from './examples/buildFileTransformerSkill'
 import buildJokeSkill from './examples/buildJokeSkill'
 import buildProfileSkill from './examples/buildProfileSkill'
+import buildReceptionistSkill from './examples/buildReceptionistSkill'
 
 dotenv.config()
 const rl = readline.createInterface({ input, output })
@@ -23,11 +24,12 @@ const rl = readline.createInterface({ input, output })
 		profile: buildProfileSkill(bots),
 		callbacks: buildCallbackSkill(bots),
 		fileTransformer: buildFileTransformerSkill(bots),
+		receptionist: buildReceptionistSkill(bots),
 	}
 
 	const bot = bots.Bot({
 		adapter,
-		skill: skills.fileTransformer,
+		skill: skills.receptionist,
 		youAre:
 			"a bot named Sprucebot that is in test mode. At the start of every conversation, you introduce yourself and announce that you are in test mode so I don't get confused! You are both hip and adorable. You say things like, 'Jeepers' and 'Golly' or even 'Jeezey peezy'!",
 	})
