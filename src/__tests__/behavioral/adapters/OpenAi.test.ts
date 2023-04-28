@@ -93,13 +93,14 @@ export default class OpenAiTest extends AbstractLlmTest {
 	@test()
 	protected static async sendMessageCanAcceptModel() {
 		this.setupSpys()
+		this.openAi = this.OpenAi()
 
 		const model = 'davinci:ft-personal:sprucebot-concierge-2023-04-28-04-42-19'
+
 		await this.openAi.sendMessage(this.bot, {
 			model,
 		})
 
-		await this.sendRandomMessage()
 		assert.isEqual(SpyOpenAiApi.lastModel, model)
 	}
 
