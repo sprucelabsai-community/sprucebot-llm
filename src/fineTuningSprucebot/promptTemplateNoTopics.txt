@@ -1,0 +1,6 @@
+Allowed Topics:
+
+{{topics}}
+
+__Me__: {{firstMessage}}
+__You_:

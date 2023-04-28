@@ -7,4 +7,11 @@ export const FIRST_MESSAGES: string[] = [
 	'test',
 	'Hi',
 	'Hi!',
+	'Greetings!',
+	'Good day!',
+	'Howdy!',
+	'Hey there!',
+	'Nice to meet you!',
+	'Welcome!',
+	'Hello there!',
 ]

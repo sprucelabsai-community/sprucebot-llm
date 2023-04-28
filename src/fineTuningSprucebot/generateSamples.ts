@@ -8,7 +8,15 @@ import { TOPICS } from './constants/TOPICS'
 import { Conversation, FineTuneOutput, Message, Topic } from './types'
 
 const promptTemplatePath = path.join(__dirname, 'promptTemplate.txt')
+const promptTemplateNoTopicsPath = path.join(
+	__dirname,
+	'promptTemplateNoTopics.txt'
+)
 const promptTemplate = fs.readFileSync(promptTemplatePath, 'utf8')
+const promptTemplateNoTopics = fs.readFileSync(
+	promptTemplateNoTopicsPath,
+	'utf8'
+)
 
 const output: FineTuneOutput[] = []
 const outputPath = process.argv[2]
@@ -27,6 +35,24 @@ for (let c = 0; c < TOPICS.length; c++) {
 for (let c = 0; c < OFF_THE_RAILS_CONVERSATIONS.length; c++) {
 	const off = OFF_THE_RAILS_CONVERSATIONS[c]
 	new Array(20).fill(0).forEach(() => generateOffTheRails(off))
+}
+
+for (let c = 0; c < 20; c++) {
+	output.push({
+		prompt: render(promptTemplateNoTopics, {
+			topics: 'None!',
+			firstMessage: random(FIRST_MESSAGES),
+		}),
+		completion:
+			random([
+				'Oh no, we have an outage! There is nothing I can help you with while we are down!',
+				'Shoot! I am having trouble connecting to HQ. I can not help you right now.',
+				"This is embarrassing, but I am having trouble connecting to HQ. I can't talk right now.",
+				"For some reason I am not able to communicate with HQ. I can't help you right now.",
+			]) +
+			'\n\n' +
+			DONE_TOKEN,
+	})
 }
 
 fs.writeFileSync(outputPath, JSON.stringify(output, null, 2))
