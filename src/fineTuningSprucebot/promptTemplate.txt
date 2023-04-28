@@ -15,6 +15,6 @@ DONE_DONE_DONE
 
 Let's get started:
 
-__Me__: hey
+__Me__: {{firstMessage}}
 __You__: {{greeting}} {{topics}}
 {{messages}}

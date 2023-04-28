@@ -1,8 +1,11 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import { DONE_TOKEN } from '../bots/templates'
+import { FIRST_MESSAGES } from './constants/FIRST_MESSAGES'
 import { GREETINGS } from './constants/GREETINGS'
+import { OFF_THE_RAILS_CONVERSATIONS } from './constants/OFF_THE_RAILS_CONVERSATIONS'
 import { TOPICS } from './constants/TOPICS'
-import { FineTuneOutput } from './types'
+import { Conversation, FineTuneOutput, Message, Topic } from './types'
 
 const promptTemplatePath = path.join(__dirname, 'promptTemplate.txt')
 const promptTemplate = fs.readFileSync(promptTemplatePath, 'utf8')
@@ -17,29 +20,63 @@ if (!outputPath) {
 }
 
 for (let c = 0; c < TOPICS.length; c++) {
-	new Array(10).fill(0).forEach(() => generateCompletion(c))
+	new Array(15).fill(0).forEach(() => generateCompletion(TOPICS, c))
+}
+
+for (let c = 0; c < OFF_THE_RAILS_CONVERSATIONS.length; c++) {
+	const off = OFF_THE_RAILS_CONVERSATIONS[c]
+	new Array(15).fill(0).forEach(() => generateOffTheRails(off))
 }
 
 fs.writeFileSync(outputPath, JSON.stringify(output, null, 2))
 
-function generateCompletion(c: number) {
-	const completion = `{{#${c + 1}}}`
+function generateOffTheRails(off: Conversation) {
 	const greeting = random(GREETINGS)
 	const topics = renderTopics()
-
-	const topic = TOPICS[c]
-	const conversation = random(topic.conversations)
-	const messages = render(
-		conversation.messages
-			.map((m) => `__${m.from}__: ${random(m.text)}`)
-			.join('\n') + '\n__You__:',
-		{ topics }
-	)
+	const messages = renderMessages([off.messages[0]], topics)
 
 	output.push({
-		prompt: render(promptTemplate, { topics, greeting, messages }),
+		prompt: render(promptTemplate, {
+			greeting,
+			topics,
+			messages,
+			firstMessage: random(FIRST_MESSAGES),
+		}),
+		completion: render(random(off.messages[1].text), { topics }),
+	})
+}
+
+function generateCompletion(ts: Topic[], c: number) {
+	const completion = `{{#${c + 1}}}\n\n${DONE_TOKEN}`
+	const greeting = random(GREETINGS)
+
+	const topic = ts[c]
+	const { topics, messages } = renderMessagesAndTopics(topic.conversations)
+
+	output.push({
+		prompt: render(promptTemplate, {
+			firstMessage: random(FIRST_MESSAGES),
+			topics,
+			greeting,
+			messages,
+		}),
 		completion,
 	})
+}
+
+function renderMessagesAndTopics(conversations: Conversation[]) {
+	const conversation = random(conversations)
+	const topics = renderTopics()
+	const rendered = renderMessages(conversation.messages, topics)
+	return { topics, messages: rendered }
+}
+
+function renderMessages(messages: Message[], topics: string) {
+	return render(
+		messages.map((m) => `__${m.from}__: ${random(m.text)}`).join('\n') +
+			'\n__You__:',
+		{ topics }
+	)
 }
 
 function renderTopics() {
