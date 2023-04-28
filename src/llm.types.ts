@@ -26,7 +26,10 @@ export interface SprucebotLlmBot<
 }
 
 export interface LlmAdapter {
-	sendMessage(bot: SprucebotLlmBot<Schema>): Promise<string>
+	sendMessage(
+		bot: SprucebotLlmBot<Schema>,
+		options?: SendMessageOptions
+	): Promise<string>
 }
 
 export interface PromptOptions<
@@ -40,6 +43,11 @@ export interface PromptOptions<
 	stateSchema?: StateSchema
 	state?: Partial<State>
 	skill?: SerializedSkill<Schema>
+}
+
+export interface SendMessageOptions {
+	model?: string
+	promptTemplate?: string
 }
 
 export interface SerializedBot<
@@ -72,6 +80,8 @@ export interface SkillOptions<
 	stateSchema?: StateSchema
 	state?: Partial<State>
 	callbacks?: LlmCallbackMap
+	model?: string
+	promptTemplate?: string
 }
 
 export interface SprucebotLLmSkill<

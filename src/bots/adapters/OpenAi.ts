@@ -1,6 +1,10 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { Configuration, OpenAIApi } from 'openai'
-import { LlmAdapter, SprucebotLlmBot } from '../../llm.types'
+import {
+	LlmAdapter,
+	SendMessageOptions,
+	SprucebotLlmBot,
+} from '../../llm.types'
 import PromptGenerator from '../PromptGenerator'
 
 export class OpenAiAdapter implements LlmAdapter {
@@ -14,8 +18,13 @@ export class OpenAiAdapter implements LlmAdapter {
 		this.api = new OpenAiAdapter.OpenAIApi(config)
 	}
 
-	public async sendMessage(bot: SprucebotLlmBot): Promise<string> {
-		const generator = new PromptGenerator(bot)
+	public async sendMessage(
+		bot: SprucebotLlmBot,
+		options?: SendMessageOptions
+	): Promise<string> {
+		const generator = PromptGenerator.Generator(bot, {
+			promptTemplate: options?.promptTemplate,
+		})
 		const prompt = await generator.generate()
 
 		const response = await this.api.createCompletion({
@@ -23,6 +32,7 @@ export class OpenAiAdapter implements LlmAdapter {
 			model: 'text-davinci-003',
 			max_tokens: 250,
 			stop: ['__Me__:'],
+			...options,
 		})
 
 		return (

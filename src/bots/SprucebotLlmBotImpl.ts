@@ -74,14 +74,19 @@ export default class SprucebotLlmBotImpl<
 			message,
 		})
 
-		const response = await this.adapter.sendMessage(this)
+		const serializedSkill = this.skill?.serialize()
+
+		const response = await this.adapter.sendMessage(this, {
+			model: serializedSkill?.model,
+			promptTemplate: serializedSkill?.promptTemplate,
+		})
 
 		const parser = ResponseParser.getInstance()
 		const {
 			isDone,
 			message: parsedResponse,
 			state,
-		} = await parser.parse(response, this.skill?.serialize().callbacks)
+		} = await parser.parse(response, serializedSkill?.callbacks)
 
 		this.isDone = isDone
 

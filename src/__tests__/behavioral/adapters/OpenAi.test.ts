@@ -5,7 +5,10 @@ import {
 	OpenAiAdapter,
 } from '../../../bots/adapters/OpenAi'
 import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
-import PromptGenerator from '../../../bots/PromptGenerator'
+import PromptGenerator, {
+	PromptGeneratorOptions,
+} from '../../../bots/PromptGenerator'
+import { SprucebotLlmBot } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { SpyBot } from '../../support/SpyBot'
 import SpyConfiguration from '../../support/SpyConfiguration'
@@ -62,7 +65,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 		])
 		await this.openAi.sendMessage(this.bot)
 
-		const prompt = new PromptGenerator(this.bot)
+		const prompt = PromptGenerator.Generator(this.bot)
 		const expected = await prompt.generate()
 
 		assert.isEqual(SpyOpenAiApi.lastMessage, expected)
@@ -85,6 +88,33 @@ export default class OpenAiTest extends AbstractLlmTest {
 	protected static async noResponseReturnsDefaultErrorMesssage() {
 		SpyOpenAiApi.responseMessage = false
 		await this.assertResponseEquals(MESSAGE_RESPONSE_ERROR_MESSAGE)
+	}
+
+	@test()
+	protected static async sendMessageCanAcceptModel() {
+		this.setupSpys()
+
+		const model = 'davinci:ft-personal:sprucebot-concierge-2023-04-28-04-42-19'
+		await this.openAi.sendMessage(this.bot, {
+			model,
+		})
+
+		this.sendRandomMessage()
+		assert.isEqual(SpyOpenAiApi.lastModel, model)
+	}
+
+	@test()
+	protected static async passesThroughPromptTemplateToPromptGenerator() {
+		const template = generateId()
+		PromptGenerator.Class = SpyPromptGenerator
+		await this.openAi.sendMessage(this.bot, {
+			promptTemplate: template,
+		})
+
+		assert.isEqual(
+			SpyPromptGenerator.lastConstructorOptions?.promptTemplate,
+			template
+		)
 	}
 
 	private static async assertResponseEquals(expected: string) {
@@ -112,5 +142,16 @@ export default class OpenAiTest extends AbstractLlmTest {
 		SpyConfiguration.options = undefined
 		SpyOpenAiApi.lastMessage = undefined
 		SpyOpenAiApi.lastModel = undefined
+	}
+}
+
+class SpyPromptGenerator extends PromptGenerator {
+	public static lastConstructorOptions?: PromptGeneratorOptions
+	protected constructor(
+		bot: SprucebotLlmBot,
+		options?: PromptGeneratorOptions
+	) {
+		super(bot, options)
+		SpyPromptGenerator.lastConstructorOptions = options
 	}
 }

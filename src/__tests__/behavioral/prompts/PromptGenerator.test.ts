@@ -2,6 +2,7 @@ import { normalizeSchemaValues, Schema, SchemaValues } from '@sprucelabs/schema'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import * as Eta from 'eta'
 import PromptGenerator, {
+	PromptGeneratorOptions,
 	setUndefinedToNull,
 	TemplateContext,
 } from '../../../bots/PromptGenerator'
@@ -126,6 +127,18 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 		this.log(await this.generate())
 	}
 
+	@test()
+	protected static async canOverrideTemplate() {
+		const template = generateId()
+
+		this.reloadGenerator({
+			promptTemplate: template,
+		})
+
+		const actual = await this.generate()
+		assert.isEqual(actual, template)
+	}
+
 	private static async renderMessage(context: Partial<TemplateContext>) {
 		return await Eta.render(
 			PROMPT_TEMPLATE,
@@ -188,7 +201,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 		return this.Bot({ ...options, Class: SpyBot }) as SpyBot
 	}
 
-	private static reloadGenerator() {
-		this.prompt = new PromptGenerator(this.bot)
+	private static reloadGenerator(options?: PromptGeneratorOptions) {
+		this.prompt = PromptGenerator.Generator(this.bot, options)
 	}
 }

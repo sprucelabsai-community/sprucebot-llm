@@ -14,9 +14,23 @@ export default class PromptGenerator {
 		process.env.SHOULD_LOG_GENERATED_PROMPTS === 'true'
 			? console.info
 			: () => {}
-	public constructor(bot: SprucebotLlmBot) {
+	public static Class?: typeof PromptGenerator
+	private promptTemplate: string
+
+	protected constructor(
+		bot: SprucebotLlmBot,
+		options?: PromptGeneratorOptions
+	) {
 		assertOptions({ bot }, ['bot'])
 		this.bot = bot
+		this.promptTemplate = options?.promptTemplate ?? PROMPT_TEMPLATE
+	}
+
+	public static Generator(
+		bot: SprucebotLlmBot,
+		options?: PromptGeneratorOptions
+	) {
+		return new (this.Class ?? PromptGenerator)(bot, options)
 	}
 
 	public async generate() {
@@ -27,7 +41,7 @@ export default class PromptGenerator {
 		)
 
 		const rendered = await this.eta.render(
-			PROMPT_TEMPLATE,
+			this.promptTemplate,
 			{
 				stateSchemaJson,
 				stateJson,
@@ -80,4 +94,8 @@ export interface TemplateContext {
 	messages: LlmMessage[]
 	stateSchemaJson?: string
 	stateJson?: string
+}
+
+export interface PromptGeneratorOptions {
+	promptTemplate?: string
 }

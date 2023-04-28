@@ -20,19 +20,24 @@ if (!outputPath) {
 }
 
 for (let c = 0; c < TOPICS.length; c++) {
-	new Array(15).fill(0).forEach(() => generateCompletion(TOPICS, c))
+	const topics = randomizedTopics()
+	new Array(20).fill(0).forEach(() => generateCompletion(topics, c))
 }
 
 for (let c = 0; c < OFF_THE_RAILS_CONVERSATIONS.length; c++) {
 	const off = OFF_THE_RAILS_CONVERSATIONS[c]
-	new Array(15).fill(0).forEach(() => generateOffTheRails(off))
+	new Array(20).fill(0).forEach(() => generateOffTheRails(off))
 }
 
 fs.writeFileSync(outputPath, JSON.stringify(output, null, 2))
 
+function randomizedTopics() {
+	return [...TOPICS].sort(() => Math.random() - 0.5)
+}
+
 function generateOffTheRails(off: Conversation) {
 	const greeting = random(GREETINGS)
-	const topics = renderTopics()
+	const topics = renderTopics(randomizedTopics())
 	const messages = renderMessages([off.messages[0]], topics)
 
 	output.push({
@@ -51,7 +56,7 @@ function generateCompletion(ts: Topic[], c: number) {
 	const greeting = random(GREETINGS)
 
 	const topic = ts[c]
-	const { topics, messages } = renderMessagesAndTopics(topic.conversations)
+	const { topics, messages } = renderMessagesAndTopics(ts, topic.conversations)
 
 	output.push({
 		prompt: render(promptTemplate, {
@@ -64,9 +69,9 @@ function generateCompletion(ts: Topic[], c: number) {
 	})
 }
 
-function renderMessagesAndTopics(conversations: Conversation[]) {
+function renderMessagesAndTopics(ts: Topic[], conversations: Conversation[]) {
 	const conversation = random(conversations)
-	const topics = renderTopics()
+	const topics = renderTopics(ts)
 	const rendered = renderMessages(conversation.messages, topics)
 	return { topics, messages: rendered }
 }
@@ -79,8 +84,8 @@ function renderMessages(messages: Message[], topics: string) {
 	)
 }
 
-function renderTopics() {
-	return TOPICS.map((t, idx) => `${idx + 1}. ${random(t.name)}`).join('\n')
+function renderTopics(topics: Topic[]) {
+	return topics.map((t, idx) => `${idx + 1}. ${random(t.name)}`).join('\n')
 }
 
 function random<T>(values: T[]): T {

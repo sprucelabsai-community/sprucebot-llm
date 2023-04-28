@@ -1,5 +1,7 @@
 import { buildSchema, Schema, SchemaPartialValues } from '@sprucelabs/schema'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import { OpenAiAdapter } from '../../../bots/adapters/OpenAi'
+import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
 import SprucebotLlmSkillImpl from '../../../bots/SprucebotLlmSkillImpl'
 import { LlmCallbackMap, SprucebotLLmSkill } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
@@ -155,6 +157,44 @@ export default class SkillTest extends AbstractLlmTest {
 		})
 
 		assert.isEqualDeep(this.serialize().callbacks, callbacks)
+	}
+
+	@test()
+	protected static async skillCanSetModel() {
+		OpenAiAdapter.OpenAIApi = SpyOpenAiApi
+
+		const model = 'davinci:ft-personal:sprucebot-concierge-2023-04-28-04-42-19'
+		this.skill = this.Skill({
+			model,
+		})
+
+		assert.isEqual(this.serialize().model, model)
+
+		const bot = this.Bot({
+			skill: this.skill,
+		})
+
+		await bot.sendMessage('what the!?')
+
+		assert.isEqual(this.adapter.lastSendOptions?.model, model)
+	}
+
+	@test()
+	protected static async skillCanOverridePromptTemplate() {
+		const promptTemplate = 'This is a test'
+		this.skill = this.Skill({
+			promptTemplate,
+		})
+
+		assert.isEqual(this.serialize().promptTemplate, promptTemplate)
+
+		const bot = this.Bot({
+			skill: this.skill,
+		})
+
+		await bot.sendMessage('what the!?')
+
+		assert.isEqual(this.adapter.lastSendOptions?.promptTemplate, promptTemplate)
 	}
 
 	private static assertStateEquals(expected: SchemaPartialValues<Schema>) {

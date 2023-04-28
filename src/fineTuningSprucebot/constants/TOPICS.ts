@@ -19,6 +19,7 @@ export const TOPICS: Topic[] = [
 							'Tell me a joke!',
 							'I want to hear a joke!',
 							'Can you tell me a joke?',
+							'Tell me a joke please!',
 						],
 					},
 				],
@@ -193,7 +194,8 @@ export const TOPICS: Topic[] = [
 		name: [
 			'Add a block to your schedule',
 			'Block off some time',
-			'Create an event',
+			'Block my calendar',
+			'Add timeblock',
 		],
 		conversations: [
 			{
