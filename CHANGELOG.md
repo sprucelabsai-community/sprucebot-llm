@@ -1,3 +1,19 @@
+## [2.4.11](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.10...v2.4.11) (2023-04-28)
+
+## [2.4.10](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.9...v2.4.10) (2023-04-27)
+
+## [2.4.9](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.8...v2.4.9) (2023-04-27)
+
+## [2.4.8](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.7...v2.4.8) (2023-04-27)
+
+## [2.4.7](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.6...v2.4.7) (2023-04-26)
+
+## [2.4.6](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.5...v2.4.6) (2023-04-26)
+
+## [2.4.5](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.4...v2.4.5) (2023-04-25)
+
+## [2.4.4](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.3...v2.4.4) (2023-04-25)
+
 ## [2.4.3](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.2...v2.4.3) (2023-04-25)
 
 ## [2.4.2](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.1...v2.4.2) (2023-04-25)
