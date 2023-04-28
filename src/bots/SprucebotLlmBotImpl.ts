@@ -47,6 +47,10 @@ export default class SprucebotLlmBotImpl<
 			: undefined
 	}
 
+	public clearMessageHistory(): void {
+		this.messages = []
+	}
+
 	public markAsDone(): void {
 		this.isDone = true
 	}

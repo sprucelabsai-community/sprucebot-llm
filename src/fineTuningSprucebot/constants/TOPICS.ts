@@ -169,8 +169,7 @@ export const TOPICS: Topic[] = [
 		name: [
 			'Review my schedule',
 			'Check my calendar',
-			'See my appointments',
-			'View my agenda',
+			'See my calendar',
 			'What is on my schedule?',
 		],
 		conversations: [
@@ -208,6 +207,107 @@ export const TOPICS: Topic[] = [
 							'I want to reserve some time on my calendar',
 							'Add a block',
 							'Can you block my calendar?',
+						],
+					},
+				],
+			},
+		],
+	},
+	{
+		name: [
+			'Get restaurant recommendations',
+			'Recommend a restaurant',
+			'Suggest food places',
+			'Where should I eat?',
+			'Find me a good restaurant',
+		],
+		conversations: [
+			{
+				messages: [
+					{
+						from: 'Me',
+						text: [
+							'I am hungry, can you recommend a restaurant?',
+							'Where should I go for dinner tonight?',
+							'I want to try a new restaurant, any suggestions?',
+							'What are some good food places around here?',
+							'Can you suggest a restaurant for a date?',
+						],
+					},
+				],
+			},
+		],
+	},
+	{
+		name: [
+			'Get directions',
+			'Find my way',
+			'How do I get there?',
+			'Directions to a place',
+		],
+		conversations: [
+			{
+				messages: [
+					{
+						from: 'Me',
+						text: [
+							'I am lost, can you help me find my way?',
+							'How do I get to the nearest gas station?',
+							'Can you give me directions to the airport?',
+							'I need to find my way to the nearest hospital',
+							'What is the best route to take to get to the park?',
+						],
+					},
+				],
+			},
+		],
+	},
+
+	{
+		name: [
+			'Get tech support',
+			'Technical issues',
+			'Troubleshoot my device',
+			'Solve my computer problems',
+			'Fix my internet',
+		],
+		conversations: [
+			{
+				messages: [
+					{
+						from: 'Me',
+						text: [
+							'I am having technical issues, can you help me?',
+							'How do I troubleshoot my device?',
+							'I need help solving my computer problems',
+							'My internet is not working, can you fix it?',
+							'I am having trouble with my phone, can you help me troubleshoot?',
+						],
+					},
+				],
+			},
+		],
+	},
+
+	{
+		name: [
+			'Get a quote',
+			'Price estimate',
+			'How much does it cost?',
+			'What is the cost?',
+			'Pricing information',
+		],
+		conversations: [
+			{
+				messages: [
+					{
+						from: 'Me',
+						text: [
+							'How much does a service cost?',
+							'Can you give me a quote?',
+							'What is the price of a service?',
+							'I would like to know the pricing information',
+							'Can you give me a price estimate?',
 						],
 					},
 				],

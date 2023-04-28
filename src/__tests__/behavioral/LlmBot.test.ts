@@ -367,6 +367,13 @@ export default class LlmBotTest extends AbstractLlmTest {
 		assert.isFalse(this.bot.getIsDone())
 	}
 
+	@test()
+	protected static async canClearMessageHistory() {
+		await this.sendRandomMessage()
+		this.bot.clearMessageHistory()
+		assert.isLength(this.bot.getMessages(), 0)
+	}
+
 	private static assertTotalMessagesTracked(expected: number) {
 		assert.isLength(this.bot.getMessages(), expected)
 	}
