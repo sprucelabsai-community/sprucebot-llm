@@ -99,7 +99,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 			model,
 		})
 
-		this.sendRandomMessage()
+		await this.sendRandomMessage()
 		assert.isEqual(SpyOpenAiApi.lastModel, model)
 	}
 
