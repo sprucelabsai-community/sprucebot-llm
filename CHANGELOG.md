@@ -1,3 +1,10 @@
+# [2.5.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.14...v2.5.0) (2023-04-28)
+
+
+### Features
+
+* can override model and prompt template for skill ([e341496](https://github.com/sprucelabsai-community/sprucebot-llm/commit/e341496))
+
 ## [2.4.14](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.13...v2.4.14) (2023-04-28)
 
 ## [2.4.13](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.4.12...v2.4.13) (2023-04-28)
