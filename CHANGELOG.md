@@ -1,3 +1,10 @@
+# [3.0.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.6.9...v3.0.0) (2023-05-04)
+
+
+### Breaking Changes
+
+* **auto-upgrade:** upgraded packages [upgrade-all] ([b614914](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b614914))
+
 ## [2.6.9](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.6.8...v2.6.9) (2023-05-03)
 
 ## [2.6.8](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v2.6.7...v2.6.8) (2023-05-02)
