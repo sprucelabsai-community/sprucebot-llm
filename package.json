@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "@sprucelabs/error": "^5.1.2",
-    "@sprucelabs/mercury-event-emitter": "^40.1.17",
+    "@sprucelabs/mercury-event-emitter": "^40.1.20",
     "@sprucelabs/mercury-types": "^45.0.11",
     "@sprucelabs/schema": "^28.6.25",
     "eta": "^2.1.2",
@@ -68,7 +68,7 @@
     "@sprucelabs/semantic-release": "^4.0.8",
     "@sprucelabs/test": "^7.7.447",
     "@sprucelabs/test-utils": "^3.4.54",
-    "@types/node": "^20.1.4",
+    "@types/node": "^20.1.5",
     "chokidar-cli": "^3.0.0",
     "concurrently": "^8.0.1",
     "dotenv": "^16.0.3",
