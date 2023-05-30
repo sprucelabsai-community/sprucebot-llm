@@ -55,7 +55,7 @@
   },
   "dependencies": {
     "@sprucelabs/error": "^5.1.4",
-    "@sprucelabs/mercury-event-emitter": "^40.1.38",
+    "@sprucelabs/mercury-event-emitter": "^40.1.39",
     "@sprucelabs/mercury-types": "^45.0.29",
     "@sprucelabs/schema": "^28.6.34",
     "eta": "^2.2.0",
@@ -71,7 +71,7 @@
     "@types/node": "^20.2.5",
     "chokidar-cli": "^3.0.0",
     "concurrently": "^8.0.1",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.1.0",
     "eslint": "^8.41.0",
     "eslint-config-spruce": "^10.12.0",
     "jest": "^29.5.0",
