@@ -1,3 +1,5 @@
+## [3.0.65](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v3.0.64...v3.0.65) (2023-06-12)
+
 ## [3.0.64](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v3.0.63...v3.0.64) (2023-06-11)
 
 ## [3.0.63](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v3.0.62...v3.0.63) (2023-06-11)
