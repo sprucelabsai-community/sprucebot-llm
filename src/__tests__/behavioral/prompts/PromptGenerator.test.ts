@@ -1,6 +1,6 @@
 import { normalizeSchemaValues, Schema, SchemaValues } from '@sprucelabs/schema'
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
-import * as Eta from 'eta'
+import { Eta } from 'eta'
 import PromptGenerator, {
 	PromptGeneratorOptions,
 	setUndefinedToNull,
@@ -15,11 +15,13 @@ import { SpyBot } from '../../support/SpyBot'
 export default class PromptGeneratorTest extends AbstractLlmTest {
 	private static bot: SpyBot
 	private static prompt: PromptGenerator
+	private static eta: Eta
 
 	protected static async beforeEach() {
 		await super.beforeEach()
 		this.bot = this.SpyBot()
 		this.reloadGenerator()
+		this.eta = new Eta()
 	}
 
 	@test()
@@ -140,23 +142,16 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 	}
 
 	private static async renderMessage(context: Partial<TemplateContext>) {
-		return await Eta.render(
-			PROMPT_TEMPLATE,
-			{
-				youAre: 'a bot',
-				messages: [
-					{
-						from: 'Me',
-						message: 'Hey there!',
-					},
-				],
-				...context,
-			},
-			{
-				async: true,
-				autoEscape: false,
-			}
-		)
+		return await this.eta.renderStringAsync(PROMPT_TEMPLATE, {
+			youAre: 'a bot',
+			messages: [
+				{
+					from: 'Me',
+					message: 'Hey there!',
+				},
+			],
+			...context,
+		})
 	}
 
 	private static async assertMessageGeneratesPrompt<S extends Schema>(options: {

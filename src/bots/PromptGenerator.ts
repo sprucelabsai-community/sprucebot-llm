@@ -3,13 +3,13 @@ import {
 	normalizeSchemaValues,
 	Schema,
 } from '@sprucelabs/schema'
-import * as Eta from 'eta'
+import { Eta } from 'eta'
 import { LlmMessage, SprucebotLlmBot } from '../llm.types'
 import { PROMPT_TEMPLATE } from './templates'
 
 export default class PromptGenerator {
 	private bot: SprucebotLlmBot
-	private eta = Eta
+	private eta = new Eta()
 	private log =
 		process.env.SHOULD_LOG_GENERATED_PROMPTS === 'true'
 			? console.info
@@ -40,18 +40,11 @@ export default class PromptGenerator {
 			state
 		)
 
-		const rendered = await this.eta.render(
-			this.promptTemplate,
-			{
-				stateSchemaJson,
-				stateJson,
-				...rest,
-			},
-			{
-				async: true,
-				autoEscape: false,
-			}
-		)
+		const rendered = await this.eta.renderStringAsync(this.promptTemplate, {
+			stateSchemaJson,
+			stateJson,
+			...rest,
+		})
 
 		this.log('Generated prompt:', rendered)
 
