@@ -68,7 +68,7 @@
     "@sprucelabs/semantic-release": "^4.0.8",
     "@sprucelabs/test": "^8.0.5",
     "@sprucelabs/test-utils": "^4.0.12",
-    "@types/node": "^20.4.5",
+    "@types/node": "^20.4.6",
     "chokidar-cli": "^3.0.0",
     "concurrently": "^8.2.0",
     "dotenv": "^16.3.1",
