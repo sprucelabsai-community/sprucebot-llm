@@ -19,7 +19,7 @@ import ResponseParser from '../parsingResponses/ResponseParser'
 
 export default class SprucebotLlmBotImpl<
 		StateSchema extends Schema = Schema,
-		State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+		State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 	>
 	extends AbstractEventEmitter<LlmEventContract>
 	implements SprucebotLlmBot<StateSchema, State>

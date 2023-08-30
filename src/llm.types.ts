@@ -6,7 +6,7 @@ import { Schema, SchemaValues } from '@sprucelabs/schema'
 
 export interface BotOptions<
 	StateSchema extends Schema = Schema,
-	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 > extends Omit<PromptOptions<StateSchema, State>, 'skill'> {
 	adapter: LlmAdapter
 	Class?: new (...opts: any[]) => SprucebotLlmBot<Schema, State>
@@ -15,7 +15,7 @@ export interface BotOptions<
 
 export interface SprucebotLlmBot<
 	StateSchema extends Schema = Schema,
-	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 > extends MercuryEventEmitter<LlmEventContract> {
 	markAsDone(): void
 	getIsDone(): boolean
@@ -35,7 +35,7 @@ export interface LlmAdapter {
 
 export interface PromptOptions<
 	StateSchema extends Schema,
-	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 > {
 	/**
 	 * Tell the bot who/what it is. Example: youAre: "a super funny comedian. You absolutely love dad jokes!"
@@ -53,7 +53,7 @@ export interface SendMessageOptions {
 
 export interface SerializedBot<
 	StateSchema extends Schema = Schema,
-	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 > extends PromptOptions<Schema, State> {
 	messages: LlmMessage[]
 }
@@ -73,7 +73,7 @@ export interface LlmMessage {
 
 export interface SkillOptions<
 	StateSchema extends Schema = Schema,
-	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 > {
 	yourJobIfYouChooseToAcceptItIs: string
 	weAreDoneWhen?: string
@@ -87,7 +87,7 @@ export interface SkillOptions<
 
 export interface SprucebotLLmSkill<
 	StateSchema extends Schema = Schema,
-	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 > extends MercuryEventEmitter<LlmEventContract> {
 	getState(): Partial<State> | undefined
 	serialize(): SerializedSkill<StateSchema, State>
@@ -96,7 +96,7 @@ export interface SprucebotLLmSkill<
 
 export interface SerializedSkill<
 	StateSchema extends Schema = Schema,
-	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+	State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 > extends SkillOptions<StateSchema, State> {}
 
 export interface LlmCallbackMap {

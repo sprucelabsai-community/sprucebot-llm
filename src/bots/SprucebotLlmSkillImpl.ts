@@ -10,7 +10,7 @@ import {
 
 export default class SprucebotLlmSkillImpl<
 		StateSchema extends Schema = Schema,
-		State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>
+		State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 	>
 	extends AbstractEventEmitter<LlmEventContract>
 	implements SprucebotLLmSkill<StateSchema, State>
