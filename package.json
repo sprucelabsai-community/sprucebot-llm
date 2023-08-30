@@ -55,11 +55,11 @@
   },
   "dependencies": {
     "@sprucelabs/error": "^5.1.26",
-    "@sprucelabs/mercury-event-emitter": "^41.0.60",
+    "@sprucelabs/mercury-event-emitter": "^41.0.63",
     "@sprucelabs/mercury-types": "^46.0.47",
     "@sprucelabs/schema": "^29.0.41",
     "eta": "^3.1.1",
-    "openai": "^3.3.0"
+    "openai": "^4.3.1"
   },
   "devDependencies": {
     "@sprucelabs/esm-postbuild": "^5.0.57",
