@@ -56,7 +56,7 @@
   },
   "dependencies": {
     "@sprucelabs/error": "^5.1.82",
-    "@sprucelabs/mercury-event-emitter": "^41.0.350",
+    "@sprucelabs/mercury-event-emitter": "^41.0.351",
     "@sprucelabs/mercury-types": "^46.0.269",
     "@sprucelabs/schema": "^29.4.31",
     "eta": "^3.4.0",
