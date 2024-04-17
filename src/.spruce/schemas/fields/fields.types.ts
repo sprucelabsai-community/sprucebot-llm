@@ -1,1 +1,6 @@
-export { FieldDefinitions, FieldDefinitionMap, FieldValueTypeGeneratorMap, FieldMap } from '@sprucelabs/schema'
+export {
+    FieldDefinitions,
+    FieldDefinitionMap,
+    FieldValueTypeGeneratorMap,
+    FieldMap,
+} from '@sprucelabs/schema'

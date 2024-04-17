@@ -40,7 +40,7 @@ When asking me about a "select" field, make sure I only pick a valid choice by s
 Your primary objective for this conversation is <%= it.skill.yourJobIfYouChooseToAcceptItIs %>
 <% if (it.skill.callbacks) { %>
 While we are talking, there are going to be things I don't want you to answer, but instead to respond with a placeholder in the form of ${renderPlaceholder(
-	'example'
+    'example'
 )}.
 
 Here are the placeholders we will be using:

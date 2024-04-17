@@ -1,17 +1,17 @@
 export interface Topic {
-	name: string[]
-	conversations: Conversation[]
+    name: string[]
+    conversations: Conversation[]
 }
 export interface Conversation {
-	messages: Message[]
+    messages: Message[]
 }
 
 export interface Message {
-	from: 'Me' | 'You'
-	text: string[]
+    from: 'Me' | 'You'
+    text: string[]
 }
 
 export interface FineTuneOutput {
-	prompt: string
-	completion: string
+    prompt: string
+    completion: string
 }
