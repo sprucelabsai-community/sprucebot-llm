@@ -12,7 +12,7 @@ import buildReceptionistSkill from './examples/buildReceptionistSkill'
 dotenv.config()
 const rl = readline.createInterface({ input, output })
 
-;(async () => {
+void (async () => {
     console.clear()
 
     const adapter = new OpenAiAdapter(process.env.OPEN_AI_API_KEY!)
