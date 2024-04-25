@@ -57,7 +57,7 @@
     "@sprucelabs/error": "^6.0.13",
     "@sprucelabs/mercury-event-emitter": "^42.0.16",
     "@sprucelabs/mercury-types": "^47.0.14",
-    "@sprucelabs/schema": "^30.0.18",
+    "@sprucelabs/schema": "^30.0.19",
     "eta": "^3.4.0",
     "openai": "^3.3.0"
   },
