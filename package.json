@@ -55,8 +55,8 @@
   },
   "dependencies": {
     "@sprucelabs/error": "^6.0.23",
-    "@sprucelabs/mercury-event-emitter": "^42.0.46",
-    "@sprucelabs/mercury-types": "^47.0.34",
+    "@sprucelabs/mercury-event-emitter": "^42.0.47",
+    "@sprucelabs/mercury-types": "^47.0.35",
     "@sprucelabs/schema": "^30.0.36",
     "eta": "^3.4.0",
     "openai": "^3.3.0"
@@ -64,7 +64,7 @@
   "devDependencies": {
     "@sprucelabs/esm-postbuild": "^6.0.20",
     "@sprucelabs/jest-json-reporter": "^8.0.24",
-    "@sprucelabs/resolve-path-aliases": "^2.0.20",
+    "@sprucelabs/resolve-path-aliases": "^2.0.21",
     "@sprucelabs/semantic-release": "^5.0.1",
     "@sprucelabs/test": "^9.0.13",
     "@sprucelabs/test-utils": "^5.0.27",
