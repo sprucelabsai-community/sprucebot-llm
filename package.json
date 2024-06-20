@@ -55,9 +55,9 @@
   },
   "dependencies": {
     "@sprucelabs/error": "^6.0.60",
-    "@sprucelabs/mercury-event-emitter": "^42.0.140",
-    "@sprucelabs/mercury-types": "^47.0.105",
-    "@sprucelabs/schema": "^30.0.105",
+    "@sprucelabs/mercury-event-emitter": "^42.0.141",
+    "@sprucelabs/mercury-types": "^47.0.106",
+    "@sprucelabs/schema": "^30.0.106",
     "eta": "^3.4.0",
     "openai": "^3.3.0"
   },
