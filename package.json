@@ -54,20 +54,20 @@
     "chat": "node ./build/chat.js"
   },
   "dependencies": {
-    "@sprucelabs/error": "^6.0.406",
-    "@sprucelabs/mercury-event-emitter": "^42.0.470",
-    "@sprucelabs/mercury-types": "^47.0.456",
-    "@sprucelabs/schema": "^30.0.455",
+    "@sprucelabs/error": "^6.0.407",
+    "@sprucelabs/mercury-event-emitter": "^42.0.471",
+    "@sprucelabs/mercury-types": "^47.0.457",
+    "@sprucelabs/schema": "^30.0.456",
     "eta": "^3.5.0",
     "openai": "^3.3.0"
   },
   "devDependencies": {
-    "@sprucelabs/esm-postbuild": "^6.0.390",
-    "@sprucelabs/jest-json-reporter": "^8.0.406",
-    "@sprucelabs/resolve-path-aliases": "^2.0.385",
+    "@sprucelabs/esm-postbuild": "^6.0.391",
+    "@sprucelabs/jest-json-reporter": "^8.0.407",
+    "@sprucelabs/resolve-path-aliases": "^2.0.386",
     "@sprucelabs/semantic-release": "^5.0.2",
     "@sprucelabs/test": "^9.0.47",
-    "@sprucelabs/test-utils": "^5.1.353",
+    "@sprucelabs/test-utils": "^5.1.354",
     "@types/node": "^22.7.4",
     "chokidar-cli": "^3.0.0",
     "dotenv": "^16.4.5",
