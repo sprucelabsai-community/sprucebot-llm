@@ -1,3 +1,5 @@
+## [5.0.544](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v5.0.543...v5.0.544) (2024-10-09)
+
 ## [5.0.543](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v5.0.542...v5.0.543) (2024-10-09)
 
 ## [5.0.542](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v5.0.541...v5.0.542) (2024-10-09)
