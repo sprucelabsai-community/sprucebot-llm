@@ -1,3 +1,10 @@
+# [6.0.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v5.0.689...v6.0.0) (2025-01-01)
+
+
+### Breaking Changes
+
+* supports callbacks send back to LLM ([544c202](https://github.com/sprucelabsai-community/sprucebot-llm/commit/544c202))
+
 ## [5.0.689](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v5.0.688...v5.0.689) (2025-01-01)
 
 ## [5.0.688](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v5.0.687...v5.0.688) (2024-12-22)

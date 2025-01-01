@@ -9,7 +9,7 @@
       "@sprucelabs/spruce-test-fixtures"
     ]
   },
-  "version": "5.0.689",
+  "version": "6.0.0",
   "files": [
     "build"
   ],
