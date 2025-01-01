@@ -8,9 +8,12 @@ import { SpyBot } from './SpyBot'
 export default abstract class AbstractLlmTest extends AbstractSpruceTest {
     protected static bots: SprucebotLlmFactory
     protected static adapter: SpyAdapter
+    protected static youAre: string
 
     protected static async beforeEach() {
         await super.beforeEach()
+
+        this.youAre = generateId()
         this.adapter = new SpyAdapter()
         this.bots = SprucebotLlmFactory.Factory()
 
@@ -21,7 +24,7 @@ export default abstract class AbstractLlmTest extends AbstractSpruceTest {
         options?: Partial<BotOptions<S>>
     ): SpyBot {
         return this.bots.Bot({
-            youAre: 'a bot',
+            youAre: this.youAre,
             adapter: this.adapter,
             Class: SpyBot,
             ...options,

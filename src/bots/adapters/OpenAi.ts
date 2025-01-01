@@ -1,41 +1,35 @@
 import { assertOptions } from '@sprucelabs/schema'
-import { Configuration, OpenAIApi } from 'openai'
+import OpenAI from 'openai'
 import {
     LlmAdapter,
     SendMessageOptions,
     SprucebotLlmBot,
 } from '../../llm.types'
-import PromptGenerator from '../PromptGenerator'
+import OpenAiMessageBuilder from './OpenAiMessageBuilder'
 
 export class OpenAiAdapter implements LlmAdapter {
-    public static Configuration = Configuration
-    public static OpenAIApi = OpenAIApi
-    private api: OpenAIApi
+    public static OpenAI = OpenAI
+    private api: OpenAI
 
     public constructor(apiKey: string) {
         assertOptions({ apiKey }, ['apiKey'])
-        const config = new OpenAiAdapter.Configuration({ apiKey })
-        this.api = new OpenAiAdapter.OpenAIApi(config)
+        this.api = new OpenAiAdapter.OpenAI({ apiKey })
     }
 
     public async sendMessage(
         bot: SprucebotLlmBot,
         options?: SendMessageOptions
     ): Promise<string> {
-        const generator = PromptGenerator.Generator(bot, {
-            promptTemplate: options?.promptTemplate,
-        })
-        const prompt = await generator.generate()
+        const messageBuilder = OpenAiMessageBuilder.Builder(bot)
+        const messages = messageBuilder.buildMessages()
 
-        const response = await this.api.createCompletion({
-            prompt,
-            model: options?.model ?? 'text-davinci-003',
-            max_tokens: 250,
-            stop: ['__Me__:'],
+        const response = await this.api.chat.completions.create({
+            messages,
+            model: options?.model ?? 'gpt-4o',
         })
 
         return (
-            response.data.choices[0]?.text?.trim() ??
+            response.choices?.[0]?.message?.content?.trim() ??
             MESSAGE_RESPONSE_ERROR_MESSAGE
         )
     }

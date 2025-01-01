@@ -104,4 +104,14 @@ export type LlmCallbackMap = Record<string, LlmCallback>
 export interface LlmCallback {
     cb: () => string | Promise<string>
     useThisWhenever: string
+    parameters?: LlmCallbackParameter[]
+}
+
+export interface LlmCallbackParameter {
+    name: string
+    type:
+        | ('string' | 'number' | 'boolean' | 'dateMs' | 'dateTimeMs')
+        | (string & {})
+    isRequired?: boolean
+    description?: string
 }

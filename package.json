@@ -6,8 +6,7 @@
     "upgradeIgnoreList": [
       "@sprucelabs/spruce-core-schemas",
       "@sprucelabs/spruce-skill-utils",
-      "@sprucelabs/spruce-test-fixtures",
-      "openai"
+      "@sprucelabs/spruce-test-fixtures"
     ]
   },
   "version": "5.0.688",
@@ -59,7 +58,7 @@
     "@sprucelabs/mercury-types": "^47.0.641",
     "@sprucelabs/schema": "^31.0.3",
     "eta": "^3.5.0",
-    "openai": "^3.3.0"
+    "openai": "^4.77.0"
   },
   "devDependencies": {
     "@sprucelabs/esm-postbuild": "^6.0.533",

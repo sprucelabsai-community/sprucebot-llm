@@ -47,10 +47,6 @@ export default class SkillTest extends AbstractLlmTest {
         assert.isEqualDeep(serialized, options)
     }
 
-    private static serialize() {
-        return this.skill.serialize()
-    }
-
     @test()
     protected static async canAddSkillToBotAndReturnItSerializing() {
         const bot = this.Bot({
@@ -161,7 +157,7 @@ export default class SkillTest extends AbstractLlmTest {
 
     @test()
     protected static async skillCanSetModel() {
-        OpenAiAdapter.OpenAIApi = SpyOpenAiApi
+        OpenAiAdapter.OpenAI = SpyOpenAiApi as any
 
         const model =
             'davinci:ft-personal:sprucebot-concierge-2023-04-28-04-42-19'
@@ -199,6 +195,10 @@ export default class SkillTest extends AbstractLlmTest {
             this.adapter.lastSendOptions?.promptTemplate,
             promptTemplate
         )
+    }
+
+    private static serialize() {
+        return this.skill.serialize()
     }
 
     private static assertStateEquals(expected: SchemaPartialValues<Schema>) {

@@ -142,7 +142,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 
     private static async renderMessage(context: Partial<TemplateContext>) {
         return await this.eta.renderStringAsync(PROMPT_TEMPLATE, {
-            youAre: 'a bot',
+            youAre: this.youAre,
             messages: [
                 {
                     from: 'Me',

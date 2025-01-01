@@ -1,50 +1,57 @@
-import { AxiosResponse } from 'axios'
+import OpenAI from 'openai'
 import {
-    Configuration,
-    CreateCompletionRequest,
-    CreateCompletionRequestPrompt,
-    CreateCompletionResponse,
-    OpenAIApi,
-} from 'openai'
+    ChatCompletion,
+    ChatCompletionCreateParamsNonStreaming,
+} from 'openai/resources'
 
-export default class SpyOpenAiApi extends OpenAIApi {
-    public static config?: Configuration
-    public static lastMessage?: CreateCompletionRequestPrompt | null
-    public static lastModel?: string
+export default class SpyOpenAiApi extends OpenAI {
+    public static config?: OpenAiOptions
+    public static lastSentCompletion?: ChatCompletionCreateParamsNonStreaming
     public static responseMessage: string | false = 'hello!'
 
-    public constructor(config: Configuration) {
+    public constructor(config: OpenAiOptions) {
         super(config)
         SpyOpenAiApi.config = config
     }
 
-    public async createCompletion(
-        createCompletionRequest: CreateCompletionRequest
+    //@ts-ignore
+    public chat = {
+        completions: {
+            create: this.createCompletion.bind(this),
+        },
+    }
+
+    private async createCompletion(
+        options: ChatCompletionCreateParamsNonStreaming
     ): Promise<Response> {
-        SpyOpenAiApi.lastMessage = createCompletionRequest.prompt
-        SpyOpenAiApi.lastModel = createCompletionRequest.model
-        const choices = []
+        SpyOpenAiApi.lastSentCompletion = options
+        const choices: ChatCompletion.Choice[] = []
 
         if (SpyOpenAiApi.responseMessage) {
             choices.push({
-                text: SpyOpenAiApi.responseMessage,
+                finish_reason: 'stop',
+                index: 0,
+                logprobs: null,
+                message: {
+                    content: SpyOpenAiApi.responseMessage,
+                    role: 'assistant',
+                    refusal: null,
+                },
             })
         }
 
         return {
-            config: {},
-            headers: {},
-            status: 200,
-            statusText: 'OK',
-            data: {
-                id: 'cmpl-1',
-                model: 'text-davinci-003',
-                created: 0,
-                object: 'text_completion',
-                choices,
-            },
+            id: 'cmpl-1',
+            model: 'text-davinci-003',
+            created: 0,
+            choices,
+            object: 'chat.completion',
         }
     }
 }
 
-type Response = AxiosResponse<CreateCompletionResponse, any>
+type Response = ChatCompletion
+
+interface OpenAiOptions {
+    apiKey: string
+}

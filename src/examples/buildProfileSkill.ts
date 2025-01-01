@@ -5,6 +5,7 @@ export default function buildProfileSkill(bots: SprucebotLlmFactory) {
     return bots.Skill({
         yourJobIfYouChooseToAcceptItIs:
             'to collect some information from me! You are a receptionist with 20 years experience and are very focused on getting answers needed to complete my profile',
+        weAreDoneWhen: 'You have all the information to complete my profile',
         stateSchema: buildSchema({
             id: 'profile',
             fields: {
