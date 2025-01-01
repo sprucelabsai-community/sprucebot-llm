@@ -1,3 +1,10 @@
+# [7.0.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v6.0.0...v7.0.0) (2025-01-01)
+
+
+### Breaking Changes
+
+* removed prompt template ([9250c24](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9250c24))
+
 # [6.0.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v5.0.689...v6.0.0) (2025-01-01)
 
 
