@@ -1,6 +1,6 @@
 import { DONE_TOKEN, STATE_BOUNDARY } from '../bots/templates'
 import { LlmCallbackMap } from '../llm.types'
-import renderPlaceholder from './renderPlaceholder'
+import renderLegacyPlaceholder from './renderPlaceholder'
 
 export default class ResponseParser {
     private static instance: ResponseParser = new ResponseParser()
@@ -19,12 +19,44 @@ export default class ResponseParser {
     ): Promise<ParsedResponse> {
         let message = response.replace(DONE_TOKEN, '').trim()
         let state: Record<string, any> | undefined
+        let callbackResults: string | undefined
 
         for (const key of Object.keys(callbacks || {})) {
-            const match = message.match(renderPlaceholder(key))
+            const match = message.match(renderLegacyPlaceholder(key))
 
             if (match) {
-                message = await this.invokeCallback(callbacks, key, message)
+                message = await this.invokeCallbackAndDropInLegacyResults(
+                    callbacks,
+                    key,
+                    message
+                )
+            }
+
+            let simpleMatches = message.match(
+                new RegExp(`<<\\s*${key}\\s*\/>>`, 'g')
+            )
+
+            let data: Record<string, any> | undefined
+
+            if (!simpleMatches) {
+                const matchWithJson = message
+                    .matchAll(
+                        new RegExp(
+                            `<<\\s*${key}\\s*>>(.*?)<<\/\\s*${key}\\s*>>`,
+                            'gs'
+                        )
+                    )
+                    .next().value
+
+                simpleMatches = matchWithJson?.[0] ? [matchWithJson?.[0]] : null
+                data = matchWithJson?.[1]
+                    ? JSON.parse(matchWithJson?.[1])
+                    : undefined
+            }
+
+            if (simpleMatches) {
+                callbackResults = await callbacks?.[key]?.cb(data)
+                message = message.replace(simpleMatches[0], '').trim()
             }
         }
 
@@ -39,16 +71,17 @@ export default class ResponseParser {
             isDone: this.doesIncludeDoneToken(response),
             state,
             message,
+            callbackResults,
         }
     }
 
-    private async invokeCallback(
+    private async invokeCallbackAndDropInLegacyResults(
         callbacks: LlmCallbackMap | undefined,
         key: string,
         message: string
     ) {
         const v = await callbacks?.[key]?.cb()
-        message = message.replace(renderPlaceholder(key), v ?? '').trim()
+        message = message.replace(renderLegacyPlaceholder(key), v ?? '').trim()
         return message
     }
 
@@ -74,4 +107,5 @@ export interface ParsedResponse {
     isDone: boolean
     state?: Record<string, any>
     message: string
+    callbackResults?: string
 }

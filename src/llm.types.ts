@@ -19,7 +19,10 @@ export interface SprucebotLlmBot<
 > extends MercuryEventEmitter<LlmEventContract> {
     markAsDone(): void
     getIsDone(): boolean
-    sendMessage(message: string): Promise<string>
+    sendMessage(
+        message: string,
+        responseCb?: MessageResponseCallback
+    ): Promise<string>
     serialize(): SerializedBot<StateSchema, State>
     updateState(state: Partial<State>): Promise<void>
     setSkill(skill: SprucebotLLmSkill<any>): void
@@ -102,7 +105,7 @@ export interface SerializedSkill<
 export type LlmCallbackMap = Record<string, LlmCallback>
 
 export interface LlmCallback {
-    cb: () => string | Promise<string>
+    cb: (options?: Record<string, any>) => string | Promise<string>
     useThisWhenever: string
     parameters?: LlmCallbackParameter[]
 }
@@ -115,3 +118,5 @@ export interface LlmCallbackParameter {
     isRequired?: boolean
     description?: string
 }
+
+export type MessageResponseCallback = (message: string) => any

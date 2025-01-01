@@ -28,10 +28,11 @@ export class OpenAiAdapter implements LlmAdapter {
             model: options?.model ?? 'gpt-4o',
         })
 
-        return (
+        const message =
             response.choices?.[0]?.message?.content?.trim() ??
             MESSAGE_RESPONSE_ERROR_MESSAGE
-        )
+
+        return message
     }
 }
 

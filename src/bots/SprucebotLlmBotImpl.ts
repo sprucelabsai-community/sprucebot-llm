@@ -11,6 +11,7 @@ import {
     llmEventContract,
     LlmEventContract,
     LlmMessage,
+    MessageResponseCallback,
     SerializedBot,
     SprucebotLlmBot,
     SprucebotLLmSkill,
@@ -73,7 +74,10 @@ export default class SprucebotLlmBotImpl<
         }
     }
 
-    public async sendMessage(message: string): Promise<string> {
+    public async sendMessage(
+        message: string,
+        cb?: MessageResponseCallback
+    ): Promise<string> {
         assertOptions({ message }, ['message'])
 
         this.trackMessage({
@@ -93,6 +97,7 @@ export default class SprucebotLlmBotImpl<
             isDone,
             message: parsedResponse,
             state,
+            callbackResults,
         } = await parser.parse(response, serializedSkill?.callbacks)
 
         this.isDone = isDone
@@ -107,6 +112,12 @@ export default class SprucebotLlmBotImpl<
             from: 'You',
             message: parsedResponse,
         })
+
+        cb?.(parsedResponse)
+
+        if (callbackResults) {
+            await this.sendMessage(`API Results: ${callbackResults}`, cb)
+        }
 
         return parsedResponse
     }

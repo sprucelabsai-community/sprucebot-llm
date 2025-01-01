@@ -390,7 +390,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         const api = `<APIReference>\n\n${descriptions.join('\n\n')}</APIReference>`
 
-        const message = `You have an API available to you to lookup answers. To use it, respond with a message in handlebars format like this: {{ FunctionName }} and I'll respond with the response of the api call in my next message. If the api call has parameters, call it like this: {{ FunctionName parameter1="value1" parameter2="value2" }}. It'll work the same way. After I respond with the api's response and you can use it going forward. The api is as follows (in xml format):\n\n${api}`
+        const message = `You have an API available to you to lookup answers. When you need the response of the function call to proceed, you can call a function using a custom markup we created that looks like this: << FunctionName />>. The API will respond with the results and then you can continue the conversation with your new knowledge. If the api call has parameters, call it like this: << FunctionName >>parameters json encoded<</ FunctionName >>. Make sure to json encode the data and drop it between the function tags. I will respond with the api's response and you can use it going forward. The api is as follows (in xml format):\n\n${api}`
         return { role: 'system', content: message }
     }
 

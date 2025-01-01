@@ -1,6 +1,10 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import SprucebotLlmBotImpl from '../../bots/SprucebotLlmBotImpl'
-import { LlmCallbackMap, SkillOptions } from '../../llm.types'
+import {
+    LlmCallbackMap,
+    MessageResponseCallback,
+    SkillOptions,
+} from '../../llm.types'
 import ResponseParser, {
     ParsedResponse,
 } from '../../parsingResponses/ResponseParser'
@@ -162,14 +166,14 @@ export default class LlmBotTest extends AbstractLlmTest {
 
     @test()
     protected static async isDoneWhenParsesSaysSo() {
-        this.parser.response.isDone = true
+        this.setParserResponseIsDone(true)
         await this.sendMessage(generateId())
         assert.isTrue(this.bot.getIsDone())
     }
 
     @test()
     protected static async notDoneUntilDone() {
-        this.parser.response.isDone = false
+        this.setParserResponseIsDone(false)
         await this.sendMessage(generateId())
         assert.isFalse(this.bot.getIsDone())
     }
@@ -182,8 +186,8 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async tracksTheResponseWithTokensRemoved() {
-        this.parser.response.message = generateId()
+    protected static async returnsTheResponseFromTheParser() {
+        this.setParserResponseMessage()
 
         const message = generateId()
         const response = await this.sendMessage(message)
@@ -195,11 +199,11 @@ export default class LlmBotTest extends AbstractLlmTest {
             },
             {
                 from: 'You',
-                message: this.parser.response.message,
+                message: this.parserResponse,
             },
         ])
 
-        assert.isEqual(response, this.parser.response.message)
+        assert.isEqual(response, this.parserResponse)
     }
 
     @test()
@@ -374,6 +378,83 @@ export default class LlmBotTest extends AbstractLlmTest {
         assert.isLength(this.bot.getMessages(), 0)
     }
 
+    @test()
+    protected static async botRespondingCallsMessageCallback() {
+        this.setParserResponseMessage()
+        let passedMessage: string | undefined
+        await this.sendMessage(generateId(), (message) => {
+            passedMessage = message
+        })
+        assert.isEqual(passedMessage, this.parserResponse)
+    }
+
+    @test()
+    protected static async messageCallbackFiredAfterAllMessagesTracked() {
+        await this.sendMessage(generateId(), () => {
+            this.assertTotalMessagesTracked(2)
+        })
+    }
+
+    @test()
+    protected static async ifParserRespondsWithCallbackResultsTheyAreSentImmediately() {
+        const functionCallResponse = generateId()
+        const response1 = generateId()
+        const response2 = generateId()
+
+        this.setParserResponseMessage(response1)
+        this.setParserResponseCallbackResults(functionCallResponse)
+
+        let passedMessages: string[] = []
+        const message = await this.sendRandomMessage((message) => {
+            passedMessages.push(message)
+            this.setParserResponseCallbackResults(undefined)
+            this.setParserResponseMessage(response2)
+        })
+
+        assert.isEqualDeep(this.bot.getMessages(), [
+            {
+                from: 'Me',
+                message,
+            },
+            {
+                from: 'You',
+                message: response1,
+            },
+            {
+                from: 'Me',
+                message: `API Results: ${functionCallResponse}`,
+            },
+            {
+                from: 'You',
+                message: response2,
+            },
+        ])
+
+        assert.isEqualDeep(
+            passedMessages,
+            [response1, response2],
+            'Messages passed to callback do not match'
+        )
+    }
+
+    private static setParserResponseCallbackResults(
+        results: string | undefined
+    ) {
+        this.parser.response.callbackResults = results
+    }
+
+    private static get parserResponse(): string | undefined {
+        return this.parser.response.message
+    }
+
+    private static setParserResponseMessage(message?: string) {
+        this.parser.response.message = message ?? generateId()
+    }
+
+    private static setParserResponseIsDone(isDone: boolean) {
+        this.parser.response.isDone = isDone
+    }
+
     private static assertTotalMessagesTracked(expected: number) {
         assert.isLength(this.bot.getMessages(), expected)
     }
@@ -395,9 +476,9 @@ export default class LlmBotTest extends AbstractLlmTest {
         await this.sendRandomMessage()
     }
 
-    private static async sendRandomMessage() {
+    private static async sendRandomMessage(cb?: MessageResponseCallback) {
         const body = generateId()
-        await this.sendMessage(body)
+        await this.sendMessage(body, cb)
         return body
     }
 
@@ -405,8 +486,11 @@ export default class LlmBotTest extends AbstractLlmTest {
         this.parser.response.state = state
     }
 
-    private static async sendMessage(message: string) {
-        return await this.bot.sendMessage(message)
+    private static async sendMessage(
+        message: string,
+        cb?: MessageResponseCallback
+    ) {
+        return await this.bot.sendMessage(message, cb)
     }
 
     private static serialize() {
