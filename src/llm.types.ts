@@ -51,7 +51,6 @@ export interface PromptOptions<
 
 export interface SendMessageOptions {
     model?: string
-    promptTemplate?: string
 }
 
 export interface SerializedBot<
@@ -85,7 +84,6 @@ export interface SkillOptions<
     state?: Partial<State>
     callbacks?: LlmCallbackMap
     model?: string
-    promptTemplate?: string
 }
 
 export interface SprucebotLLmSkill<

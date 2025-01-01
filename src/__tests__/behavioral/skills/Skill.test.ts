@@ -176,27 +176,6 @@ export default class SkillTest extends AbstractLlmTest {
         assert.isEqual(this.adapter.lastSendOptions?.model, model)
     }
 
-    @test()
-    protected static async skillCanOverridePromptTemplate() {
-        const promptTemplate = 'This is a test'
-        this.skill = this.Skill({
-            promptTemplate,
-        })
-
-        assert.isEqual(this.serialize().promptTemplate, promptTemplate)
-
-        const bot = this.Bot({
-            skill: this.skill,
-        })
-
-        await bot.sendMessage('what the!?')
-
-        assert.isEqual(
-            this.adapter.lastSendOptions?.promptTemplate,
-            promptTemplate
-        )
-    }
-
     private static serialize() {
         return this.skill.serialize()
     }
