@@ -1,3 +1,28 @@
+## [7.0.9](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.8...v7.0.9) (2025-01-07)
+
+## [7.0.8](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.7...v7.0.8) (2025-01-06)
+
+## [7.0.7](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.6...v7.0.7) (2025-01-06)
+
+## [7.0.6](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.5...v7.0.6) (2025-01-02)
+
+## [7.0.5](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.4...v7.0.5) (2025-01-02)
+
+## [7.0.4](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.3...v7.0.4) (2025-01-02)
+
+## [7.0.3](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.2...v7.0.3) (2025-01-02)
+
+## [7.0.2](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.1...v7.0.2) (2025-01-02)
+
+## [7.0.1](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.0...v7.0.1) (2025-01-02)
+
+# [7.0.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v6.0.0...v7.0.0) (2025-01-01)
+
+
+### Breaking Changes
+
+* removed prompt template ([9250c24](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9250c24))
+
 # [6.0.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v5.0.689...v6.0.0) (2025-01-01)
 
 
