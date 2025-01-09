@@ -58,7 +58,7 @@
     "@sprucelabs/mercury-types": "^47.0.649",
     "@sprucelabs/schema": "^31.0.9",
     "eta": "^3.5.0",
-    "openai": "^4.77.3"
+    "openai": "^4.77.4"
   },
   "devDependencies": {
     "@sprucelabs/esm-postbuild": "^6.0.535",
@@ -77,7 +77,7 @@
     "prettier": "^3.4.2",
     "ts-node": "^10.9.2",
     "tsc-watch": "^6.2.1",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.3"
   },
   "jest": {
     "testRunner": "jest-circus/runner",
