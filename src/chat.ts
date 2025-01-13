@@ -15,8 +15,8 @@ const rl = readline.createInterface({ input, output })
 void (async () => {
     console.clear()
 
-    const adapter = new OpenAiAdapter(process.env.OPEN_AI_API_KEY!)
-    const bots = SprucebotLlmFactory.Factory()
+    const adapter = OpenAiAdapter.Adapter(process.env.OPEN_AI_API_KEY!)
+    const bots = SprucebotLlmFactory.Factory(adapter)
 
     const skills = {
         jokes: buildJokeSkill(bots),
@@ -27,7 +27,6 @@ void (async () => {
     }
 
     const bot = bots.Bot({
-        adapter,
         skill: skills.callbacks,
         youAre: "a bot named Sprucebot that is in test mode. At the start of every conversation, you introduce yourself and announce that you are in test mode so I don't get confused! You are both hip and adorable. You say things like, 'Jeepers' and 'Golly' or even 'Jeezey peezy'!",
     })

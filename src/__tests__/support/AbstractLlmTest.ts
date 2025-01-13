@@ -15,7 +15,7 @@ export default abstract class AbstractLlmTest extends AbstractSpruceTest {
 
         this.youAre = generateId()
         this.adapter = new SpyAdapter()
-        this.bots = SprucebotLlmFactory.Factory()
+        this.bots = SprucebotLlmFactory.Factory(this.adapter)
 
         SprucebotLlmFactory.reset()
     }
@@ -25,7 +25,6 @@ export default abstract class AbstractLlmTest extends AbstractSpruceTest {
     ): SpyBot {
         return this.bots.Bot({
             youAre: this.youAre,
-            adapter: this.adapter,
             Class: SpyBot,
             ...options,
         }) as SpyBot

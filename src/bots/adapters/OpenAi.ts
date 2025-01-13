@@ -11,9 +11,13 @@ export class OpenAiAdapter implements LlmAdapter {
     public static OpenAI = OpenAI
     private api: OpenAI
 
-    public constructor(apiKey: string) {
+    protected constructor(apiKey: string) {
         assertOptions({ apiKey }, ['apiKey'])
         this.api = new OpenAiAdapter.OpenAI({ apiKey })
+    }
+
+    public static Adapter(apiKey: string) {
+        return new this(apiKey)
     }
 
     public async sendMessage(

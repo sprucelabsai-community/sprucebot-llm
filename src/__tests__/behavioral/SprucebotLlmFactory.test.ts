@@ -9,7 +9,17 @@ import { SpyBot } from '../support/SpyBot'
 export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
     @test()
     protected static async canGetInstance() {
+        //@ts-ignore
         assert.isInstanceOf(this.bots, SprucebotLlmFactory)
+    }
+
+    @test()
+    protected static async factoryMethodThrowsWithMissing() {
+        //@ts-ignore
+        const err = assert.doesThrow(() => SprucebotLlmFactory.Factory())
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: ['adapter'],
+        })
     }
 
     @test()
@@ -17,7 +27,7 @@ export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
         //@ts-ignore
         const err = assert.doesThrow(() => this.bots.Bot())
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
-            parameters: ['youAre', 'adapter'],
+            parameters: ['youAre'],
         })
     }
 
@@ -48,7 +58,8 @@ export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
     @test()
     protected static async canSetTheFactoryClass() {
         SprucebotLlmFactory.FactoryClass = SpyFactory
-        const factory = SprucebotLlmFactory.Factory()
+        const factory = SprucebotLlmFactory.Factory(this.adapter)
+        //@ts-ignore
         assert.isInstanceOf(factory, SpyFactory)
     }
 
@@ -57,9 +68,9 @@ export default class SprucebotLlmFactoryTest extends AbstractLlmTest {
         SprucebotLlmFactory.BotClass = SpyBot
 
         const bot = this.bots.Bot({
-            adapter: this.adapter,
             youAre: 'a bot',
         })
+
         assert.isInstanceOf(bot, SpyBot)
     }
 

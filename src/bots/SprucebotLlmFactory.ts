@@ -2,6 +2,7 @@ import { assertOptions } from '@sprucelabs/schema'
 import SpruceError from '../errors/SpruceError'
 import {
     BotOptions,
+    LlmAdapter,
     SkillOptions,
     SprucebotLlmBot,
     SprucebotLLmSkill,
@@ -11,25 +12,32 @@ import SprucebotLlmSkillImpl from './SprucebotLlmSkillImpl'
 
 export default class SprucebotLlmFactory {
     private instance?: SprucebotLlmBot
+
+    protected adapter: LlmAdapter
+
     public static FactoryClass?: typeof SprucebotLlmFactory
     public static BotClass?: new (options: any) => SprucebotLlmBot
     public static SkillClass?: new (options: any) => SprucebotLLmSkill
 
-    public Bot(options: BotOptions): SprucebotLlmBot {
-        assertOptions(options, ['youAre', 'adapter'])
+    protected constructor(adapter: LlmAdapter) {
+        this.adapter = adapter
+    }
+
+    public Bot(options: Omit<BotOptions, 'adapter'>): SprucebotLlmBot {
+        assertOptions(options, ['youAre'])
 
         const { Class } = options
 
         return new (Class ??
             SprucebotLlmFactory.BotClass ??
-            SprucebotLlmBotImpl)(options)
+            SprucebotLlmBotImpl)({ ...options, adapter: this.adapter })
     }
 
     public Skill(options: SkillOptions): SprucebotLLmSkill {
         assertOptions(options, ['yourJobIfYouChooseToAcceptItIs'])
-        return new (SprucebotLlmFactory.SkillClass ?? SprucebotLlmSkillImpl)(
-            options
-        )
+        return new (SprucebotLlmFactory.SkillClass ?? SprucebotLlmSkillImpl)({
+            ...options,
+        })
     }
 
     public getBotInstance() {
@@ -45,8 +53,9 @@ export default class SprucebotLlmFactory {
         this.instance = bot
     }
 
-    public static Factory(): SprucebotLlmFactory {
-        return new (this.FactoryClass ?? this)()
+    public static Factory(adapter: LlmAdapter): SprucebotLlmFactory {
+        assertOptions({ adapter }, ['adapter'])
+        return new (this.FactoryClass ?? this)(adapter)
     }
 
     public static reset() {

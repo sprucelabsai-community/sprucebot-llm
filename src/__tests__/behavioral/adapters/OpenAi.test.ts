@@ -503,7 +503,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     private static OpenAi(key?: string) {
-        return new OpenAiAdapter(key ?? generateId())
+        return OpenAiAdapter.Adapter(key ?? generateId())
     }
 
     private static setupSpys() {
