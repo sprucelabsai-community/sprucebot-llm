@@ -1,3 +1,10 @@
+# [8.0.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.19...v8.0.0) (2025-01-14)
+
+
+### Breaking Changes
+
+* factory signature change ([beb36b8](https://github.com/sprucelabsai-community/sprucebot-llm/commit/beb36b8))
+
 ## [7.0.19](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.18...v7.0.19) (2025-01-13)
 
 ## [7.0.18](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v7.0.17...v7.0.18) (2025-01-12)
