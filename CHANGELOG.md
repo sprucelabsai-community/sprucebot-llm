@@ -1,3 +1,10 @@
+# [8.1.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.0.14...v8.1.0) (2025-01-21)
+
+
+### Features
+
+* can limit messages using env: OPENAI_MESSAGE_MEMORY_LIMIT ([4c6e90a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4c6e90a))
+
 ## [8.0.14](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.0.13...v8.0.14) (2025-01-21)
 
 ## [8.0.13](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.0.12...v8.0.13) (2025-01-21)
