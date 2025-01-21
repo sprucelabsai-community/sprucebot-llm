@@ -29,14 +29,20 @@ export class OpenAiAdapter implements LlmAdapter {
         const messageBuilder = OpenAiMessageBuilder.Builder(bot)
         const messages = messageBuilder.buildMessages()
 
-        this.log.info('Sending message to OpenAI', JSON.stringify(messages))
+        this.log.info(
+            'Sending message to OpenAI',
+            JSON.stringify(messages, null, 2)
+        )
 
         const response = await this.api.chat.completions.create({
             messages,
             model: options?.model ?? 'gpt-4o',
         })
 
-        this.log.info('Received response from OpenAI', JSON.stringify(response))
+        this.log.info(
+            'Received response from OpenAI',
+            JSON.stringify(response, null, 2)
+        )
 
         const message =
             response.choices?.[0]?.message?.content?.trim() ??
