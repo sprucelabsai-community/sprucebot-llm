@@ -32,7 +32,16 @@ export default class OpenAiMessageBuilder {
     }
 
     private buildChatHistoryMessages(messages: LlmMessage[]) {
-        return messages.map((message) => ({
+        let messagesBeingConsidered = messages
+        const limit = parseInt(process.env.OPENAI_MESSAGE_MEMORY_LIMIT ?? '0')
+
+        if (limit > 0) {
+            messagesBeingConsidered = messages.slice(
+                Math.max(messages.length - limit, 0)
+            )
+        }
+
+        return messagesBeingConsidered.map((message) => ({
             role: message.from === 'Me' ? 'user' : 'assistant',
             content: message.message,
         })) as ChatCompletionMessageParam[]

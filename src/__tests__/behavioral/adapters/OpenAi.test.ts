@@ -34,6 +34,8 @@ export default class OpenAiTest extends AbstractLlmTest {
         this.setupSpys()
         this.openAi = this.OpenAi()
         this.bot = this.Bot()
+
+        delete process.env.OPENAI_CHAT_HISTORY_LIMIT
     }
 
     @test()
@@ -342,6 +344,68 @@ export default class OpenAiTest extends AbstractLlmTest {
                 },
             }
         )
+    }
+
+    @test()
+    protected static async chatHistoryCanBeLimitedByEnvTo1() {
+        this.setMessageMemoryLimit('1')
+
+        this.bot.setMessages([
+            {
+                from: 'Me',
+                message: generateId(),
+            },
+            {
+                from: 'You',
+                message: 'hello world',
+            },
+        ])
+
+        await this.sendMessage()
+
+        this.assertLastCompletionEquals([
+            {
+                role: 'assistant',
+                content: 'hello world',
+            },
+        ])
+    }
+
+    @test()
+    protected static async chatHistoryCanBeLimitedByEnvTo2() {
+        this.setMessageMemoryLimit('2')
+
+        this.bot.setMessages([
+            {
+                from: 'Me',
+                message: 'hey there!',
+            },
+            {
+                from: 'You',
+                message: 'hello world',
+            },
+            {
+                from: 'Me',
+                message: 'another',
+            },
+        ])
+
+        await this.sendMessage()
+
+        this.assertLastCompletionEquals([
+            {
+                role: 'assistant',
+                content: 'hello world',
+            },
+            {
+                role: 'user',
+                content: 'another',
+            },
+        ])
+    }
+
+    private static setMessageMemoryLimit(limit: string) {
+        process.env.OPENAI_MESSAGE_MEMORY_LIMIT = limit
     }
 
     private static async setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
