@@ -165,6 +165,29 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
+    protected static async trackedMessageUsesResponseFromAdapterNotParser() {
+        this.setupBotWithSkill({
+            callbacks: {
+                helloWorld: {
+                    cb: () => 'Hello, World!',
+                    useThisWhenever: 'Hello, World!',
+                },
+            },
+        })
+
+        this.adapter.messageResponse =
+            'should use this response to track message history'
+        this.parser.response.message = generateId()
+        await this.sendMessage(generateId())
+        const { messages } = this.bot.serialize()
+
+        assert.isEqual(
+            messages[1].message,
+            'should use this response to track message history'
+        )
+    }
+
+    @test()
     protected static async isDoneWhenParsesSaysSo() {
         this.setParserResponseIsDone(true)
         await this.sendMessage(generateId())
@@ -183,27 +206,6 @@ export default class LlmBotTest extends AbstractLlmTest {
         this.adapter.messageResponse = generateId()
         await this.sendMessage(generateId())
         assert.isEqual(this.parser.lastMessage, this.adapter.messageResponse)
-    }
-
-    @test()
-    protected static async returnsTheResponseFromTheParser() {
-        this.setParserResponseMessage()
-
-        const message = generateId()
-        const response = await this.sendMessage(message)
-
-        assert.isEqualDeep(this.bot.getMessages(), [
-            {
-                from: 'Me',
-                message,
-            },
-            {
-                from: 'You',
-                message: this.parserResponse,
-            },
-        ])
-
-        assert.isEqual(response, this.parserResponse)
     }
 
     @test()
@@ -401,14 +403,14 @@ export default class LlmBotTest extends AbstractLlmTest {
         const response1 = generateId()
         const response2 = generateId()
 
-        this.setParserResponseMessage(response1)
+        this.adapter.messageResponse = response1
         this.setParserResponseCallbackResults(functionCallResponse)
 
         let passedMessages: string[] = []
         const message = await this.sendRandomMessage((message) => {
             passedMessages.push(message)
             this.setParserResponseCallbackResults(undefined)
-            this.setParserResponseMessage(response2)
+            this.adapter.messageResponse = response2
         })
 
         assert.isEqualDeep(this.bot.getMessages(), [

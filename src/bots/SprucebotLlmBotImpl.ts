@@ -109,7 +109,7 @@ export default class SprucebotLlmBotImpl<
 
         this.trackMessage({
             from: 'You',
-            message: parsedResponse,
+            message: response,
         })
 
         cb?.(parsedResponse)

@@ -79,14 +79,14 @@ export default class OpenAiMessageBuilder {
             messages.push(this.buildWeAreDoneWhenMessage(skill.weAreDoneWhen))
         }
 
+        if (skill.callbacks) {
+            messages.push(this.buildCallbacksMessage(skill.callbacks))
+        }
+
         if (skill.pleaseKeepInMindThat) {
             messages.push(
                 this.buildPleaseKeepInMindMessage(skill.pleaseKeepInMindThat)
             )
-        }
-
-        if (skill.callbacks) {
-            messages.push(this.buildCallbacksMessage(skill.callbacks))
         }
 
         return messages

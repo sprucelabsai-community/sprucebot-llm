@@ -155,12 +155,7 @@ export default class OpenAiTest extends AbstractLlmTest {
             {
                 pleaseKeepInMindThat: pleaseKeepInMind,
             },
-            [
-                {
-                    role: 'system',
-                    content: `During this conversation, please keep the following in mind:\n\n1. ${pleaseKeepInMind}.`,
-                },
-            ]
+            [this.buildPleaseKeepInMindMessage(pleaseKeepInMind)]
         )
     }
 
@@ -402,6 +397,42 @@ export default class OpenAiTest extends AbstractLlmTest {
                 content: 'another',
             },
         ])
+    }
+
+    @test()
+    protected static async pleaseKeepInMindIsLast() {
+        const callbacks: LlmCallbackMap = {
+            test: {
+                cb: async () => 'hello',
+                useThisWhenever: 'here we go!',
+            },
+        }
+
+        await this.setSkillSendMessageAndAssertSystemMessagesEqual(
+            {
+                callbacks,
+                pleaseKeepInMindThat: ['this is important'],
+            },
+            [
+                this.buildCallbacksMessage(callbacks),
+                this.buildPleaseKeepInMindMessage(['this is important']),
+            ]
+        )
+    }
+
+    private static buildPleaseKeepInMindMessage(
+        pleaseKeepInMind: string[]
+    ): OpenAI.Chat.Completions.ChatCompletionMessageParam {
+        return {
+            role: 'system',
+            content: this.renderPleaseKeepInMind(pleaseKeepInMind),
+        }
+    }
+
+    private static renderPleaseKeepInMind(
+        pleaseKeepInMind: string[]
+    ): string | OpenAI.Chat.Completions.ChatCompletionContentPartText[] {
+        return `During this conversation, please keep the following in mind:\n\n${pleaseKeepInMind.map((m, idx) => `${idx + 1}. ${m}`).join('\n')}.`
     }
 
     private static setMessageMemoryLimit(limit: string) {
