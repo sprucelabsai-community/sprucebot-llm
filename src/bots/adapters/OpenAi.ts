@@ -1,4 +1,5 @@
 import { assertOptions } from '@sprucelabs/schema'
+import { buildLog } from '@sprucelabs/spruce-skill-utils'
 import OpenAI from 'openai'
 import {
     LlmAdapter,
@@ -10,7 +11,7 @@ import OpenAiMessageBuilder from './OpenAiMessageBuilder'
 export class OpenAiAdapter implements LlmAdapter {
     public static OpenAI = OpenAI
     private api: OpenAI
-    // private log = buildLog('SprucebotLLM::OpenAiAdapter')
+    private log = buildLog('SprucebotLLM::OpenAiAdapter')
 
     protected constructor(apiKey: string) {
         assertOptions({ apiKey }, ['apiKey'])
@@ -28,24 +29,21 @@ export class OpenAiAdapter implements LlmAdapter {
         const messageBuilder = OpenAiMessageBuilder.Builder(bot)
         const messages = messageBuilder.buildMessages()
 
-        // this.log.info(
-        //     'Sending message to OpenAI',
-        //     JSON.stringify(messages, null, 2)
-        // )
+        this.log.info(
+            'Sending message to OpenAI',
+            JSON.stringify(messages, null, 2)
+        )
 
         const response = await this.api.chat.completions.create({
             messages,
             model: options?.model ?? 'gpt-4o',
         })
 
-        // this.log.info(
-        //     'Received response from OpenAI',
-        //     JSON.stringify(response, null, 2)
-        // )
-
         const message =
             response.choices?.[0]?.message?.content?.trim() ??
             MESSAGE_RESPONSE_ERROR_MESSAGE
+
+        this.log.info('Received response from OpenAI', message)
 
         return message
     }
