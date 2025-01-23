@@ -1,3 +1,10 @@
+# [8.4.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.3.1...v8.4.0) (2025-01-23)
+
+
+### Features
+
+* sends invalid callback message to llm ([01a8724](https://github.com/sprucelabsai-community/sprucebot-llm/commit/01a8724))
+
 ## [8.3.1](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.3.0...v8.3.1) (2025-01-23)
 
 # [8.3.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.2.0...v8.3.0) (2025-01-23)
