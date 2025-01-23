@@ -1,5 +1,6 @@
 import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
 import SprucebotLlmBotImpl from '../../bots/SprucebotLlmBotImpl'
+import SpruceError from '../../errors/SpruceError'
 import {
     LlmCallbackMap,
     MessageResponseCallback,
@@ -439,6 +440,20 @@ export default class LlmBotTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected static async sendsMessageBackToBotIfParserThrows() {
+        const passedMessages: string[] = []
+        const error = generateId()
+        const parserResponse = generateId()
+        this.setParserResponseMessage(parserResponse)
+        this.parser.invalidParseErrorOnNextParse = error
+        await this.sendMessage(generateId(), (message) => {
+            passedMessages.push(message)
+        })
+        assert.isEqual(this.bot.getMessages()[1].message, 'Error: ' + error)
+        assert.isEqualDeep(passedMessages, [parserResponse])
+    }
+
     private static setParserResponseCallbackResults(
         results: string | undefined
     ) {
@@ -515,11 +530,22 @@ class FakeResponseParser extends ResponseParser {
     }
     public lastMessage?: string
     public lastCallbacks?: LlmCallbackMap
+    public invalidParseErrorOnNextParse?: string
 
     public async parse(
         message: string,
         callbacks?: LlmCallbackMap
     ): Promise<ParsedResponse> {
+        if (this.invalidParseErrorOnNextParse) {
+            const invalidParse = this.invalidParseErrorOnNextParse
+            delete this.invalidParseErrorOnNextParse
+            throw new SpruceError({
+                code: 'INVALID_CALLBACK',
+                matchedCallback: generateId(),
+                validCallbacks: [],
+                friendlyMessage: invalidParse,
+            })
+        }
         this.lastMessage = message
         this.lastCallbacks = callbacks
         return {

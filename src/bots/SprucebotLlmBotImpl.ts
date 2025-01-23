@@ -8,6 +8,7 @@ import {
 import {
     BotOptions,
     LlmAdapter,
+    LlmCallbackMap,
     llmEventContract,
     LlmEventContract,
     LlmMessage,
@@ -85,40 +86,65 @@ export default class SprucebotLlmBotImpl<
             message,
         })
 
-        const serializedSkill = this.skill?.serialize()
+        const { model, callbacks } = this.skill?.serialize() ?? {}
+        const response = await this.sendMessageToAdapter(model)
 
-        const response = await this.adapter.sendMessage(this, {
-            model: serializedSkill?.model,
-        })
+        let parsedMessage: string
+        let isDone: boolean
+        let state: Record<string, any> | undefined
+        let callbackResults: string | undefined
 
-        const parser = ResponseParser.getInstance()
-        const {
-            isDone,
-            message: parsedResponse,
-            state,
-            callbackResults,
-        } = await parser.parse(response, serializedSkill?.callbacks)
+        try {
+            const parsed = await this.parseResponse(response, callbacks)
+            parsedMessage = parsed.message
+            isDone = parsed.isDone
+            state = parsed.state
+            callbackResults = parsed.callbackResults
+        } catch (err: any) {
+            if (err.options?.code === 'INVALID_CALLBACK') {
+                return this.sendMessage(`Error: ${err.message}`, cb)
+            }
+            throw err
+        }
 
         this.isDone = isDone
 
-        if (this.stateSchema && state) {
-            await this.updateState(state as Partial<State>)
-        } else if (state) {
-            await this.skill?.updateState(state)
-        }
+        await this.optionallyUpdateState(state)
 
         this.trackMessage({
             from: 'You',
             message: response,
         })
 
-        cb?.(parsedResponse)
+        cb?.(parsedMessage)
 
         if (callbackResults) {
             await this.sendMessage(`API Results: ${callbackResults}`, cb)
         }
 
-        return parsedResponse
+        return parsedMessage
+    }
+
+    private async optionallyUpdateState(
+        state: Record<string, any> | undefined
+    ) {
+        if (this.stateSchema && state) {
+            await this.updateState(state as Partial<State>)
+        } else if (state) {
+            await this.skill?.updateState(state)
+        }
+    }
+
+    private async parseResponse(response: string, callbacks?: LlmCallbackMap) {
+        const parser = ResponseParser.getInstance()
+        const parsed = await parser.parse(response, callbacks)
+        return parsed
+    }
+
+    private async sendMessageToAdapter(model: string | undefined) {
+        return await this.adapter.sendMessage(this, {
+            model,
+        })
     }
 
     private trackMessage(m: LlmMessage) {
