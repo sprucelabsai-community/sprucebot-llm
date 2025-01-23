@@ -61,13 +61,13 @@ export default class ResponseParser {
             }
         }
 
-        let extraMatches = message.match(new RegExp(`<<(.*)\/>>`, 'g'))
-        if (extraMatches && (extraMatches?.length ?? 0) > 0) {
-            debugger
+        const matchedCallback = this.findFirstBadCallback(message)
+
+        if (matchedCallback) {
             throw new SpruceError({
                 code: 'INVALID_CALLBACK',
                 validCallbacks: Object.keys(callbacks ?? {}),
-                matchedCallback: extraMatches[0],
+                matchedCallback,
             })
         }
 
@@ -84,6 +84,16 @@ export default class ResponseParser {
             message,
             callbackResults,
         }
+    }
+
+    private findFirstBadCallback(message: string) {
+        const simpleMatches = message.match(new RegExp(`<<(.*)\/>>`, 'g'))
+        const extraJsonMatches = message.match(
+            new RegExp(`<<.*?>>(.*?)<<\/.*?>>`, 'gs')
+        )
+
+        const matchedCallback = extraJsonMatches?.[0] || simpleMatches?.[0]
+        return matchedCallback
     }
 
     private async invokeCallbackAndDropInLegacyResults(

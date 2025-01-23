@@ -216,6 +216,15 @@ export default class ResponseParserTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected static async throwsWithAdvancedCallbackMarkup() {
+        await this.assertPromptThrowsWithErrorIncludingCallbacks(
+            'hey there <<listOrganizations>>{"hello": "world"}<</listOrganizations>>',
+            '<<listOrganizations>>{"hello": "world"}<</listOrganizations>>',
+            ['login']
+        )
+    }
+
     private static async assertPromptThrowsWithErrorIncludingCallbacks(
         prompt: string,
         match: string,
