@@ -1,3 +1,10 @@
+# [8.2.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.1.4...v8.2.0) (2025-01-23)
+
+
+### Features
+
+* throws with invalid callback ([3df3d8c](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3df3d8c))
+
 ## [8.1.4](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.1.3...v8.1.4) (2025-01-22)
 
 ## [8.1.3](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.1.2...v8.1.3) (2025-01-22)
