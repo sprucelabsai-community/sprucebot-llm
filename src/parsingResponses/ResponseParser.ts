@@ -1,4 +1,5 @@
 import { DONE_TOKEN, STATE_BOUNDARY } from '../bots/templates'
+import SpruceError from '../errors/SpruceError'
 import { LlmCallbackMap } from '../llm.types'
 import renderLegacyPlaceholder from './renderPlaceholder'
 
@@ -58,6 +59,16 @@ export default class ResponseParser {
                 callbackResults = await callbacks?.[key]?.cb(data)
                 message = message.replace(simpleMatches[0], '').trim()
             }
+        }
+
+        let extraMatches = message.match(new RegExp(`<<(.*)\/>>`, 'g'))
+        if (extraMatches && (extraMatches?.length ?? 0) > 0) {
+            debugger
+            throw new SpruceError({
+                code: 'INVALID_CALLBACK',
+                validCallbacks: Object.keys(callbacks ?? {}),
+                matchedCallback: extraMatches[0],
+            })
         }
 
         const { match, fullMatch } = this.parseState(message)

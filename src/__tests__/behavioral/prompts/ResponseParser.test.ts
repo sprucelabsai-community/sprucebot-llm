@@ -1,4 +1,4 @@
-import { test, assert, generateId } from '@sprucelabs/test-utils'
+import { test, assert, generateId, errorAssert } from '@sprucelabs/test-utils'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/templates'
 import { LlmCallback, LlmCallbackMap } from '../../../llm.types'
 import renderLegacyPlaceholder from '../../../parsingResponses/renderPlaceholder'
@@ -198,6 +198,47 @@ export default class ResponseParserTest extends AbstractLlmTest {
         assert.isEqualDeep(passedParams, data)
     }
 
+    @test()
+    protected static async throwsIfBadCallbackMarkupPassed() {
+        await this.assertPromptThrowsWithErrorIncludingCallbacks(
+            '<< taco />>',
+            '<< taco />>',
+            ['burrito']
+        )
+    }
+
+    @test()
+    protected static async throwsWithDifferentBadCallbackMarkup() {
+        await this.assertPromptThrowsWithErrorIncludingCallbacks(
+            'hey there <<listOrganizations/>>',
+            '<<listOrganizations/>>',
+            ['listLocations']
+        )
+    }
+
+    private static async assertPromptThrowsWithErrorIncludingCallbacks(
+        prompt: string,
+        match: string,
+        callbackKeys: string[]
+    ) {
+        const callbacks: LlmCallbackMap = {}
+        for (const key of callbackKeys) {
+            callbacks[key] = {
+                cb: () => '',
+                useThisWhenever: generateId(),
+            }
+        }
+
+        const err = await assert.doesThrowAsync(() =>
+            this.parse(prompt, callbacks)
+        )
+
+        errorAssert.assertError(err, 'INVALID_CALLBACK', {
+            validCallbacks: callbackKeys,
+            matchedCallback: match,
+        })
+    }
+
     private static defaultCallback(response: string): LlmCallback {
         return {
             cb: () => {
@@ -208,7 +249,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     private static async parse(message: string, callbacks?: LlmCallbackMap) {
-        return await this.parser.parse(message, this.callbacks ?? callbacks)
+        return await this.parser.parse(message, callbacks ?? this.callbacks)
     }
 
     private static generateStateSchema(input: Record<string, any>) {
