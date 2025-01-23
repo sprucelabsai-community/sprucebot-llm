@@ -1,3 +1,10 @@
+# [8.3.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.2.0...v8.3.0) (2025-01-23)
+
+
+### Features
+
+* exporting error as SprucebotLlmError ([04ef3ac](https://github.com/sprucelabsai-community/sprucebot-llm/commit/04ef3ac))
+
 # [8.2.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.1.4...v8.2.0) (2025-01-23)
 
 
