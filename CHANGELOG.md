@@ -1,3 +1,5 @@
+## [8.4.64](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.4.63...v8.4.64) (2025-03-21)
+
 ## [8.4.63](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.4.62...v8.4.63) (2025-03-20)
 
 ## [8.4.62](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.4.61...v8.4.62) (2025-03-20)
