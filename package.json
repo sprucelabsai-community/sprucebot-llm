@@ -53,10 +53,10 @@
     "chat": "node ./build/chat.js"
   },
   "dependencies": {
-    "@sprucelabs/error": "^6.0.595",
-    "@sprucelabs/mercury-event-emitter": "^42.0.778",
-    "@sprucelabs/mercury-types": "^47.2.70",
-    "@sprucelabs/schema": "^31.0.82",
+    "@sprucelabs/error": "^6.0.596",
+    "@sprucelabs/mercury-event-emitter": "^42.0.779",
+    "@sprucelabs/mercury-types": "^47.2.71",
+    "@sprucelabs/schema": "^31.0.83",
     "@sprucelabs/spruce-skill-utils": "^31.2.18",
     "eta": "^3.5.0",
     "openai": "^4.93.0"
