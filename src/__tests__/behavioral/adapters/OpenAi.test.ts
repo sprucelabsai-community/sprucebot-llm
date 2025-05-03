@@ -7,7 +7,10 @@ import {
     generateId,
 } from '@sprucelabs/test-utils'
 import OpenAI from 'openai'
-import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources'
+import {
+    ChatCompletionCreateParamsNonStreaming,
+    ChatCompletionMessageParam,
+} from 'openai/resources'
 import {
     MESSAGE_RESPONSE_ERROR_MESSAGE,
     OpenAiAdapter,
@@ -26,7 +29,7 @@ import { SpyBot } from '../../support/SpyBot'
 export default class OpenAiTest extends AbstractLlmTest {
     private openAi!: OpenAiAdapter
     private bot!: SpyBot
-    private skillJob!: string
+    private skillJob: string = generateId()
 
     protected static async beforeAll(): Promise<void> {
         await super.beforeAll()
@@ -35,8 +38,6 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     protected async beforeEach() {
         await super.beforeEach()
-
-        this.skillJob = generateId()
 
         this.setupSpys()
         this.openAi = this.OpenAi()
@@ -427,6 +428,38 @@ export default class OpenAiTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected async canSendImageAsBase64() {
+        const image = generateId()
+        const message = generateId()
+        this.bot.setMessages([
+            {
+                from: 'Me',
+                message,
+                imageBase64: image,
+            },
+        ])
+
+        await this.sendMessage()
+        this.assertLastCompletionEquals([
+            {
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: message,
+                    },
+                    {
+                        type: 'image_url',
+                        image_url: {
+                            url: `data:image/png;base64,${image}`,
+                        },
+                    },
+                ],
+            },
+        ])
+    }
+
     private buildPleaseKeepInMindMessage(
         pleaseKeepInMind: string[]
     ): OpenAI.Chat.Completions.ChatCompletionMessageParam {
@@ -574,10 +607,13 @@ export default class OpenAiTest extends AbstractLlmTest {
         const { messages } = completion
         completion.messages = messages.map((message) => ({
             ...message,
-            content: (message.content as string)
-                .replace(/\t|\n|/g, '')
-                .replace(/\s+/g, ' '),
-        }))
+            content:
+                typeof message.content === 'string'
+                    ? message.content
+                          .replace(/\t|\n|/g, '')
+                          .replace(/\s+/g, ' ')
+                    : message.content,
+        })) as ChatCompletionMessageParam[]
 
         return completion
     }

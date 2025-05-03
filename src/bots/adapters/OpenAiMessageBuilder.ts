@@ -1,5 +1,8 @@
 import { Schema } from '@sprucelabs/schema'
-import { ChatCompletionMessageParam } from 'openai/resources'
+import {
+    ChatCompletionContentPart,
+    ChatCompletionMessageParam,
+} from 'openai/resources'
 import {
     SprucebotLlmBot,
     LlmMessage,
@@ -41,10 +44,32 @@ export default class OpenAiMessageBuilder {
             )
         }
 
-        return messagesBeingConsidered.map((message) => ({
+        return messagesBeingConsidered.map((message) =>
+            this.mapMessageToCompletion(message)
+        ) as ChatCompletionMessageParam[]
+    }
+
+    private mapMessageToCompletion(message: LlmMessage) {
+        let content: ChatCompletionContentPart[] | string = message.message
+        if (message.imageBase64) {
+            content = [
+                {
+                    type: 'text',
+                    text: message.message,
+                },
+                {
+                    type: 'image_url',
+                    image_url: {
+                        url: `data:image/png;base64,${message.imageBase64}`,
+                    },
+                },
+            ]
+        }
+
+        return {
             role: message.from === 'Me' ? 'user' : 'assistant',
-            content: message.message,
-        })) as ChatCompletionMessageParam[]
+            content,
+        }
     }
 
     private buildFirstMessage(youAre: string): ChatCompletionMessageParam {

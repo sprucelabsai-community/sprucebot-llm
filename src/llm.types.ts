@@ -71,6 +71,7 @@ export type LlmEventContract = typeof llmEventContract
 export interface LlmMessage {
     from: 'Me' | 'You'
     message: string
+    imageBase64?: string
 }
 
 export interface SkillOptions<
