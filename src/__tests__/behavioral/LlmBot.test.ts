@@ -10,6 +10,7 @@ import SpruceError from '../../errors/SpruceError'
 import {
     LlmCallbackMap,
     MessageResponseCallback,
+    SendMessage,
     SkillOptions,
 } from '../../llm.types'
 import ResponseParser, {
@@ -358,7 +359,7 @@ export default class LlmBotTest extends AbstractLlmTest {
         await this.sendRandomMessage()
         const body = await this.sendRandomMessage()
         this.assertTotalMessagesTracked(10)
-        assert.doesInclude(this.bot.getMessages(), { message: body })
+        assert.doesInclude(this.messages, { message: body })
     }
 
     @test()
@@ -385,7 +386,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     protected async canClearMessageHistory() {
         await this.sendRandomMessage()
         this.bot.clearMessageHistory()
-        assert.isLength(this.bot.getMessages(), 0)
+        assert.isLength(this.messages, 0)
     }
 
     @test()
@@ -421,7 +422,7 @@ export default class LlmBotTest extends AbstractLlmTest {
             this.adapter.messageResponse = response2
         })
 
-        assert.isEqualDeep(this.bot.getMessages(), [
+        assert.isEqualDeep(this.messages, [
             {
                 from: 'Me',
                 message,
@@ -457,8 +458,25 @@ export default class LlmBotTest extends AbstractLlmTest {
         await this.sendMessage(generateId(), (message) => {
             passedMessages.push(message)
         })
-        assert.isEqual(this.bot.getMessages()[1].message, 'Error: ' + error)
+        assert.isEqual(this.messages[1].message, 'Error: ' + error)
         assert.isEqualDeep(passedMessages, [parserResponse])
+    }
+
+    @test()
+    protected async canSendImage() {
+        const base64 = generateId()
+        const description = generateId()
+
+        await this.sendMessage({
+            imageBase64: base64,
+            imageDescription: description,
+        })
+
+        assert.isEqualDeep(this.messages[0], {
+            from: 'Me',
+            message: description,
+            imageBase64: base64,
+        })
     }
 
     private setParserResponseCallbackResults(results: string | undefined) {
@@ -478,7 +496,11 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     private assertTotalMessagesTracked(expected: number) {
-        assert.isLength(this.bot.getMessages(), expected)
+        assert.isLength(this.messages, expected)
+    }
+
+    private get messages() {
+        return this.bot.getMessages()
     }
 
     private setupBotWithSkill(options: Partial<SkillOptions>) {
@@ -506,7 +528,10 @@ export default class LlmBotTest extends AbstractLlmTest {
         this.parser.response.state = state
     }
 
-    private async sendMessage(message: string, cb?: MessageResponseCallback) {
+    private async sendMessage(
+        message: SendMessage,
+        cb?: MessageResponseCallback
+    ) {
         return await this.bot.sendMessage(message, cb)
     }
 

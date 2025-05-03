@@ -13,6 +13,7 @@ import {
     LlmEventContract,
     LlmMessage,
     MessageResponseCallback,
+    SendMessage,
     SerializedBot,
     SprucebotLlmBot,
     SprucebotLLmSkill,
@@ -76,15 +77,24 @@ export default class SprucebotLlmBotImpl<
     }
 
     public async sendMessage(
-        message: string,
+        message: SendMessage,
         cb?: MessageResponseCallback
     ): Promise<string> {
         assertOptions({ message }, ['message'])
 
-        this.trackMessage({
+        const llmMessage: LlmMessage = {
             from: 'Me',
-            message,
-        })
+            message: '',
+        }
+
+        if (typeof message === 'string') {
+            llmMessage.message = message
+        } else {
+            llmMessage.message = message.imageDescription
+            llmMessage.imageBase64 = message.imageBase64
+        }
+
+        this.trackMessage(llmMessage)
 
         const { model, callbacks } = this.skill?.serialize() ?? {}
         const response = await this.sendMessageToAdapter(model)

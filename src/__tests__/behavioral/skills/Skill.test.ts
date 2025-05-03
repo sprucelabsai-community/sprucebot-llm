@@ -75,10 +75,9 @@ export default class SkillTest extends AbstractLlmTest {
             wasHit = true
         })
 
-        const updates = {
+        await this.updateState({
             firstName: generateId(),
-        }
-        await this.updateState(updates)
+        })
 
         assert.isTrue(wasHit)
     }

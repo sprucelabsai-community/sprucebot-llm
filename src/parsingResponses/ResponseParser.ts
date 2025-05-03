@@ -1,6 +1,6 @@
 import { DONE_TOKEN, STATE_BOUNDARY } from '../bots/templates'
 import SpruceError from '../errors/SpruceError'
-import { LlmCallbackMap } from '../llm.types'
+import { LlmCallbackMap, SendMessage } from '../llm.types'
 import renderLegacyPlaceholder from './renderPlaceholder'
 
 export default class ResponseParser {
@@ -20,7 +20,7 @@ export default class ResponseParser {
     ): Promise<ParsedResponse> {
         let message = response.replace(DONE_TOKEN, '').trim()
         let state: Record<string, any> | undefined
-        let callbackResults: string | undefined
+        let callbackResults: SendMessage | undefined
 
         for (const key of Object.keys(callbacks || {})) {
             const match = message.match(renderLegacyPlaceholder(key))
