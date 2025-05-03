@@ -7,7 +7,7 @@ import {
 } from '@sprucelabs/test-utils'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/templates'
 import { LlmCallback, LlmCallbackMap } from '../../../llm.types'
-import renderLegacyPlaceholder from '../../../parsingResponses/renderPlaceholder'
+import renderPlaceholder from '../../../parsingResponses/renderPlaceholder'
 import ResponseParser, {
     ParsedResponse,
 } from '../../../parsingResponses/ResponseParser'
@@ -88,7 +88,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
             useThisWhenever: 'you are asking for my favorite color.',
         })
 
-        await this.parse(renderLegacyPlaceholder(key))
+        await this.parse(renderPlaceholder(key))
 
         assert.isTrue(wasHit)
     }
@@ -112,7 +112,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
             useThisWhenever: generateId(),
         })
 
-        await this.parse(renderLegacyPlaceholder('taco'))
+        await this.parse(renderPlaceholder('taco'))
 
         assert.isTrue(wasHit)
     }
@@ -120,7 +120,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     @test('callback populate placeholders 1', 'bravo')
     @test('callback populate placeholders 2', 'taco')
     protected async callbacksPopulatePlaceholders(placeholder: string) {
-        const message = renderLegacyPlaceholder(placeholder)
+        const message = renderPlaceholder(placeholder)
         this.setCallback(placeholder, this.defaultCallback(placeholder))
         const response = await this.parse(message)
 
@@ -134,7 +134,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
 
     @test()
     protected async usesBoundariesToFindPlaceholders() {
-        const message = `taco ${renderLegacyPlaceholder('taco')} taco`
+        const message = `taco ${renderPlaceholder('taco')} taco`
         this.setCallback('taco', this.defaultCallback('bravo'))
         const response = await this.parse(message)
         assert.isEqual(response.message, 'taco bravo taco')
@@ -143,7 +143,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     @test()
     protected async replacesPlaceholderInTheText() {
         this.setCallback('personName', this.defaultCallback('Tay'))
-        const p = renderLegacyPlaceholder('personName')
+        const p = renderPlaceholder('personName')
         const response = await this.parse(`hey there ${p}!`)
         assert.isEqual(response.message, 'hey there Tay!')
     }

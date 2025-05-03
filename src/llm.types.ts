@@ -20,7 +20,7 @@ export interface SprucebotLlmBot<
     markAsDone(): void
     getIsDone(): boolean
     sendMessage(
-        message: string,
+        message: SendMessage,
         responseCb?: MessageResponseCallback
     ): Promise<string>
     serialize(): SerializedBot<StateSchema, State>

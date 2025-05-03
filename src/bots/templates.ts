@@ -1,4 +1,4 @@
-import renderLegacyPlaceholder from '../parsingResponses/renderPlaceholder'
+import renderPlaceholder from '../parsingResponses/renderPlaceholder'
 
 export const STATE_BOUNDARY = '*****'
 export const DONE_TOKEN = `DONE_DONE_DONE`
@@ -39,7 +39,7 @@ When asking me about a "select" field, make sure I only pick a valid choice by s
 	
 Your primary objective for this conversation is <%= it.skill.yourJobIfYouChooseToAcceptItIs %>
 <% if (it.skill.callbacks) { %>
-While we are talking, there are going to be things I don't want you to answer, but instead to respond with a placeholder in the form of ${renderLegacyPlaceholder(
+While we are talking, there are going to be things I don't want you to answer, but instead to respond with a placeholder in the form of ${renderPlaceholder(
     'example'
 )}.
 

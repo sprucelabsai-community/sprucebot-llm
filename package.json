@@ -50,7 +50,8 @@
     "watch.build.dev": "tsc-watch --sourceMap --onCompilationComplete 'yarn run post.watch.build'",
     "watch.rebuild": "yarn run clean.all && yarn install && yarn run watch.build.dev",
     "watch.tsc": "tsc -w",
-    "chat": "node ./build/chat.js"
+    "chat": "node ./build/chat.js",
+    "chat.images": "node ./build/chatWithImages.js"
   },
   "dependencies": {
     "@sprucelabs/error": "^6.0.598",

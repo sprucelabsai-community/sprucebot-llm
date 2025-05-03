@@ -67,7 +67,21 @@
 			"cwd": "${workspaceFolder}",
 			"console": "integratedTerminal",
 			"internalConsoleOptions": "neverOpen"
-		}
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "chat.images",
+			"runtimeExecutable": "node",
+			"runtimeArgs": [
+				"--inspect-brk",
+				"--trace-warnings",
+				"${workspaceFolder}/build/chatWithImages.js",
+			],
+			"cwd": "${workspaceFolder}",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen"
+		},
 		{
 			"type": "node",
 			"request": "launch",

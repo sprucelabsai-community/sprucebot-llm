@@ -449,6 +449,26 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
+    protected async handleParserRespondingWithImage() {
+        const base64Image = generateId()
+        const description = generateId()
+        const functionResponse: SendMessage = {
+            imageBase64: base64Image,
+            imageDescription: description,
+        }
+        this.setParserResponseCallbackResults(functionResponse)
+        await this.sendRandomMessage(() => {
+            this.setParserResponseCallbackResults(undefined)
+        })
+
+        assert.isEqualDeep(this.messages[2], {
+            from: 'Me',
+            message: `API Results: ${description}`,
+            imageBase64: base64Image,
+        })
+    }
+
+    @test()
     protected async sendsMessageBackToBotIfParserThrows() {
         const passedMessages: string[] = []
         const error = generateId()
@@ -479,7 +499,7 @@ export default class LlmBotTest extends AbstractLlmTest {
         })
     }
 
-    private setParserResponseCallbackResults(results: string | undefined) {
+    private setParserResponseCallbackResults(results?: SendMessage) {
         this.parser.response.callbackResults = results
     }
 

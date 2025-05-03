@@ -1,7 +1,7 @@
 import { DONE_TOKEN, STATE_BOUNDARY } from '../bots/templates'
 import SpruceError from '../errors/SpruceError'
 import { LlmCallbackMap, SendMessage } from '../llm.types'
-import renderLegacyPlaceholder from './renderPlaceholder'
+import renderPlaceholder from './renderPlaceholder'
 
 export default class ResponseParser {
     private static instance: ResponseParser = new ResponseParser()
@@ -23,7 +23,7 @@ export default class ResponseParser {
         let callbackResults: SendMessage | undefined
 
         for (const key of Object.keys(callbacks || {})) {
-            const match = message.match(renderLegacyPlaceholder(key))
+            const match = message.match(renderPlaceholder(key))
 
             if (match) {
                 message = await this.invokeCallbackAndDropInLegacyResults(
@@ -101,8 +101,8 @@ export default class ResponseParser {
         key: string,
         message: string
     ) {
-        const v = await callbacks?.[key]?.cb()
-        message = message.replace(renderLegacyPlaceholder(key), v ?? '').trim()
+        const v = (await callbacks?.[key]?.cb()) as string
+        message = message.replace(renderPlaceholder(key), v ?? '').trim()
         return message
     }
 
@@ -128,5 +128,5 @@ export interface ParsedResponse {
     isDone: boolean
     state?: Record<string, any>
     message: string
-    callbackResults?: string
+    callbackResults?: SendMessage
 }

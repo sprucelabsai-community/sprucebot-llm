@@ -102,7 +102,7 @@ export default class SprucebotLlmBotImpl<
         let parsedMessage: string
         let isDone: boolean
         let state: Record<string, any> | undefined
-        let callbackResults: string | undefined
+        let callbackResults: SendMessage | undefined
 
         try {
             const parsed = await this.parseResponse(response, callbacks)
@@ -129,7 +129,16 @@ export default class SprucebotLlmBotImpl<
         cb?.(parsedMessage)
 
         if (callbackResults) {
-            await this.sendMessage(`API Results: ${callbackResults}`, cb)
+            let message: SendMessage | undefined
+            if (typeof callbackResults === 'string') {
+                message = `API Results: ${callbackResults}`
+            } else {
+                message = {
+                    imageBase64: callbackResults.imageBase64,
+                    imageDescription: `API Results: ${callbackResults.imageDescription}`,
+                }
+            }
+            await this.sendMessage(message, cb)
         }
 
         return parsedMessage
