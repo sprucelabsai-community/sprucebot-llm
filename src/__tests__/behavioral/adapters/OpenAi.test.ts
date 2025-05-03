@@ -1,5 +1,11 @@
 import { buildSchema, Schema } from '@sprucelabs/schema'
-import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import {
+    test,
+    suite,
+    assert,
+    errorAssert,
+    generateId,
+} from '@sprucelabs/test-utils'
 import OpenAI from 'openai'
 import { ChatCompletionCreateParamsNonStreaming } from 'openai/resources'
 import {
@@ -16,17 +22,18 @@ import {
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { SpyBot } from '../../support/SpyBot'
 
+@suite()
 export default class OpenAiTest extends AbstractLlmTest {
-    private static openAi: OpenAiAdapter
-    private static bot: SpyBot
-    private static skillJob: string
+    private openAi!: OpenAiAdapter
+    private bot!: SpyBot
+    private skillJob!: string
 
     protected static async beforeAll(): Promise<void> {
         await super.beforeAll()
         assert.isEqual(OpenAiAdapter.OpenAI, OpenAI, 'OpenAI not set')
     }
 
-    protected static async beforeEach() {
+    protected async beforeEach() {
         await super.beforeEach()
 
         this.skillJob = generateId()
@@ -39,7 +46,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async throwsWhenMissingKey() {
+    protected async throwsWhenMissingKey() {
         //@ts-ignore
         const err = assert.doesThrow(() => new OpenAiAdapter())
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
@@ -48,14 +55,14 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async instantiatingOpenAiSetsKeyToConfig() {
+    protected async instantiatingOpenAiSetsKeyToConfig() {
         const key = generateId()
         this.OpenAi(key)
         assert.isEqual(SpyOpenAiApi.config?.apiKey, key)
     }
 
     @test()
-    protected static async canSendMessage() {
+    protected async canSendMessage() {
         const message = generateId()
 
         await this.setAndSendMessage(message)
@@ -69,25 +76,25 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async returnsResponseFromSendMessage() {
+    protected async returnsResponseFromSendMessage() {
         SpyOpenAiApi.responseMessage = generateId()
         await this.assertResponseEquals(SpyOpenAiApi.responseMessage)
     }
 
     @test()
-    protected static async trimsResponseMessage() {
+    protected async trimsResponseMessage() {
         SpyOpenAiApi.responseMessage = ' hello world '
         await this.assertResponseEquals('hello world')
     }
 
     @test()
-    protected static async noResponseReturnsDefaultErrorMesssage() {
+    protected async noResponseReturnsDefaultErrorMesssage() {
         SpyOpenAiApi.responseMessage = false
         await this.assertResponseEquals(MESSAGE_RESPONSE_ERROR_MESSAGE)
     }
 
     @test()
-    protected static async sendMessageCanAcceptModel() {
+    protected async sendMessageCanAcceptModel() {
         const model =
             'davinci:ft-personal:sprucebot-concierge-2023-04-28-04-42-19'
 
@@ -99,7 +106,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsAllMessagesToOpenAi() {
+    protected async sendsAllMessagesToOpenAi() {
         const message1 = generateId()
         const message2 = generateId()
         this.bot.setMessages([
@@ -128,12 +135,12 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedMessageIfSkillIsPassedWithJustJustJob() {
+    protected async sendsExpectedMessageIfSkillIsPassedWithJustJustJob() {
         await this.setSkillSendMessageAndAssertSystemMessagesEqual({}, [])
     }
 
     @test()
-    protected static async sendsExpectedMessageIfSkillPassedWithWhenWeAreDone() {
+    protected async sendsExpectedMessageIfSkillPassedWithWhenWeAreDone() {
         const doneWhen = generateId()
         await this.setSkillSendMessageAndAssertSystemMessagesEqual(
             {
@@ -149,7 +156,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedWithOnePleaseKeepInMind() {
+    protected async sendsExpectedWithOnePleaseKeepInMind() {
         const pleaseKeepInMind = [generateId()]
         await this.setSkillSendMessageAndAssertSystemMessagesEqual(
             {
@@ -160,7 +167,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedWithMultiplePleaseKeepInMind() {
+    protected async sendsExpectedWithMultiplePleaseKeepInMind() {
         const pleaseKeepInMind = [generateId(), generateId()]
         await this.setSkillSendMessageAndAssertSystemMessagesEqual(
             {
@@ -176,7 +183,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedWithSchema() {
+    protected async sendsExpectedWithSchema() {
         await this.setSkillSendMessageWithSchemaAndAssertSystemMessagesEqualExpected(
             buildSchema({
                 id: 'test',
@@ -201,7 +208,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedWithState() {
+    protected async sendsExpectedWithState() {
         const schema = buildSchema({
             id: 'next',
             fields: {
@@ -224,7 +231,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedMessageWithSimpleCallback() {
+    protected async sendsExpectedMessageWithSimpleCallback() {
         await this.setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
             {
                 test: {
@@ -236,7 +243,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExectedMessageWithDifferentSimpleCallback() {
+    protected async sendsExectedMessageWithDifferentSimpleCallback() {
         await this.setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
             {
                 aDifferentCallback: {
@@ -248,7 +255,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedMessagesWithMultipleCallbacks() {
+    protected async sendsExpectedMessagesWithMultipleCallbacks() {
         await this.setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
             {
                 a: {
@@ -264,7 +271,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedWithCallbackWithParameters() {
+    protected async sendsExpectedWithCallbackWithParameters() {
         await this.setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
             {
                 a: {
@@ -282,7 +289,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedWithCallbackParameterWithDescription() {
+    protected async sendsExpectedWithCallbackParameterWithDescription() {
         await this.setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
             {
                 callbackOne: {
@@ -301,7 +308,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedWithCallbackParmaterThatIsRequired() {
+    protected async sendsExpectedWithCallbackParmaterThatIsRequired() {
         await this.setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
             {
                 callbackOne: {
@@ -320,7 +327,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsExpectedWithMultipleCallbackParameters() {
+    protected async sendsExpectedWithMultipleCallbackParameters() {
         await this.setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
             {
                 callbackOne: {
@@ -342,7 +349,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async chatHistoryCanBeLimitedByEnvTo1() {
+    protected async chatHistoryCanBeLimitedByEnvTo1() {
         this.setMessageMemoryLimit('1')
 
         this.bot.setMessages([
@@ -367,7 +374,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async chatHistoryCanBeLimitedByEnvTo2() {
+    protected async chatHistoryCanBeLimitedByEnvTo2() {
         this.setMessageMemoryLimit('2')
 
         this.bot.setMessages([
@@ -400,7 +407,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async pleaseKeepInMindIsLast() {
+    protected async pleaseKeepInMindIsLast() {
         const callbacks: LlmCallbackMap = {
             test: {
                 cb: async () => 'hello',
@@ -420,7 +427,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         )
     }
 
-    private static buildPleaseKeepInMindMessage(
+    private buildPleaseKeepInMindMessage(
         pleaseKeepInMind: string[]
     ): OpenAI.Chat.Completions.ChatCompletionMessageParam {
         return {
@@ -429,17 +436,17 @@ export default class OpenAiTest extends AbstractLlmTest {
         }
     }
 
-    private static renderPleaseKeepInMind(
+    private renderPleaseKeepInMind(
         pleaseKeepInMind: string[]
     ): string | OpenAI.Chat.Completions.ChatCompletionContentPartText[] {
         return `During this conversation, please keep the following in mind:\n\n${pleaseKeepInMind.map((m, idx) => `${idx + 1}. ${m}`).join('\n')}.`
     }
 
-    private static setMessageMemoryLimit(limit: string) {
+    private setMessageMemoryLimit(limit: string) {
         process.env.OPENAI_MESSAGE_MEMORY_LIMIT = limit
     }
 
-    private static async setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
+    private async setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
         callbacks: LlmCallbackMap
     ) {
         await this.setSkillSendMessageAndAssertSystemMessagesEqual(
@@ -450,7 +457,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         )
     }
 
-    private static buildCallbacksMessage(callbacks: LlmCallbackMap): Message {
+    private buildCallbacksMessage(callbacks: LlmCallbackMap): Message {
         const keys = Object.keys(callbacks)
         const descriptions: string[] = []
 
@@ -489,14 +496,14 @@ export default class OpenAiTest extends AbstractLlmTest {
         return { role: 'system', content: message }
     }
 
-    private static renderStateMessage(state: Record<string, any>): Message {
+    private renderStateMessage(state: Record<string, any>): Message {
         return {
             role: 'system',
             content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the state is being updated, send it back to me in json format (something in can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by a boundary, like this: ${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`,
         }
     }
 
-    private static async setSkillSendMessageWithSchemaAndAssertSystemMessagesEqualExpected(
+    private async setSkillSendMessageWithSchemaAndAssertSystemMessagesEqualExpected(
         schema: Schema
     ) {
         await this.setSkillSendMessageAndAssertSystemMessagesEqual(
@@ -507,14 +514,14 @@ export default class OpenAiTest extends AbstractLlmTest {
         )
     }
 
-    private static renderSchemaMessage(schema: Schema): Message {
+    private renderSchemaMessage(schema: Schema): Message {
         return {
             role: 'system',
             content: `We will be tracking state for this conversation. The following schema is what we'll use to define the shape of the state:\n\n${JSON.stringify(schema)}`,
         }
     }
 
-    private static async setSkillSendMessageAndAssertSystemMessagesEqual(
+    private async setSkillSendMessageAndAssertSystemMessagesEqual(
         skillOptions: Partial<SkillOptions>,
         messages: Message[]
     ) {
@@ -543,7 +550,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         ])
     }
 
-    private static assertLastCompletionEquals(expected: Message[]) {
+    private assertLastCompletionEquals(expected: Message[]) {
         assert.isEqualDeep(
             this.stripTabsAndNewlinesFromCompletion(
                 SpyOpenAiApi.lastSentCompletion!
@@ -561,7 +568,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         )
     }
 
-    private static stripTabsAndNewlinesFromCompletion(
+    private stripTabsAndNewlinesFromCompletion(
         completion: ChatCompletionCreateParamsNonStreaming
     ) {
         const { messages } = completion
@@ -575,12 +582,12 @@ export default class OpenAiTest extends AbstractLlmTest {
         return completion
     }
 
-    private static async assertResponseEquals(expected: string) {
+    private async assertResponseEquals(expected: string) {
         const response = await this.setAndSendMessage()
         assert.isEqual(response, expected)
     }
 
-    private static async setAndSendMessage(
+    private async setAndSendMessage(
         message?: string,
         options?: SendMessageOptions
     ) {
@@ -593,15 +600,15 @@ export default class OpenAiTest extends AbstractLlmTest {
         return await this.sendMessage(options)
     }
 
-    private static async sendMessage(options?: SendMessageOptions) {
+    private async sendMessage(options?: SendMessageOptions) {
         return await this.openAi.sendMessage(this.bot, options)
     }
 
-    private static OpenAi(key?: string) {
+    private OpenAi(key?: string) {
         return OpenAiAdapter.Adapter(key ?? generateId())
     }
 
-    private static setupSpys() {
+    private setupSpys() {
         OpenAiAdapter.OpenAI = SpyOpenAiApi as any
         SpyOpenAiApi.lastSentCompletion = undefined
     }

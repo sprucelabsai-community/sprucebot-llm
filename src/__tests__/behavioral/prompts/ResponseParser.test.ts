@@ -1,4 +1,10 @@
-import { test, assert, generateId, errorAssert } from '@sprucelabs/test-utils'
+import {
+    test,
+    suite,
+    assert,
+    generateId,
+    errorAssert,
+} from '@sprucelabs/test-utils'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/templates'
 import { LlmCallback, LlmCallbackMap } from '../../../llm.types'
 import renderLegacyPlaceholder from '../../../parsingResponses/renderPlaceholder'
@@ -7,35 +13,36 @@ import ResponseParser, {
 } from '../../../parsingResponses/ResponseParser'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 
+@suite()
 export default class ResponseParserTest extends AbstractLlmTest {
-    private static parser: ResponseParser
-    private static callbacks: LlmCallbackMap = {}
-    protected static async beforeEach() {
+    private parser!: ResponseParser
+    private callbacks: LlmCallbackMap = {}
+    protected async beforeEach() {
         await super.beforeEach()
         this.parser = ResponseParser.getInstance()
         this.callbacks = {}
     }
 
     @test()
-    protected static async canSetAndGetInstance() {
+    protected async canSetAndGetInstance() {
         ResponseParser.setInstance(this.parser)
         const match = ResponseParser.getInstance()
         assert.isEqual(match, this.parser)
     }
 
     @test()
-    protected static async emptyReturnedIfResponseHasNoPlaceholders() {
+    protected async emptyReturnedIfResponseHasNoPlaceholders() {
         await this.assertNotDone('hello world')
         await this.assertNotDone('DONE')
     }
 
     @test()
-    protected static async knowsWhenDone() {
+    protected async knowsWhenDone() {
         await this.assertDone(`hey there!!! ${DONE_TOKEN}`)
     }
 
     @test()
-    protected static async gettingInstanceWithoutOneSetReturnsFresh() {
+    protected async gettingInstanceWithoutOneSetReturnsFresh() {
         const instance = ResponseParser.getInstance()
         assert.isInstanceOf(instance, ResponseParser)
         const instance2 = ResponseParser.getInstance()
@@ -48,9 +55,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     @test('parses state 2', {
         what: 'the??',
     })
-    protected static async parsesStateWithNothingElse(
-        input: Record<string, any>
-    ) {
+    protected async parsesStateWithNothingElse(input: Record<string, any>) {
         const state = this.generateStateSchema(input)
         await this.parsingEquals(state, {
             isDone: false,
@@ -60,7 +65,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async removesStateFromResponse() {
+    protected async removesStateFromResponse() {
         const state = this.generateStateSchema({ hello: 'world' })
         const message = `hello ${state} world`
         await this.parsingEquals(message, {
@@ -72,9 +77,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
 
     @test('can handle single callback 1', 'favoriteColors')
     @test('can handle single callback 2', 'tacoBravo')
-    protected static async callsCallbacksWhenPlaceholdersFoundInResponse(
-        key: string
-    ) {
+    protected async callsCallbacksWhenPlaceholdersFoundInResponse(key: string) {
         let wasHit = false
 
         this.setCallback(key, {
@@ -91,7 +94,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async canCallSecondPlacehloder() {
+    protected async canCallSecondPlacehloder() {
         let wasHit = false
 
         this.setCallback('favoriteColors', {
@@ -116,7 +119,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
 
     @test('callback populate placeholders 1', 'bravo')
     @test('callback populate placeholders 2', 'taco')
-    protected static async callbacksPopulatePlaceholders(placeholder: string) {
+    protected async callbacksPopulatePlaceholders(placeholder: string) {
         const message = renderLegacyPlaceholder(placeholder)
         this.setCallback(placeholder, this.defaultCallback(placeholder))
         const response = await this.parse(message)
@@ -130,7 +133,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async usesBoundariesToFindPlaceholders() {
+    protected async usesBoundariesToFindPlaceholders() {
         const message = `taco ${renderLegacyPlaceholder('taco')} taco`
         this.setCallback('taco', this.defaultCallback('bravo'))
         const response = await this.parse(message)
@@ -138,7 +141,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async replacesPlaceholderInTheText() {
+    protected async replacesPlaceholderInTheText() {
         this.setCallback('personName', this.defaultCallback('Tay'))
         const p = renderLegacyPlaceholder('personName')
         const response = await this.parse(`hey there ${p}!`)
@@ -146,7 +149,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async clearsOutCallbackMarkupPlaceholders() {
+    protected async clearsOutCallbackMarkupPlaceholders() {
         const name = generateId()
         const message = generateId()
         this.setCallback(name, this.defaultCallback('Tay'))
@@ -157,7 +160,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async returnsResultsOfCallback() {
+    protected async returnsResultsOfCallback() {
         const results = generateId()
         this.setCallback('availableTimes', this.defaultCallback(results))
         const response = await this.parse(
@@ -167,7 +170,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async canParseWithoutSpaceInHandlebars() {
+    protected async canParseWithoutSpaceInHandlebars() {
         const results = generateId()
         this.setCallback('availableTimes', this.defaultCallback(results))
         const response = await this.parse(
@@ -177,7 +180,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async passesParametersToCallback() {
+    protected async passesParametersToCallback() {
         let passedParams: Record<string, any> | undefined
         const data = {
             time: generateId(),
@@ -199,7 +202,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async throwsIfBadCallbackMarkupPassed() {
+    protected async throwsIfBadCallbackMarkupPassed() {
         await this.assertPromptThrowsWithErrorIncludingCallbacks(
             '<< taco />>',
             '<< taco />>',
@@ -208,7 +211,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async throwsWithDifferentBadCallbackMarkup() {
+    protected async throwsWithDifferentBadCallbackMarkup() {
         await this.assertPromptThrowsWithErrorIncludingCallbacks(
             'hey there <<listOrganizations/>>',
             '<<listOrganizations/>>',
@@ -217,7 +220,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async throwsWithAdvancedCallbackMarkup() {
+    protected async throwsWithAdvancedCallbackMarkup() {
         await this.assertPromptThrowsWithErrorIncludingCallbacks(
             'hey there <<listOrganizations>>{"hello": "world"}<</listOrganizations>>',
             '<<listOrganizations>>{"hello": "world"}<</listOrganizations>>',
@@ -225,7 +228,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
         )
     }
 
-    private static async assertPromptThrowsWithErrorIncludingCallbacks(
+    private async assertPromptThrowsWithErrorIncludingCallbacks(
         prompt: string,
         match: string,
         callbackKeys: string[]
@@ -248,7 +251,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
         })
     }
 
-    private static defaultCallback(response: string): LlmCallback {
+    private defaultCallback(response: string): LlmCallback {
         return {
             cb: () => {
                 return response
@@ -257,15 +260,15 @@ export default class ResponseParserTest extends AbstractLlmTest {
         }
     }
 
-    private static async parse(message: string, callbacks?: LlmCallbackMap) {
+    private async parse(message: string, callbacks?: LlmCallbackMap) {
         return await this.parser.parse(message, callbacks ?? this.callbacks)
     }
 
-    private static generateStateSchema(input: Record<string, any>) {
+    private generateStateSchema(input: Record<string, any>) {
         return `${STATE_BOUNDARY} ${JSON.stringify(input)} ${STATE_BOUNDARY}`
     }
 
-    private static async assertDone(message: string) {
+    private async assertDone(message: string) {
         await this.parsingEquals(message, {
             isDone: true,
             state: undefined,
@@ -273,7 +276,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
         })
     }
 
-    private static async assertNotDone(message: string) {
+    private async assertNotDone(message: string) {
         await this.parsingEquals(message, {
             isDone: false,
             state: undefined,
@@ -281,15 +284,12 @@ export default class ResponseParserTest extends AbstractLlmTest {
         })
     }
 
-    private static async parsingEquals(
-        message: string,
-        expected: ParsedResponse
-    ) {
+    private async parsingEquals(message: string, expected: ParsedResponse) {
         const results = await this.parse(message)
         assert.isEqualDeep(results, { callbackResults: undefined, ...expected })
     }
 
-    private static setCallback(key: string, callback: LlmCallback) {
+    private setCallback(key: string, callback: LlmCallback) {
         this.callbacks[key] = callback
     }
 }

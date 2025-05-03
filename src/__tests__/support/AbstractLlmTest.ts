@@ -6,11 +6,11 @@ import SpyAdapter from './SpyAdapter'
 import { SpyBot } from './SpyBot'
 
 export default abstract class AbstractLlmTest extends AbstractSpruceTest {
-    protected static bots: SprucebotLlmFactory
-    protected static adapter: SpyAdapter
-    protected static youAre: string
+    protected bots!: SprucebotLlmFactory
+    protected adapter!: SpyAdapter
+    protected youAre!: string
 
-    protected static async beforeEach() {
+    protected async beforeEach() {
         await super.beforeEach()
 
         this.youAre = generateId()
@@ -20,9 +20,7 @@ export default abstract class AbstractLlmTest extends AbstractSpruceTest {
         SprucebotLlmFactory.reset()
     }
 
-    protected static Bot<S extends Schema>(
-        options?: Partial<BotOptions<S>>
-    ): SpyBot {
+    protected Bot<S extends Schema>(options?: Partial<BotOptions<S>>): SpyBot {
         return this.bots.Bot({
             youAre: this.youAre,
             Class: SpyBot,
@@ -30,7 +28,7 @@ export default abstract class AbstractLlmTest extends AbstractSpruceTest {
         }) as SpyBot
     }
 
-    protected static Skill(options?: Partial<SkillOptions>) {
+    protected Skill(options?: Partial<SkillOptions>) {
         return this.bots.Skill({
             weAreDoneWhen: generateId(),
             yourJobIfYouChooseToAcceptItIs: generateId(),

@@ -1,5 +1,11 @@
 import { normalizeSchemaValues, Schema, SchemaValues } from '@sprucelabs/schema'
-import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import {
+    test,
+    suite,
+    assert,
+    errorAssert,
+    generateId,
+} from '@sprucelabs/test-utils'
 import { Eta } from 'eta'
 import PromptGenerator, {
     PromptGeneratorOptions,
@@ -12,12 +18,13 @@ import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { personSchema } from '../../support/schemas/personSchema'
 import { SpyBot } from '../../support/SpyBot'
 
+@suite()
 export default class PromptGeneratorTest extends AbstractLlmTest {
-    private static bot: SpyBot
-    private static prompt: PromptGenerator
-    private static eta: Eta
+    private bot!: SpyBot
+    private prompt!: PromptGenerator
+    private eta!: Eta
 
-    protected static async beforeEach() {
+    protected async beforeEach() {
         await super.beforeEach()
         this.bot = this.SpyBot()
         this.reloadGenerator()
@@ -25,7 +32,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async throwsWhenNotSentBot() {
+    protected async throwsWhenNotSentBot() {
         //@ts-ignore
         const err = assert.doesThrow(() => new PromptGenerator())
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
@@ -34,7 +41,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async generatesPromptWithJustYouAre() {
+    protected async generatesPromptWithJustYouAre() {
         const youAre = generateId()
         const message = generateId()
 
@@ -61,7 +68,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
     @test('can generate with state schema and populated state', {
         firstName: 'tay',
     })
-    protected static async generatesWithStateSchema(
+    protected async generatesWithStateSchema(
         values: SchemaValues<typeof personSchema>
     ) {
         const state = normalizeSchemaValues(personSchema, values, {})
@@ -82,7 +89,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async includesPastMessages() {
+    protected async includesPastMessages() {
         const messages: LlmMessage[] = [
             {
                 from: 'Me',
@@ -106,7 +113,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async writeFullPromptToLogForReading() {
+    protected async writeFullPromptToLogForReading() {
         const skill = this.Skill({
             yourJobIfYouChooseToAcceptItIs:
                 'to tell the best knock knock jokes you can think of! ',
@@ -129,7 +136,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async canOverrideTemplate() {
+    protected async canOverrideTemplate() {
         const template = generateId()
 
         this.reloadGenerator({
@@ -140,7 +147,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
         assert.isEqual(actual, template)
     }
 
-    private static async renderMessage(context: Partial<TemplateContext>) {
+    private async renderMessage(context: Partial<TemplateContext>) {
         return await this.eta.renderStringAsync(PROMPT_TEMPLATE, {
             youAre: this.youAre,
             messages: [
@@ -153,9 +160,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
         })
     }
 
-    private static async assertMessageGeneratesPrompt<
-        S extends Schema,
-    >(options: {
+    private async assertMessageGeneratesPrompt<S extends Schema>(options: {
         options: Partial<BotOptions<S>>
         message?: string
         expected: string
@@ -179,7 +184,7 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
         assert.isEqual(prompt, expected)
     }
 
-    private static async generate(message?: string) {
+    private async generate(message?: string) {
         if (message) {
             this.bot.setMessages([
                 {
@@ -191,13 +196,13 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
         return await this.prompt.generate()
     }
 
-    private static SpyBot<S extends Schema = Schema>(
+    private SpyBot<S extends Schema = Schema>(
         options?: Partial<BotOptions<S, SchemaValues<S, false>>>
     ): SpyBot {
         return this.Bot({ ...options, Class: SpyBot }) as SpyBot
     }
 
-    private static reloadGenerator(options?: PromptGeneratorOptions) {
+    private reloadGenerator(options?: PromptGeneratorOptions) {
         this.prompt = PromptGenerator.Generator(this.bot, options)
     }
 }

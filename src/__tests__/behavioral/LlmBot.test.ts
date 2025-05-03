@@ -1,4 +1,10 @@
-import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import {
+    test,
+    suite,
+    assert,
+    errorAssert,
+    generateId,
+} from '@sprucelabs/test-utils'
 import SprucebotLlmBotImpl from '../../bots/SprucebotLlmBotImpl'
 import SpruceError from '../../errors/SpruceError'
 import {
@@ -15,11 +21,12 @@ import { personSchema } from '../support/schemas/personSchema'
 import { personWithDefaultsSchema } from '../support/schemas/personWithDefaultsSchema'
 import { SpyBot } from '../support/SpyBot'
 
+@suite()
 export default class LlmBotTest extends AbstractLlmTest {
-    private static bot: SpyBot
-    private static parser: FakeResponseParser
+    private bot!: SpyBot
+    private parser!: FakeResponseParser
 
-    protected static async beforeEach() {
+    protected async beforeEach() {
         await super.beforeEach()
         this.bot = this.Bot({
             stateSchema: personSchema,
@@ -30,7 +37,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async throwsWhenSendingBadMessage() {
+    protected async throwsWhenSendingBadMessage() {
         //@ts-ignore
         const err = await assert.doesThrowAsync(() => this.bot.sendMessage())
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
@@ -39,14 +46,14 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsItselfToTheLlmAdapter() {
+    protected async sendsItselfToTheLlmAdapter() {
         const message = generateId()
         await this.sendMessage(message)
         assert.isEqual(this.adapter.lastBot, this.bot)
     }
 
     @test()
-    protected static async serializesAsExpected() {
+    protected async serializesAsExpected() {
         const youAre = generateId()
 
         const state = {
@@ -70,7 +77,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async canUpdateState() {
+    protected async canUpdateState() {
         const newState = {
             favoriteColor: 'blue',
             firstName: generateId(),
@@ -82,7 +89,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async updatingStateMixesIn() {
+    protected async updatingStateMixesIn() {
         const state = {
             make: 'Ford',
         }
@@ -107,7 +114,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async stateHonorsDefaultValues() {
+    protected async stateHonorsDefaultValues() {
         this.bot = this.Bot({
             stateSchema: personWithDefaultsSchema,
         })
@@ -119,7 +126,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async updatingStateEmitsDidUpdateState() {
+    protected async updatingStateEmitsDidUpdateState() {
         let wasHit = false
         await this.bot.on('did-update-state', () => {
             wasHit = true
@@ -133,14 +140,14 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async knowsWhenDone() {
+    protected async knowsWhenDone() {
         assert.isFalse(this.bot.getIsDone())
         this.bot.markAsDone()
         assert.isTrue(this.bot.getIsDone())
     }
 
     @test()
-    protected static async sendMessageReturnsResponseFromAdapter() {
+    protected async sendMessageReturnsResponseFromAdapter() {
         this.adapter.messageResponse = generateId()
         const message = generateId()
         const response = await this.sendMessage(message)
@@ -148,7 +155,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async tracksMessageHistory() {
+    protected async tracksMessageHistory() {
         const message = generateId()
         this.adapter.messageResponse = generateId()
         await this.sendMessage(message)
@@ -166,7 +173,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async trackedMessageUsesResponseFromAdapterNotParser() {
+    protected async trackedMessageUsesResponseFromAdapterNotParser() {
         this.setupBotWithSkill({
             callbacks: {
                 helloWorld: {
@@ -189,28 +196,28 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async isDoneWhenParsesSaysSo() {
+    protected async isDoneWhenParsesSaysSo() {
         this.setParserResponseIsDone(true)
         await this.sendMessage(generateId())
         assert.isTrue(this.bot.getIsDone())
     }
 
     @test()
-    protected static async notDoneUntilDone() {
+    protected async notDoneUntilDone() {
         this.setParserResponseIsDone(false)
         await this.sendMessage(generateId())
         assert.isFalse(this.bot.getIsDone())
     }
 
     @test()
-    protected static async botActuallySendsResponseToParser() {
+    protected async botActuallySendsResponseToParser() {
         this.adapter.messageResponse = generateId()
         await this.sendMessage(generateId())
         assert.isEqual(this.parser.lastMessage, this.adapter.messageResponse)
     }
 
     @test()
-    protected static async enheritesStateSchemaFromSkillWhenSerializing() {
+    protected async enheritesStateSchemaFromSkillWhenSerializing() {
         this.setupBotWithSkill({
             stateSchema: personSchema,
         })
@@ -225,7 +232,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     @test('inherits state from skill when serializing 2', {
         firstName: generateId(),
     })
-    protected static async inheritsStateFromSkillWhenSerializing(
+    protected async inheritsStateFromSkillWhenSerializing(
         skillState: Record<string, any>
     ) {
         this.setupBotWithSkill({
@@ -243,7 +250,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     @test('inherits state from bot when parsing response 2', {
         firstName: generateId(),
     })
-    protected static async stateIsSentBackToBotWhenParsing(
+    protected async stateIsSentBackToBotWhenParsing(
         state: Record<string, any>
     ) {
         this.bot = this.Bot({
@@ -256,7 +263,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async emitsDidUpdateStateWhenStateIsUpdated() {
+    protected async emitsDidUpdateStateWhenStateIsUpdated() {
         this.bot = this.Bot({
             stateSchema: personSchema,
         })
@@ -274,7 +281,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async shouldNotEmitUpdateItNoStatePassed() {
+    protected async shouldNotEmitUpdateItNoStatePassed() {
         let wasHit = false
         await this.bot.on('did-update-state', () => {
             wasHit = true
@@ -290,7 +297,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     @test('sets state in response to skill if skill has state 2', {
         firstName: generateId(),
     })
-    protected static async setsStateInResponseToSkillIfSkillHasState(
+    protected async setsStateInResponseToSkillIfSkillHasState(
         state: Record<string, any>
     ) {
         const skill = this.setupBotWithSkill({
@@ -303,7 +310,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async doesntEmitDidChangeOnSkillIfStateIsNotOnSkill() {
+    protected async doesntEmitDidChangeOnSkillIfStateIsNotOnSkill() {
         const skill = this.setupBotWithSkill({})
 
         let wasHit = false
@@ -317,7 +324,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async passesCallbacksToParserOnResponse() {
+    protected async passesCallbacksToParserOnResponse() {
         const callbacks = {
             foo: {
                 cb: () => 'hey',
@@ -333,7 +340,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async canSwapSkillMidWayThrough() {
+    protected async canSwapSkillMidWayThrough() {
         this.setupBotWithSkill({})
         const skill2 = this.Skill()
         this.bot.setSkill(skill2)
@@ -341,7 +348,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async defaultLimitsMessagesTo10() {
+    protected async defaultLimitsMessagesTo10() {
         await this.sendRandomMessage()
         this.assertTotalMessagesTracked(2)
         await this.sendRandomMessage()
@@ -355,7 +362,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async canSetMemory() {
+    protected async canSetMemory() {
         SprucebotLlmBotImpl.messageMemoryLimit = 5
         await this.sendRandomMessage()
         this.assertTotalMessagesTracked(2)
@@ -368,21 +375,21 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async settingSkillToBotSetsToNotDone() {
+    protected async settingSkillToBotSetsToNotDone() {
         this.bot.markAsDone()
         this.bot.setSkill(this.Skill())
         assert.isFalse(this.bot.getIsDone())
     }
 
     @test()
-    protected static async canClearMessageHistory() {
+    protected async canClearMessageHistory() {
         await this.sendRandomMessage()
         this.bot.clearMessageHistory()
         assert.isLength(this.bot.getMessages(), 0)
     }
 
     @test()
-    protected static async botRespondingCallsMessageCallback() {
+    protected async botRespondingCallsMessageCallback() {
         this.setParserResponseMessage()
         let passedMessage: string | undefined
         await this.sendMessage(generateId(), (message) => {
@@ -392,14 +399,14 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async messageCallbackFiredAfterAllMessagesTracked() {
+    protected async messageCallbackFiredAfterAllMessagesTracked() {
         await this.sendMessage(generateId(), () => {
             this.assertTotalMessagesTracked(2)
         })
     }
 
     @test()
-    protected static async ifParserRespondsWithCallbackResultsTheyAreSentImmediately() {
+    protected async ifParserRespondsWithCallbackResultsTheyAreSentImmediately() {
         const functionCallResponse = generateId()
         const response1 = generateId()
         const response2 = generateId()
@@ -441,7 +448,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async sendsMessageBackToBotIfParserThrows() {
+    protected async sendsMessageBackToBotIfParserThrows() {
         const passedMessages: string[] = []
         const error = generateId()
         const parserResponse = generateId()
@@ -454,29 +461,27 @@ export default class LlmBotTest extends AbstractLlmTest {
         assert.isEqualDeep(passedMessages, [parserResponse])
     }
 
-    private static setParserResponseCallbackResults(
-        results: string | undefined
-    ) {
+    private setParserResponseCallbackResults(results: string | undefined) {
         this.parser.response.callbackResults = results
     }
 
-    private static get parserResponse(): string | undefined {
+    private get parserResponse(): string | undefined {
         return this.parser.response.message
     }
 
-    private static setParserResponseMessage(message?: string) {
+    private setParserResponseMessage(message?: string) {
         this.parser.response.message = message ?? generateId()
     }
 
-    private static setParserResponseIsDone(isDone: boolean) {
+    private setParserResponseIsDone(isDone: boolean) {
         this.parser.response.isDone = isDone
     }
 
-    private static assertTotalMessagesTracked(expected: number) {
+    private assertTotalMessagesTracked(expected: number) {
         assert.isLength(this.bot.getMessages(), expected)
     }
 
-    private static setupBotWithSkill(options: Partial<SkillOptions>) {
+    private setupBotWithSkill(options: Partial<SkillOptions>) {
         const skill = this.Skill(options)
 
         this.bot = this.Bot({
@@ -486,39 +491,34 @@ export default class LlmBotTest extends AbstractLlmTest {
         return skill
     }
 
-    private static async sendMessageWithResponseState(
-        state: Record<string, any>
-    ) {
+    private async sendMessageWithResponseState(state: Record<string, any>) {
         this.setStateInResponse(state)
         await this.sendRandomMessage()
     }
 
-    private static async sendRandomMessage(cb?: MessageResponseCallback) {
+    private async sendRandomMessage(cb?: MessageResponseCallback) {
         const body = generateId()
         await this.sendMessage(body, cb)
         return body
     }
 
-    private static setStateInResponse(state: Record<string, any>) {
+    private setStateInResponse(state: Record<string, any>) {
         this.parser.response.state = state
     }
 
-    private static async sendMessage(
-        message: string,
-        cb?: MessageResponseCallback
-    ) {
+    private async sendMessage(message: string, cb?: MessageResponseCallback) {
         return await this.bot.sendMessage(message, cb)
     }
 
-    private static serialize() {
+    private serialize() {
         return this.bot.serialize()
     }
 
-    private static async updateState(updates: Record<string, any>) {
+    private async updateState(updates: Record<string, any>) {
         await this.bot.updateState(updates)
     }
 
-    private static assertSerializedStateEquals(expected?: Record<string, any>) {
+    private assertSerializedStateEquals(expected?: Record<string, any>) {
         assert.isEqualDeep(this.bot.serialize().state, expected)
     }
 }

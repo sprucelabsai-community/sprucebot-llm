@@ -1,5 +1,11 @@
 import { buildSchema, Schema, SchemaPartialValues } from '@sprucelabs/schema'
-import { test, assert, errorAssert, generateId } from '@sprucelabs/test-utils'
+import {
+    test,
+    suite,
+    assert,
+    errorAssert,
+    generateId,
+} from '@sprucelabs/test-utils'
 import { OpenAiAdapter } from '../../../bots/adapters/OpenAi'
 import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
 import SprucebotLlmSkillImpl from '../../../bots/SprucebotLlmSkillImpl'
@@ -7,17 +13,18 @@ import { LlmCallbackMap, SprucebotLLmSkill } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { personSchema } from '../../support/schemas/personSchema'
 
+@suite()
 export default class SkillTest extends AbstractLlmTest {
-    private static skill: SprucebotLLmSkill
-    private static readonly emptyState = {}
+    private skill!: SprucebotLLmSkill
+    private readonly emptyState = {}
 
-    protected static async beforeEach() {
+    protected async beforeEach() {
         await super.beforeEach()
         this.skill = this.Skill()
     }
 
     @test()
-    protected static async skillThrowsWhenMissing() {
+    protected async skillThrowsWhenMissing() {
         //@ts-ignore
         const err = assert.doesThrow(() => this.bots.Skill())
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
@@ -26,12 +33,12 @@ export default class SkillTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static canCreateSkill() {
+    protected canCreateSkill() {
         assert.isInstanceOf(this.skill, SprucebotLlmSkillImpl)
     }
 
     @test()
-    protected static async canSerializeSkill() {
+    protected async canSerializeSkill() {
         const options = {
             weAreDoneWhen: generateId(),
             yourJobIfYouChooseToAcceptItIs: generateId(),
@@ -48,7 +55,7 @@ export default class SkillTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async canAddSkillToBotAndReturnItSerializing() {
+    protected async canAddSkillToBotAndReturnItSerializing() {
         const bot = this.Bot({
             skill: this.skill,
         })
@@ -58,7 +65,7 @@ export default class SkillTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async updatingStateEmitsEvent() {
+    protected async updatingStateEmitsEvent() {
         this.skill = this.Skill({
             stateSchema: personSchema,
         })
@@ -77,7 +84,7 @@ export default class SkillTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async canGetAndUpdateState() {
+    protected async canGetAndUpdateState() {
         this.skill = this.Skill({
             stateSchema: personSchema,
         })
@@ -103,7 +110,7 @@ export default class SkillTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async canPassStateInContructor() {
+    protected async canPassStateInContructor() {
         const state = {
             firstName: generateId(),
         }
@@ -117,7 +124,7 @@ export default class SkillTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async honorsDefaultValuesInState() {
+    protected async honorsDefaultValuesInState() {
         const stateSchema = buildSchema({
             id: 'test',
             fields: {
@@ -140,7 +147,7 @@ export default class SkillTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async passesPlaceholdersThroughToSerializedSkill() {
+    protected async passesPlaceholdersThroughToSerializedSkill() {
         const callbacks: LlmCallbackMap = {
             favoriteColorOptions: {
                 cb: () => 'Taco, Burrito, Cheezy Crunch',
@@ -156,7 +163,7 @@ export default class SkillTest extends AbstractLlmTest {
     }
 
     @test()
-    protected static async skillCanSetModel() {
+    protected async skillCanSetModel() {
         OpenAiAdapter.OpenAI = SpyOpenAiApi as any
 
         const model =
@@ -176,16 +183,16 @@ export default class SkillTest extends AbstractLlmTest {
         assert.isEqual(this.adapter.lastSendOptions?.model, model)
     }
 
-    private static serialize() {
+    private serialize() {
         return this.skill.serialize()
     }
 
-    private static assertStateEquals(expected: SchemaPartialValues<Schema>) {
+    private assertStateEquals(expected: SchemaPartialValues<Schema>) {
         const state = this.skill.getState()
         assert.isEqualDeep(state, expected)
     }
 
-    private static async updateState(updates: SchemaPartialValues<Schema>) {
+    private async updateState(updates: SchemaPartialValues<Schema>) {
         await this.skill.updateState(updates)
     }
 }
