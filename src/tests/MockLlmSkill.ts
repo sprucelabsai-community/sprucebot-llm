@@ -7,9 +7,12 @@ export default class MockLlmSkill<
     StateSchema extends Schema = Schema,
     State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 > extends SprucebotLlmSkillImpl<StateSchema, State> {
+    public static instance: MockLlmSkill
+
     public constructor(options: SkillOptions<StateSchema, State>) {
         super(options)
         assertOptions(options, ['yourJobIfYouChooseToAcceptItIs'])
+        MockLlmSkill.instance = this
     }
 
     public assertYourJobEquals(expected: string) {

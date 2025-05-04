@@ -261,6 +261,12 @@ export default class MockLlmSkillTest extends AbstractLlmTest {
         this.assertHasCallback(cbName, { useThisWhenever, parameters })
     }
 
+    @test()
+    protected async creatingMockLlmSetsStaticInstance() {
+        const skill = new MockLlmSkill(this.skillOptions)
+        assert.isEqual(skill, MockLlmSkill.instance)
+    }
+
     private assertDoesNotHaveCallback(expected: string) {
         assert.doesThrow(() => this.assertHasCallback(expected))
     }
