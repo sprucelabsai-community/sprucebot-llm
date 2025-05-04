@@ -15,15 +15,15 @@ export default class SprucebotLlmSkillImpl<
     extends AbstractEventEmitter<LlmEventContract>
     implements SprucebotLLmSkill<StateSchema, State>
 {
-    private options: SkillOptions
+    protected options: SkillOptions
     private state?: Partial<State> = {}
-    private stateSchema?: StateSchema | undefined
+    protected stateSchema?: StateSchema
 
     public constructor(options: SkillOptions<StateSchema, State>) {
         super(llmEventContract)
-        const { state, stateSchema, ...rest } = options
-        this.options = { ...rest, stateSchema }
+        const { state, stateSchema, ...rest } = options ?? {}
 
+        this.options = { ...rest, stateSchema }
         this.stateSchema = stateSchema
         this.state = stateSchema
             ? ({

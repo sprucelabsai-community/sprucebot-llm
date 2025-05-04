@@ -16,11 +16,11 @@ import { PROMPT_TEMPLATE } from '../../../bots/templates'
 import { BotOptions, LlmMessage } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { personSchema } from '../../support/schemas/personSchema'
-import { SpyBot } from '../../support/SpyBot'
+import SpyLlmBot from '../../../tests/SpyLlmBot'
 
 @suite()
 export default class PromptGeneratorTest extends AbstractLlmTest {
-    private bot!: SpyBot
+    private bot!: SpyLlmBot
     private prompt!: PromptGenerator
     private eta!: Eta
 
@@ -198,8 +198,8 @@ export default class PromptGeneratorTest extends AbstractLlmTest {
 
     private SpyBot<S extends Schema = Schema>(
         options?: Partial<BotOptions<S, SchemaValues<S, false>>>
-    ): SpyBot {
-        return this.Bot({ ...options, Class: SpyBot }) as SpyBot
+    ): SpyLlmBot {
+        return this.Bot({ ...options, Class: SpyLlmBot }) as SpyLlmBot
     }
 
     private reloadGenerator(options?: PromptGeneratorOptions) {

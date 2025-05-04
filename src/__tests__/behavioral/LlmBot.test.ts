@@ -20,11 +20,11 @@ import AbstractLlmTest from '../support/AbstractLlmTest'
 import { Car, carSchema } from '../support/schemas/carSchema'
 import { personSchema } from '../support/schemas/personSchema'
 import { personWithDefaultsSchema } from '../support/schemas/personWithDefaultsSchema'
-import { SpyBot } from '../support/SpyBot'
+import SpyLlmBot from '../../tests/SpyLlmBot'
 
 @suite()
 export default class LlmBotTest extends AbstractLlmTest {
-    private bot!: SpyBot
+    private bot!: SpyLlmBot
     private parser!: FakeResponseParser
 
     protected async beforeEach() {

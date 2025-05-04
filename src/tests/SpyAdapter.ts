@@ -1,10 +1,6 @@
-import {
-    LlmAdapter,
-    SendMessageOptions,
-    SprucebotLlmBot,
-} from '../../llm.types'
+import { LlmAdapter, SendMessageOptions, SprucebotLlmBot } from '../llm.types'
 
-export default class SpyAdapter implements LlmAdapter {
+export default class SpyLlmAdapter implements LlmAdapter {
     public lastBot?: SprucebotLlmBot
     public lastMessage?: string
     public messageResponse = ''

@@ -23,12 +23,12 @@ import {
     SkillOptions,
 } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
-import { SpyBot } from '../../support/SpyBot'
+import SpyLlmBot from '../../../tests/SpyLlmBot'
 
 @suite()
 export default class OpenAiTest extends AbstractLlmTest {
     private openAi!: OpenAiAdapter
-    private bot!: SpyBot
+    private bot!: SpyLlmBot
     private skillJob: string = generateId()
 
     protected static async beforeAll(): Promise<void> {
