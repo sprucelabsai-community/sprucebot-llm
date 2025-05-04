@@ -1,3 +1,11 @@
+# [8.5.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.4.101...v8.5.0) (2025-05-03)
+
+
+### Features
+
+* can now send messages and respond to callbacks with images ([8466d00](https://github.com/sprucelabsai-community/sprucebot-llm/commit/8466d00))
+* can send messages, next up, responding to callbacks with image ([37855be](https://github.com/sprucelabsai-community/sprucebot-llm/commit/37855be))
+
 ## [8.4.101](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.4.100...v8.4.101) (2025-05-03)
 
 ## [8.4.100](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.4.99...v8.4.100) (2025-04-26)
