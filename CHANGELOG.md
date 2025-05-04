@@ -1,3 +1,10 @@
+# [8.6.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.5.1...v8.6.0) (2025-05-04)
+
+
+### Features
+
+* test doubles exported ([e213891](https://github.com/sprucelabsai-community/sprucebot-llm/commit/e213891))
+
 ## [8.5.1](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.5.0...v8.5.1) (2025-05-04)
 
 # [8.5.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.4.101...v8.5.0) (2025-05-03)
