@@ -3,8 +3,8 @@ import SprucebotLlmBotImpl from '../../bots/SprucebotLlmBotImpl'
 import SprucebotLlmFactory from '../../bots/SprucebotLlmFactory'
 import SprucebotLlmSkillImpl from '../../bots/SprucebotLlmSkillImpl'
 import { SprucebotLlmBot } from '../../llm.types'
-import AbstractLlmTest from '../support/AbstractLlmTest'
 import SpyLlmBot from '../../tests/SpyLlmBot'
+import AbstractLlmTest from '../support/AbstractLlmTest'
 
 @suite()
 export default class SprucebotLlmFactoryTest extends AbstractLlmTest {

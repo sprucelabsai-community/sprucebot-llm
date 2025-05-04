@@ -16,11 +16,11 @@ import {
 import ResponseParser, {
     ParsedResponse,
 } from '../../parsingResponses/ResponseParser'
+import SpyLlmBot from '../../tests/SpyLlmBot'
 import AbstractLlmTest from '../support/AbstractLlmTest'
 import { Car, carSchema } from '../support/schemas/carSchema'
 import { personSchema } from '../support/schemas/personSchema'
 import { personWithDefaultsSchema } from '../support/schemas/personWithDefaultsSchema'
-import SpyLlmBot from '../../tests/SpyLlmBot'
 
 @suite()
 export default class LlmBotTest extends AbstractLlmTest {

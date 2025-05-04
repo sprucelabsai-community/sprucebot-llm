@@ -14,9 +14,9 @@ import PromptGenerator, {
 } from '../../../bots/PromptGenerator'
 import { PROMPT_TEMPLATE } from '../../../bots/templates'
 import { BotOptions, LlmMessage } from '../../../llm.types'
+import SpyLlmBot from '../../../tests/SpyLlmBot'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { personSchema } from '../../support/schemas/personSchema'
-import SpyLlmBot from '../../../tests/SpyLlmBot'
 
 @suite()
 export default class PromptGeneratorTest extends AbstractLlmTest {

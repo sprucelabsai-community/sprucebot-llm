@@ -22,8 +22,8 @@ import {
     SendMessageOptions,
     SkillOptions,
 } from '../../../llm.types'
-import AbstractLlmTest from '../../support/AbstractLlmTest'
 import SpyLlmBot from '../../../tests/SpyLlmBot'
+import AbstractLlmTest from '../../support/AbstractLlmTest'
 
 @suite()
 export default class OpenAiTest extends AbstractLlmTest {

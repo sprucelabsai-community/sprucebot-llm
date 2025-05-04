@@ -20,7 +20,9 @@ export default abstract class AbstractLlmTest extends AbstractSpruceTest {
         SprucebotLlmFactory.reset()
     }
 
-    protected Bot<S extends Schema>(options?: Partial<BotOptions<S>>): SpyLlmBot {
+    protected Bot<S extends Schema>(
+        options?: Partial<BotOptions<S>>
+    ): SpyLlmBot {
         return this.bots.Bot({
             youAre: this.youAre,
             Class: SpyLlmBot,
