@@ -70,5 +70,12 @@ export default class MockLlmSkill<
                 `the options for the '${name}' callback don\`t match`
             )
         }
+
+        return cb
+    }
+
+    public async invokeCallback(cbName: string, options?: Record<string, any>) {
+        const cb = this.assertHasCallback(cbName)
+        return await cb(options)
     }
 }

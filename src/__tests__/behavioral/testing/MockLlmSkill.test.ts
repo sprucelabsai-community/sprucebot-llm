@@ -267,6 +267,60 @@ export default class MockLlmSkillTest extends AbstractLlmTest {
         assert.isEqual(skill, MockLlmSkill.instance)
     }
 
+    @test()
+    protected async canInvokeCallback() {
+        const cbName = generateId()
+        let passedOptions: Record<string, any> | undefined
+
+        const options = {
+            [generateId()]: generateId(),
+        }
+
+        let wasHit = false
+        this.skillOptions.callbacks = {
+            [cbName]: {
+                cb: (options) => {
+                    passedOptions = options
+                    wasHit = true
+                    return ''
+                },
+                useThisWhenever: generateId(),
+            },
+        }
+
+        this.reloadSkill()
+        await this.invokeCallback(cbName, options)
+        assert.isTrue(wasHit, 'Callback was not hit')
+        assert.isEqualDeep(
+            passedOptions,
+            options,
+            'Callback was not passed the right options'
+        )
+    }
+
+    @test()
+    protected async invokingCallbackThrowsIfCallbackNotFound() {
+        this.skillOptions.callbacks = {
+            [generateId()]: {
+                cb: () => '',
+                useThisWhenever: generateId(),
+            },
+        }
+
+        this.reloadSkill()
+        await assert.doesThrowAsync(
+            () => this.invokeCallback(generateId()),
+            'Could not find callback'
+        )
+    }
+
+    private async invokeCallback(
+        cbName: string,
+        options?: Record<string, any>
+    ) {
+        await this.skill.invokeCallback(cbName, options)
+    }
+
     private assertDoesNotHaveCallback(expected: string) {
         assert.doesThrow(() => this.assertHasCallback(expected))
     }
