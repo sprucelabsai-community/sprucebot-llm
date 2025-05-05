@@ -6,6 +6,7 @@ import * as SpruceSchema from '@sprucelabs/schema'
 
 
 
+
 export declare namespace SpruceErrors.SprucebotLlm {
 
 	
@@ -60,6 +61,26 @@ export declare namespace SpruceErrors.SprucebotLlm {
 	}
 
 	export type InvalidCallbackEntity = SchemaEntity<SpruceErrors.SprucebotLlm.InvalidCallbackSchema>
+
+}
+
+
+export declare namespace SpruceErrors.SprucebotLlm {
+
+	
+	export interface CallbackError {
+		
+	}
+
+	export interface CallbackErrorSchema extends SpruceSchema.Schema {
+		id: 'callbackError',
+		namespace: 'SprucebotLlm',
+		name: 'Callback error',
+		    fields: {
+		    }
+	}
+
+	export type CallbackErrorEntity = SchemaEntity<SpruceErrors.SprucebotLlm.CallbackErrorSchema>
 
 }
 

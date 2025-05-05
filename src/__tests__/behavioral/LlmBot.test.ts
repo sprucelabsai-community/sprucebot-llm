@@ -483,6 +483,23 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
+    protected async sendsMessageBackToBotIfCallbackThrows() {
+        const passedMessages: string[] = []
+        const error = generateId()
+        const parserResponse = generateId()
+        this.setParserResponseMessage(parserResponse)
+        this.parser.callbackErrorOnNextParse = error
+        await this.sendMessage(generateId(), (message) => {
+            passedMessages.push(message)
+        })
+        assert.isEqual(
+            this.messages[1].message,
+            'Error: A Callback error just happened!'
+        )
+        assert.isEqualDeep(passedMessages, [parserResponse])
+    }
+
+    @test()
     protected async canSendImage() {
         const base64 = generateId()
         const description = generateId()
@@ -576,6 +593,7 @@ class FakeResponseParser extends ResponseParser {
     public lastMessage?: string
     public lastCallbacks?: LlmCallbackMap
     public invalidParseErrorOnNextParse?: string
+    public callbackErrorOnNextParse?: string
 
     public async parse(
         message: string,
@@ -591,6 +609,14 @@ class FakeResponseParser extends ResponseParser {
                 friendlyMessage: invalidParse,
             })
         }
+
+        if (this.callbackErrorOnNextParse) {
+            delete this.callbackErrorOnNextParse
+            throw new SpruceError({
+                code: 'CALLBACK_ERROR',
+            })
+        }
+
         this.lastMessage = message
         this.lastCallbacks = callbacks
         return {

@@ -7,7 +7,10 @@ export interface NoBotInstanceSetErrorOptions extends SpruceErrors.SprucebotLlm.
 export interface InvalidCallbackErrorOptions extends SpruceErrors.SprucebotLlm.InvalidCallback, ISpruceErrorOptions {
 	code: 'INVALID_CALLBACK'
 }
+export interface CallbackErrorErrorOptions extends SpruceErrors.SprucebotLlm.CallbackError, ISpruceErrorOptions {
+	code: 'CALLBACK_ERROR'
+}
 
-type ErrorOptions =  | NoBotInstanceSetErrorOptions  | InvalidCallbackErrorOptions 
+type ErrorOptions =  | NoBotInstanceSetErrorOptions  | InvalidCallbackErrorOptions  | CallbackErrorErrorOptions 
 
 export default ErrorOptions

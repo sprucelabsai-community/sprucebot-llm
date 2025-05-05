@@ -111,7 +111,10 @@ export default class SprucebotLlmBotImpl<
             state = parsed.state
             callbackResults = parsed.callbackResults
         } catch (err: any) {
-            if (err.options?.code === 'INVALID_CALLBACK') {
+            if (
+                err.options?.code === 'INVALID_CALLBACK' ||
+                err.options?.code === 'CALLBACK_ERROR'
+            ) {
                 return this.sendMessage(`Error: ${err.message}`, cb)
             }
             throw err

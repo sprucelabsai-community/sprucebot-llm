@@ -33,13 +33,13 @@ export default class ResponseParser {
                 )
             }
 
-            let simpleMatches = message.match(
+            let xmlCallMatches = message.match(
                 new RegExp(`<<\\s*${key}\\s*\/>>`, 'g')
             )
 
             let data: Record<string, any> | undefined
 
-            if (!simpleMatches) {
+            if (!xmlCallMatches) {
                 const matchWithJson = message
                     .matchAll(
                         new RegExp(
@@ -49,15 +49,25 @@ export default class ResponseParser {
                     )
                     .next().value
 
-                simpleMatches = matchWithJson?.[0] ? [matchWithJson?.[0]] : null
+                xmlCallMatches = matchWithJson?.[0]
+                    ? [matchWithJson?.[0]]
+                    : null
                 data = matchWithJson?.[1]
                     ? JSON.parse(matchWithJson?.[1])
                     : undefined
             }
 
-            if (simpleMatches) {
-                callbackResults = await callbacks?.[key]?.cb(data)
-                message = message.replace(simpleMatches[0], '').trim()
+            if (xmlCallMatches) {
+                try {
+                    callbackResults = await callbacks?.[key]?.cb(data)
+                    message = message.replace(xmlCallMatches[0], '').trim()
+                } catch (error: any) {
+                    throw new SpruceError({
+                        code: 'CALLBACK_ERROR',
+                        friendlyMessage: `Error while executing callback (${key}). The error is: ${error.message}`,
+                        originalError: error,
+                    })
+                }
             }
         }
 
@@ -87,7 +97,7 @@ export default class ResponseParser {
     }
 
     private findFirstBadCallback(message: string) {
-        const simpleMatches = message.match(new RegExp(`<<(.*)\/>>`, 'g'))
+        const simpleMatches = message.match(new RegExp(`<<(.*)\/?>>`, 'g'))
         const extraJsonMatches = message.match(
             new RegExp(`<<.*?>>(.*?)<<\/.*?>>`, 'gs')
         )

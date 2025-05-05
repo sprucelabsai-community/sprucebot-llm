@@ -228,6 +228,31 @@ export default class ResponseParserTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected async throwsWithAdvancedCallbackMarkupThatIsWrong() {
+        await this.assertPromptThrowsWithErrorIncludingCallbacks(
+            'hey there <<listOrganizations{"hello": "world"} >>',
+            '<<listOrganizations{"hello": "world"} >>',
+            ['login']
+        )
+    }
+
+    @test()
+    protected async throwsExpectedErrorIfCallbackFails() {
+        const err = await assert.doesThrowAsync(() =>
+            this.parse('hey there <<listLocations/>>', {
+                listLocations: {
+                    cb: () => {
+                        throw new Error('I am a bad callback')
+                    },
+                    useThisWhenever: generateId(),
+                },
+            })
+        )
+
+        errorAssert.assertError(err, 'CALLBACK_ERROR')
+    }
+
     private async assertPromptThrowsWithErrorIncludingCallbacks(
         prompt: string,
         match: string,
