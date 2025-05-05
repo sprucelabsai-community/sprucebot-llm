@@ -10,10 +10,12 @@ export default class SpyLlmBot<
     implements SprucebotLlmBot
 {
     public static instance: SpyLlmBot
+    public constructorOptions: BotOptions<StateSchema, State>
 
     public constructor(options: BotOptions<StateSchema, State>) {
         super(options)
         SpyLlmBot.instance = this
+        this.constructorOptions = options
     }
 
     public getState() {

@@ -7,10 +7,12 @@ import AbstractLlmTest from '../../support/AbstractLlmTest'
 export default class SpyLlmBotTest extends AbstractLlmTest {
     @test()
     protected async spyBotInstanceSetToLastIntsance() {
-        const spyLlmBot = new SpyLlmBot({
+        const options = {
             adapter: new SpyLlmAdapter(),
             youAre: generateId(),
-        })
+        }
+        const spyLlmBot = new SpyLlmBot(options)
         assert.isEqual(SpyLlmBot.instance, spyLlmBot)
+        assert.isEqual(SpyLlmBot.instance.constructorOptions, options)
     }
 }
