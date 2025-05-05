@@ -1,10 +1,21 @@
+import { Schema, SchemaValues } from '@sprucelabs/schema'
 import SprucebotLlmBotImpl from '../bots/SprucebotLlmBotImpl'
-import { LlmMessage, SprucebotLlmBot } from '../llm.types'
+import { BotOptions, LlmMessage, SprucebotLlmBot } from '../llm.types'
 
-export default class SpyLlmBot
-    extends SprucebotLlmBotImpl
+export default class SpyLlmBot<
+        StateSchema extends Schema = Schema,
+        State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
+    >
+    extends SprucebotLlmBotImpl<StateSchema, State>
     implements SprucebotLlmBot
 {
+    public static instance: SpyLlmBot
+
+    public constructor(options: BotOptions<StateSchema, State>) {
+        super(options)
+        SpyLlmBot.instance = this
+    }
+
     public getState() {
         return this.state
     }
