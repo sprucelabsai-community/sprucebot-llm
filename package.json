@@ -60,7 +60,7 @@
     "@sprucelabs/schema": "^31.0.93",
     "@sprucelabs/spruce-skill-utils": "^31.2.18",
     "eta": "^3.5.0",
-    "openai": "^4.102.0"
+    "openai": "^4.103.0"
   },
   "devDependencies": {
     "@sprucelabs/esm-postbuild": "^6.0.564",
