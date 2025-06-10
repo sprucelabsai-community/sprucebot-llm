@@ -1,3 +1,10 @@
+# [9.0.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.6.30...v9.0.0) (2025-06-10)
+
+
+### Breaking Changes
+
+* jest update ([2da565d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2da565d))
+
 ## [8.6.30](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.6.29...v8.6.30) (2025-06-07)
 
 ## [8.6.29](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v8.6.28...v8.6.29) (2025-06-06)
