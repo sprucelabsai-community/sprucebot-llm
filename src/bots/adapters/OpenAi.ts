@@ -7,7 +7,7 @@ import {
 } from '../../llm.types'
 import OpenAiMessageBuilder from './OpenAiMessageBuilder'
 
-export class OpenAiAdapter implements LlmAdapter {
+export default class OpenAiAdapter implements LlmAdapter {
     public static OpenAI = OpenAI
     private api: OpenAI
     // private log = buildLog('SprucebotLLM::OpenAiAdapter')

@@ -11,9 +11,8 @@ import {
     ChatCompletionCreateParamsNonStreaming,
     ChatCompletionMessageParam,
 } from 'openai/resources'
-import {
+import OpenAiAdapter, {
     MESSAGE_RESPONSE_ERROR_MESSAGE,
-    OpenAiAdapter,
 } from '../../../bots/adapters/OpenAi'
 import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/templates'

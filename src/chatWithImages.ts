@@ -1,6 +1,6 @@
 import fs from 'fs'
 import dotenv from 'dotenv'
-import { OpenAiAdapter } from './bots/adapters/OpenAi'
+import OpenAiAdapter from './bots/adapters/OpenAi'
 import SprucebotLlmFactory from './bots/SprucebotLlmFactory'
 
 dotenv.config()

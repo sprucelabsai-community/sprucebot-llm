@@ -1,7 +1,7 @@
 import { stdin as input, stdout as output } from 'node:process'
 import * as readline from 'node:readline/promises'
 import dotenv from 'dotenv'
-import { OpenAiAdapter } from './bots/adapters/OpenAi'
+import OpenAiAdapter from './bots/adapters/OpenAi'
 import SprucebotLlmFactory from './bots/SprucebotLlmFactory'
 import buildCallbackSkill from './examples/buildCallbackSkill'
 import buildFileTransformerSkill from './examples/buildFileTransformerSkill'

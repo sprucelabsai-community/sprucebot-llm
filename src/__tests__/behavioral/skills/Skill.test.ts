@@ -6,7 +6,7 @@ import {
     errorAssert,
     generateId,
 } from '@sprucelabs/test-utils'
-import { OpenAiAdapter } from '../../../bots/adapters/OpenAi'
+import OpenAiAdapter from '../../../bots/adapters/OpenAi'
 import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
 import SprucebotLlmSkillImpl from '../../../bots/SprucebotLlmSkillImpl'
 import { LlmCallbackMap, SprucebotLLmSkill } from '../../../llm.types'
