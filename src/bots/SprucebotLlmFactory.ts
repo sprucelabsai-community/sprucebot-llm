@@ -12,7 +12,6 @@ import SprucebotLlmSkillImpl from './SprucebotLlmSkillImpl'
 
 export default class SprucebotLlmFactory {
     protected adapter: LlmAdapter
-
     private instance?: SprucebotLlmBot
 
     public static FactoryClass?: typeof SprucebotLlmFactory
