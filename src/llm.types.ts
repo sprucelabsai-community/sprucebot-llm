@@ -104,7 +104,9 @@ export interface SerializedSkill<
 export type LlmCallbackMap = Record<string, LlmCallback>
 
 export interface LlmCallback {
-    cb: (options?: Record<string, any>) => SendMessage | Promise<SendMessage>
+    cb: (
+        options?: Record<string, any>
+    ) => void | SendMessage | Promise<SendMessage>
     useThisWhenever: string
     parameters?: LlmCallbackParameter[]
 }

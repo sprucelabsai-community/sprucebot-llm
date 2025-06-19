@@ -20,7 +20,7 @@ export default class ResponseParser {
     ): Promise<ParsedResponse> {
         let message = response.replace(DONE_TOKEN, '').trim()
         let state: Record<string, any> | undefined
-        let callbackResults: SendMessage | undefined
+        let callbackResults: SendMessage | undefined | void
 
         for (const key of Object.keys(callbacks || {})) {
             const match = message.match(renderPlaceholder(key))
@@ -92,7 +92,7 @@ export default class ResponseParser {
             isDone: this.doesIncludeDoneToken(response),
             state,
             message,
-            callbackResults,
+            callbackResults: callbackResults ?? undefined,
         }
     }
 
