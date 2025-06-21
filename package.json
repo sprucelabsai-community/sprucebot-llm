@@ -55,20 +55,20 @@
     "build": "yarn run build.tsc --sourceMap ; yarn run resolve-paths"
   },
   "dependencies": {
-    "@sprucelabs/error": "^7.0.11",
+    "@sprucelabs/error": "^7.0.12",
     "@sprucelabs/mercury-event-emitter": "^43.0.22",
     "@sprucelabs/mercury-types": "^48.0.18",
-    "@sprucelabs/resolve-path-aliases": "^3.0.7",
-    "@sprucelabs/schema": "^32.0.17",
+    "@sprucelabs/schema": "^32.0.18",
     "eta": "^3.5.0",
     "openai": "^5.6.0"
   },
   "devDependencies": {
     "@sprucelabs/esm-postbuild": "^7.0.7",
-    "@sprucelabs/jest-json-reporter": "^9.0.12",
+    "@sprucelabs/jest-json-reporter": "^9.0.13",
+    "@sprucelabs/resolve-path-aliases": "^3.0.7",
     "@sprucelabs/semantic-release": "^5.0.2",
     "@sprucelabs/test": "^10.0.5",
-    "@sprucelabs/test-utils": "^6.0.16",
+    "@sprucelabs/test-utils": "^6.0.17",
     "@types/node": "^24.0.3",
     "chokidar-cli": "^3.0.0",
     "dotenv": "^16.5.0",
