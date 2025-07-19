@@ -68,7 +68,7 @@
     "@sprucelabs/semantic-release": "^5.0.2",
     "@sprucelabs/test": "^10.0.11",
     "@sprucelabs/test-utils": "^6.0.38",
-    "@types/node": "^24.0.14",
+    "@types/node": "^24.0.15",
     "chokidar-cli": "^3.0.0",
     "dotenv": "^17.2.0",
     "eslint": "^9.31.0",
