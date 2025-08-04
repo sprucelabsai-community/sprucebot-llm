@@ -1,3 +1,5 @@
+## [9.0.78](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v9.0.77...v9.0.78) (2025-08-04)
+
 ## [9.0.77](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v9.0.76...v9.0.77) (2025-08-04)
 
 ## [9.0.76](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v9.0.75...v9.0.76) (2025-08-01)
