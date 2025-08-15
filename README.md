@@ -39,7 +39,7 @@ import dotenv from 'dotenv'
 import { OpenAi } from './bots/adapters/OpenAi'
 import SprucebotLlmFactory from './bots/SprucebotLlmFactory'
 
-dotenv.config()
+dotenv.config({ quiet: true })
 const rl = readline.createInterface({ input, output })
 
 ;(async () => {

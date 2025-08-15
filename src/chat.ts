@@ -9,7 +9,7 @@ import buildJokeSkill from './examples/buildJokeSkill'
 import buildProfileSkill from './examples/buildProfileSkill'
 import buildReceptionistSkill from './examples/buildReceptionistSkill'
 
-dotenv.config()
+dotenv.config({ quiet: true })
 const rl = readline.createInterface({ input, output })
 
 void (async () => {
