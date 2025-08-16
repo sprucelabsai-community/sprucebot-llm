@@ -111,7 +111,7 @@ Conversation Memory is the total number of messages that will be tracked during 
 OPENAI_MESSAGE_MEMORY_LIMIT=10
 ```
 
-> *Note*: OpenAI is currently the only adapter supported. If you would like to see support for other adapters (or programattic ways to configure convers), please open an issue and we'll get on it! 🤘
+> *Note*: OpenAI is currently the only adapter supported. If you would like to see support for other adapters (or programattic ways to configure memory), please open an issue and we'll get on it! 🤘
 
 ### Adding state to your conversation
 This library depends on [`@sprucelabs/spruce-schema`](https://github.com/sprucelabsai/spruce-schema) to handle the structure and validation rules around your state.
