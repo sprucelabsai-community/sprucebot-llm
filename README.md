@@ -48,7 +48,7 @@ yarn rebuild
 code .
 ```
 
-### Testing in out
+### Testing it out for yourself
 You can use `sprucebot-llm` inside any Javascript runtime (nodejs, bun, browser).
 
 If you want to try this locally, you can checkout `chat.ts`. Here are the contents of that file for you to review now, rather than needing to explore the codebase.
