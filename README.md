@@ -7,7 +7,7 @@ A Typescript library for leveraging Large Langage Models to do... anything!
 * [Manages state](#adding-state-to-your-conversation)
     * The state builds as the conversation continues
     * Invoke callbacks whenever state changes
-* [Connect to 3rd party API's](pulling-from-3rd-party-apis)
+* [Connect to 3rd party API's](#pulling-from-3rd-party-apis)
     * Pull in data in real time
     * Have your bot respond generated responses
 * Unlimited use cases
@@ -16,7 +16,14 @@ A Typescript library for leveraging Large Langage Models to do... anything!
 * Adapter Interface to create your own adapters
     * Only support OpenAI models for now (more adapters based on demand)
 * Fully typed
+	* Built in modern Typescript
+	* Fully typed [schema based](https://github.com/sprucelabsai-community/spruce-schema) state management
 
+
+## Lexicon
+
+- `Bot`: This is the abstraction that holds the agent's personality.
+- `Skill`: Describes what the `Bot` is responsible for doing and how to do it (including tool integration).
 
 ## Getting started
 
@@ -30,7 +37,7 @@ yarn add @sprucelabs/sprucebot-llm
 npm install @sprucelabs/sprucebot-llm
 ```
 
-### Cloning and testing
+### Cloning and testing directly
 
 To clone the repository and prepare for development, do the following:
 
@@ -44,10 +51,10 @@ code .
 ### Testing in out
 You can use `sprucebot-llm` inside any Javascript runtime (nodejs, bun, browser).
 
-If you want to try this locally, you can checkout `chat.ts`. Here are the contents of that file for you to explore.
+If you want to try this locally, you can checkout `chat.ts`. Here are the contents of that file for you to review now, rather than needing to explore the codebase.
 
 ```ts
-import { stdimport { stdin as input, stdout as output } from 'node:process'
+import { stdin as input, stdout as output } from 'node:process'
 import * as readline from 'node:readline/promises'
 import dotenv from 'dotenv'
 import OpenAiAdapter from './bots/adapters/OpenAi'
@@ -145,9 +152,9 @@ const skill = bots.Skill({
 
 ```
 
-### Listening to state changes
+### Listening for state changes
 
-If you supply a `stateSchema` then your bot will work through it until the state is completely updated. While the conversation is taking place, if the state changes, the skill will emit `did-update-state`
+If you supply a `stateSchema`, then your bot will work with it based on the job you decide to give it. While the conversation is taking place, if the state changes, the skill will emit the `did-update-state` event.
 
 ```ts
 await skill.on('did-update-state', () => {
@@ -217,9 +224,11 @@ const skill = bots.Skill({
 
 ```
 
+> *Note*: This is not MCP (Model Context Protocol). MCP is focused on making API's available to LLM's. `sprucebot-llm` comes at this from the opposite direction. It does not require you to do anything server side, so you can connect to all your existing endpoints/tools/systems without needing to change them.
+
 ### Choosing a model
 
-When you configure a `Skill` with your bot, you can specify the model that the skill will use. In other words, you can have different skills use different models depending on their requirements.
+When you configure a `Skill` with for bot, you can specify the model that the skill will use. In other words, you can have different skills use different models depending on their requirements.
 
 ```ts
 
