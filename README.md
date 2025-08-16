@@ -1,4 +1,4 @@
-# sprucebot-llm (WIP)
+# sprucebot-llm
 A Typescript library for leveraging Large Langage Models (like GPT-3) to do... anything!
 
 * [Has memory](#has-memory)
