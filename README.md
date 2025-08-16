@@ -1,7 +1,7 @@
 # sprucebot-llm
 A Typescript library for leveraging Large Langage Models (like GPT-3) to do... anything!
 
-* [Has memory](#has-memory)
+* [Has memory](#memory)
     * Remembers past messages to build context
     * Configure how much of the conversation your bot should remember
 * [Manages state](#adding-state-to-your-conversation)
@@ -103,15 +103,15 @@ void (async () => {
 
 ```
 
-### Memory
+### Conversation Memory
 
-Currently, you can only configure memory (number of messages that are tracked) through you project's .env:
+Conversation Memory is the total number of messages that will be tracked during a conversation. Once the limit is hit, old messages will be popped off the stack and forgotten. Currently, you can only configure memory through you project's .env:
 
 ```env
 OPENAI_MESSAGE_MEMORY_LIMIT=10
 ```
 
-> *Note*: For now, OpenAI is the only adapter supported. If you would like to see support for other adapters, please open an issue and we'll get on it! 🤘
+> *Note*: OpenAI is currently the only adapter supported. If you would like to see support for other adapters (or programattic ways to configure convers), please open an issue and we'll get on it! 🤘
 
 ### Adding state to your conversation
 This library depends on [`@sprucelabs/spruce-schema`](https://github.com/sprucelabsai/spruce-schema) to handle the structure and validation rules around your state.
