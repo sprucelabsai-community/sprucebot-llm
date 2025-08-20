@@ -52,6 +52,7 @@ export default class ResponseParser {
                 xmlCallMatches = matchWithJson?.[0]
                     ? [matchWithJson?.[0]]
                     : null
+
                 data = matchWithJson?.[1]
                     ? JSON.parse(matchWithJson?.[1])
                     : undefined
