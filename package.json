@@ -59,7 +59,7 @@
     "@sprucelabs/mercury-types": "^48.0.70",
     "@sprucelabs/schema": "^32.1.19",
     "eta": "^3.5.0",
-    "openai": "^5.15.0"
+    "openai": "^5.16.0"
   },
   "devDependencies": {
     "@sprucelabs/esm-postbuild": "^7.0.24",
