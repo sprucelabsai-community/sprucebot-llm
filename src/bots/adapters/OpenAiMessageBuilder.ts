@@ -1,4 +1,4 @@
-import { Schema } from '@sprucelabs/schema'
+import { Schema, SelectFieldDefinition } from '@sprucelabs/schema'
 import {
     ChatCompletionContentPart,
     ChatCompletionMessageParam,
@@ -131,11 +131,25 @@ export default class OpenAiMessageBuilder {
             if (callback.parameters) {
                 let params = '<Parameters>'
                 for (const param of callback.parameters) {
+                    let parameterChoices = ''
+                    if (param.type === 'select') {
+                        const choices = (param as SelectFieldDefinition).options
+                            .choices
+                        parameterChoices = `<Choices>\n${choices
+                            .map(
+                                (c) => `
+                        <Choice>
+                            <Label>${c.label}</Label>
+                            <Value>${c.value}</Value>
+                        </Choice>`
+                            )
+                            .join('\n')}\n</Choices>`
+                    }
                     params += `
                         <Parameter${param.isRequired ? ' required="true"' : ''}>
                             <Name>${param.name}</Name>
                             <Type>${param.type}</Type>
-                            ${param.description ? `<Description>${param.description}</Description>` : ''}
+                            ${param.description ? `<Description>${param.description}</Description>` : ''}${parameterChoices}
                         </Parameter>`
                 }
                 params += '</Parameters>'

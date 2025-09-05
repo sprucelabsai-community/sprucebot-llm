@@ -2,7 +2,7 @@ import {
     buildEventContract,
     MercuryEventEmitter,
 } from '@sprucelabs/mercury-types'
-import { Schema, SchemaValues } from '@sprucelabs/schema'
+import { Schema, SchemaValues, SelectFieldDefinition } from '@sprucelabs/schema'
 
 export interface BotOptions<
     StateSchema extends Schema = Schema,
@@ -113,14 +113,16 @@ export interface LlmCallback {
     parameters?: LlmCallbackParameter[]
 }
 
-export interface LlmCallbackParameter {
-    name: string
-    type:
-        | ('string' | 'number' | 'boolean' | 'dateMs' | 'dateTimeMs')
-        | (string & {})
-    isRequired?: boolean
-    description?: string
-}
+export type LlmCallbackParameter =
+    | {
+          name: string
+          type:
+              | ('text' | 'number' | 'boolean' | 'dateMs' | 'dateTimeMs')
+              | (string & {})
+          isRequired?: boolean
+          description?: string
+      }
+    | (SelectFieldDefinition & { name: string; description?: string })
 
 export type MessageResponseCallback = (message: string) => any
 

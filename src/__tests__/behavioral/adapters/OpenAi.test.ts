@@ -1,4 +1,4 @@
-import { buildSchema, Schema } from '@sprucelabs/schema'
+import { buildSchema, Schema, SelectFieldDefinition } from '@sprucelabs/schema'
 import {
     test,
     suite,
@@ -459,6 +459,84 @@ export default class OpenAiTest extends AbstractLlmTest {
         ])
     }
 
+    @test()
+    protected async rendersSelectOptionsAsExpected() {
+        const callbacks: LlmCallbackMap = {
+            test: {
+                cb: async () => 'hello',
+                useThisWhenever: 'here we go!',
+                parameters: [
+                    {
+                        name: 'option',
+                        type: 'select',
+                        options: {
+                            choices: [
+                                {
+                                    label: 'Option 1',
+                                    value: 'option_1',
+                                },
+                                {
+                                    label: 'Option 2',
+                                    value: 'option_2',
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        }
+
+        await this.setSkillSendMessageAndAssertSystemMessagesEqual(
+            {
+                callbacks,
+            },
+            [this.buildCallbacksMessage(callbacks)]
+        )
+    }
+
+    @test()
+    protected async rendersDifferentSelectOptionsAsExpected() {
+        const callbacks: LlmCallbackMap = {
+            test: {
+                cb: async () => 'what the',
+                useThisWhenever: generateId(),
+                parameters: [
+                    {
+                        name: generateId(),
+                        type: 'boolean',
+                    },
+                    {
+                        name: generateId(),
+                        type: 'select',
+                        options: {
+                            choices: [
+                                {
+                                    label: generateId(),
+                                    value: generateId(),
+                                },
+                                {
+                                    label: generateId(),
+                                    value: generateId(),
+                                },
+                                {
+                                    label: generateId(),
+                                    value: generateId(),
+                                },
+                            ],
+                        },
+                    },
+                ],
+            },
+        }
+
+        await this.setSkillSendMessageAndAssertSystemMessagesEqual(
+            {
+                callbacks,
+            },
+            [this.buildCallbacksMessage(callbacks)]
+        )
+    }
+
     private buildPleaseKeepInMindMessage(
         pleaseKeepInMind: string[]
     ): OpenAI.Chat.Completions.ChatCompletionMessageParam {
@@ -503,14 +581,30 @@ export default class OpenAiTest extends AbstractLlmTest {
                 desc += `<Parameters>`
                 const parameters: string[] = []
                 for (const parameter of callback.parameters) {
-                    parameters.push(
-                        `
+                    let parameterChoices = ''
+
+                    if (parameter.type === 'select') {
+                        const choices = (parameter as SelectFieldDefinition)
+                            .options.choices
+                        parameterChoices = `<Choices>\n${choices
+                            .map(
+                                (c) => `
+    <Choice>
+        <Label>${c.label}</Label>
+        <Value>${c.value}</Value>
+    </Choice>`
+                            )
+                            .join('\n')}\n</Choices>`
+                    }
+
+                    const parameterDefinition = `
         <Parameter${parameter.isRequired ? ' required="true"' : ''}>
             <Name>${parameter.name}</Name>
             <Type>${parameter.type}</Type>
-            ${parameter.description ? `<Description>${parameter.description}</Description>` : ''}
+            ${parameter.description ? `<Description>${parameter.description}</Description>` : ''}${parameterChoices}
         </Parameter>`
-                    )
+
+                    parameters.push(parameterDefinition)
                 }
 
                 desc += parameters.join('\n') + `</Parameters>`
