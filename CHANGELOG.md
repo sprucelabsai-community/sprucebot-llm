@@ -1,3 +1,10 @@
+# [10.0.0](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v9.0.136...v10.0.0) (2025-09-05)
+
+
+### Breaking Changes
+
+* select choice support, string -> text type change in callbacks. moving to support schemas for callback params ([3bbd929](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3bbd929))
+
 ## [9.0.136](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v9.0.135...v9.0.136) (2025-09-05)
 
 ## [9.0.135](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v9.0.134...v9.0.135) (2025-09-05)
