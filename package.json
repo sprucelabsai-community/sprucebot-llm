@@ -59,7 +59,7 @@
     "@sprucelabs/mercury-types": "^48.0.101",
     "@sprucelabs/schema": "^32.1.51",
     "eta": "3.5.0",
-    "openai": "^5.22.0"
+    "openai": "^5.23.0"
   },
   "resolutions": {
     "eta": "3.5.0"
