@@ -1,3 +1,8 @@
+## <small>10.0.78 (2025-11-08)</small>
+
+* chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([e7f1b61](https://github.com/sprucelabsai-community/sprucebot-llm/commit/e7f1b61))
+* chore(auto-upgrade): upgraded packages [upgrade-all] ([cd2e169](https://github.com/sprucelabsai-community/sprucebot-llm/commit/cd2e169))
+
 ## [10.0.77](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v10.0.76...v10.0.77) (2025-11-08)
 
 ## [10.0.76](https://github.com/sprucelabsai-community/sprucebot-llm/compare/v10.0.75...v10.0.76) (2025-10-31)
