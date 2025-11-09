@@ -1,3 +1,7 @@
+## 11.0.0 (2025-11-09)
+
+* major: upgrade ([5737ccc](https://github.com/sprucelabsai-community/sprucebot-llm/commit/5737ccc))
+
 ## <small>10.0.78 (2025-11-08)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([e7f1b61](https://github.com/sprucelabsai-community/sprucebot-llm/commit/e7f1b61))
