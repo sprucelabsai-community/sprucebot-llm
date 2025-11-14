@@ -1,3 +1,8 @@
+## <small>11.0.10 (2025-11-14)</small>
+
+* chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([ed2f094](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ed2f094))
+* chore(auto-upgrade): upgraded packages [upgrade-all] ([b7df313](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b7df313))
+
 ## <small>11.0.9 (2025-11-13)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([b3a56bf](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b3a56bf))
