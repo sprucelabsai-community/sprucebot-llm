@@ -3,9 +3,9 @@ import SprucebotLlmBotImpl from '../bots/SprucebotLlmBotImpl'
 import { BotOptions, LlmMessage, SprucebotLlmBot } from '../llm.types'
 
 export default class SpyLlmBot<
-        StateSchema extends Schema = Schema,
-        State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
-    >
+    StateSchema extends Schema = Schema,
+    State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
+>
     extends SprucebotLlmBotImpl<StateSchema, State>
     implements SprucebotLlmBot
 {
