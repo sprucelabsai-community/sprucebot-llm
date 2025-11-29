@@ -27,9 +27,11 @@ export default class SprucebotLlmFactory {
 
         const { Class } = options
 
-        return new (Class ??
+        return new (
+            Class ??
             SprucebotLlmFactory.BotClass ??
-            SprucebotLlmBotImpl)({ ...options, adapter: this.adapter })
+            SprucebotLlmBotImpl
+        )({ ...options, adapter: this.adapter })
     }
 
     public Skill(options: SkillOptions): SprucebotLLmSkill {
