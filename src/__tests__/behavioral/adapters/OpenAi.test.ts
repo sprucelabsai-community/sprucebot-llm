@@ -150,7 +150,7 @@ export default class OpenAiTest extends AbstractLlmTest {
             },
             [
                 {
-                    role: 'system',
+                    role: 'developer',
                     content: `Our conversation is done when ${doneWhen}. Once you determine we are done, send me the following message so I know we're done: ${DONE_TOKEN}`,
                 },
             ]
@@ -177,7 +177,7 @@ export default class OpenAiTest extends AbstractLlmTest {
             },
             [
                 {
-                    role: 'system',
+                    role: 'developer',
                     content: `During this conversation, please keep the following in mind:\n\n1. ${pleaseKeepInMind[0]}\n2. ${pleaseKeepInMind[1]}.`,
                 },
             ]
@@ -559,7 +559,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         pleaseKeepInMind: string[]
     ): OpenAI.Chat.Completions.ChatCompletionMessageParam {
         return {
-            role: 'system',
+            role: 'developer',
             content: this.renderPleaseKeepInMind(pleaseKeepInMind),
         }
     }
@@ -636,13 +636,13 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         const api = `<APIReference>\n\n${descriptions.join('\n\n')}</APIReference>`
 
-        const message = `You have an API available to you to lookup answers. When you need the response of the function call to proceed, you can call a function using a custom markup we created that looks like this: <<FunctionName/>>. The API will respond with the results and then you can continue the conversation with your new knowledge. If the api call has parameters, call it like this: <<FunctionName>>{{parametersJsonEncoded}}<</FunctionName>>. Make sure to json encode the data and drop it between the function tags. The API is as follows (in xml format):\n\n${api}`
-        return { role: 'system', content: message }
+        const message = `You have an API available to you to lookup answers. When you need the response of the function call to proceed, you can call a function using a custom markup we created that looks like this: <<FunctionName/>>. The API will respond with the results and then you can continue the conversation with your new knowledge. If the api call has parameters, call it like this: <<FunctionName>>{{parametersJsonEncoded}}<</FunctionName>>. Make sure to json encode the data and drop it between the function tags. Note: You can only make one API call at a time. The API is as follows (in xml format):\n\n${api}`
+        return { role: 'developer', content: message }
     }
 
     private renderStateMessage(state: Record<string, any>): Message {
         return {
-            role: 'system',
+            role: 'developer',
             content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the state is being updated, send it back to me in json format (something in can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by a boundary, like this: ${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`,
         }
     }
@@ -660,7 +660,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     private renderSchemaMessage(schema: Schema): Message {
         return {
-            role: 'system',
+            role: 'developer',
             content: `We will be tracking state for this conversation. The following schema is what we'll use to define the shape of the state:\n\n${JSON.stringify(schema)}`,
         }
     }
@@ -683,7 +683,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         this.assertLastCompletionEquals([
             {
-                role: 'system',
+                role: 'developer',
                 content: `For this interaction, your job is ${this.skillJob}.`,
             },
             ...messages,
@@ -699,7 +699,7 @@ export default class OpenAiTest extends AbstractLlmTest {
             model: 'gpt-4o',
             messages: [
                 {
-                    role: 'system',
+                    role: 'developer',
                     content: `You are ${this.youAre}.`,
                 },
                 ...expected,

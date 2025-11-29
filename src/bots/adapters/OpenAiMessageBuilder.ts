@@ -76,7 +76,7 @@ export default class OpenAiMessageBuilder {
 
     private buildFirstMessage(youAre: string): ChatCompletionMessageParam {
         return {
-            role: 'system',
+            role: 'developer',
             content: `You are ${youAre}.`,
         }
     }
@@ -164,8 +164,8 @@ export default class OpenAiMessageBuilder {
         const api = `<APIReference>\n\n${descriptions.join('\n\n')}</APIReference>`
 
         return {
-            role: 'system',
-            content: `You have an API available to you to lookup answers. When you need the response of the function call to proceed, you can call a function using a custom markup we created that looks like this: <<FunctionName/>>. The API will respond with the results and then you can continue the conversation with your new knowledge. If the api call has parameters, call it like this: <<FunctionName>>{{parametersJsonEncoded}}<</FunctionName>>. Make sure to json encode the data and drop it between the function tags. The API is as follows (in xml format):\n\n${api}`,
+            role: 'developer',
+            content: `You have an API available to you to lookup answers. When you need the response of the function call to proceed, you can call a function using a custom markup we created that looks like this: <<FunctionName/>>. The API will respond with the results and then you can continue the conversation with your new knowledge. If the api call has parameters, call it like this: <<FunctionName>>{{parametersJsonEncoded}}<</FunctionName>>. Make sure to json encode the data and drop it between the function tags. Note: You can only make one API call at a time. The API is as follows (in xml format):\n\n${api}`,
         }
     }
 
@@ -173,7 +173,7 @@ export default class OpenAiMessageBuilder {
         pleaseKeepInMindThat: string[]
     ): ChatCompletionMessageParam {
         return {
-            role: 'system',
+            role: 'developer',
             content: `During this conversation, please keep the following in mind:\n\n${pleaseKeepInMindThat.map((m, idx) => `${idx + 1}. ${m}`).join('\n')}.`,
         }
     }
@@ -182,14 +182,14 @@ export default class OpenAiMessageBuilder {
         state: Record<string, any>
     ): ChatCompletionMessageParam {
         return {
-            role: 'system',
+            role: 'developer',
             content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the state is being updated, send it back to me in json format (something in can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by a boundary, like this: ${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`,
         }
     }
 
     private buildYourJobMessage(yourJob: string): ChatCompletionMessageParam {
         return {
-            role: 'system',
+            role: 'developer',
             content: `For this interaction, your job is ${yourJob}.`,
         }
     }
@@ -198,7 +198,7 @@ export default class OpenAiMessageBuilder {
         weAreDoneWhen: string
     ): ChatCompletionMessageParam {
         return {
-            role: 'system',
+            role: 'developer',
             content: `Our conversation is done when ${weAreDoneWhen}. Once you determine we are done, send me the following message so I know we're done: ${DONE_TOKEN}`,
         }
     }
@@ -207,7 +207,7 @@ export default class OpenAiMessageBuilder {
         schema: Schema
     ): ChatCompletionMessageParam {
         return {
-            role: 'system',
+            role: 'developer',
             content: `We will be tracking state for this conversation. The following schema is what we'll use to define the shape of the state:\n\n${JSON.stringify(schema)}`,
         }
     }
