@@ -1,3 +1,11 @@
+## <small>11.1.2 (2025-11-29)</small>
+
+* patch: callback results from assistante ([eb9f44d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/eb9f44d))
+* patch: testing responses ([def3846](https://github.com/sprucelabsai-community/sprucebot-llm/commit/def3846))
+* patch: type fixes ([9f56823](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9f56823))
+* patch: type tweak ([4549f76](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4549f76))
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([359212a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/359212a))
+
 ## <small>11.1.1 (2025-11-29)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([d37da0d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/d37da0d))
