@@ -68,8 +68,10 @@ export const llmEventContract = buildEventContract({
 
 export type LlmEventContract = typeof llmEventContract
 
+export type LlmMessageFrom = 'Me' | 'You' | 'Api'
+
 export interface LlmMessage {
-    from: 'Me' | 'You'
+    from: LlmMessageFrom
     message: string
     imageBase64?: string
 }
@@ -129,6 +131,7 @@ export type MessageResponseCallback = (message: string) => any
 export type SendMessage = string | SendMessageWithImage
 
 export interface SendMessageWithImage {
+    from: LlmMessageFrom
     imageDescription: string
     imageBase64: string
 }

@@ -94,6 +94,13 @@ export default class SprucebotLlmBotImpl<
             llmMessage.imageBase64 = message.imageBase64
         }
 
+        return this._sendMessageInternal(llmMessage, cb)
+    }
+
+    private async _sendMessageInternal(
+        llmMessage: LlmMessage,
+        cb?: MessageResponseCallback
+    ): Promise<string> {
         this.trackMessage(llmMessage)
 
         const { model, callbacks } = this.skill?.serialize() ?? {}
@@ -132,16 +139,20 @@ export default class SprucebotLlmBotImpl<
         cb?.(parsedMessage)
 
         if (callbackResults) {
-            let message: SendMessage | undefined
+            let message: LlmMessage | undefined
             if (typeof callbackResults === 'string') {
-                message = `API Results: ${callbackResults}`
+                message = {
+                    from: 'Api',
+                    message: `API Results: ${callbackResults}`,
+                }
             } else {
                 message = {
+                    from: 'Api',
                     imageBase64: callbackResults.imageBase64,
-                    imageDescription: `API Results: ${callbackResults.imageDescription}`,
+                    message: `API Results: ${callbackResults.imageDescription}`,
                 }
             }
-            await this.sendMessage(message, cb)
+            await this._sendMessageInternal(message, cb)
         }
 
         return parsedMessage

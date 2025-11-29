@@ -432,7 +432,7 @@ export default class LlmBotTest extends AbstractLlmTest {
                 message: response1,
             },
             {
-                from: 'Me',
+                from: 'Api',
                 message: `API Results: ${functionCallResponse}`,
             },
             {
@@ -462,7 +462,7 @@ export default class LlmBotTest extends AbstractLlmTest {
         })
 
         assert.isEqualDeep(this.messages[2], {
-            from: 'Me',
+            from: 'Api',
             message: `API Results: ${description}`,
             imageBase64: base64Image,
         })
