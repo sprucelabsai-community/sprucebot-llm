@@ -1,3 +1,7 @@
+## <small>11.1.3 (2025-11-29)</small>
+
+* patch: prompt tests ([9e674e6](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9e674e6))
+
 ## <small>11.1.2 (2025-11-29)</small>
 
 * patch: callback results from assistante ([eb9f44d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/eb9f44d))
