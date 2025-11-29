@@ -128,7 +128,7 @@ export type LlmCallbackParameter =
 
 export type MessageResponseCallback = (message: string) => any
 
-export type SendMessage = string | SendMessageWithImage
+export type SendMessage = string | Omit<SendMessageWithImage, 'from'>
 
 export interface SendMessageWithImage {
     from: LlmMessageFrom
