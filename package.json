@@ -5,7 +5,6 @@
     "namespace": "sprucebot-llm",
     "upgradeIgnoreList": [
       "@sprucelabs/spruce-core-schemas",
-      "@sprucelabs/spruce-skill-utils",
       "eta"
     ]
   },
@@ -58,6 +57,7 @@
     "@sprucelabs/mercury-event-emitter": "^45.0.17",
     "@sprucelabs/mercury-types": "^49.0.14",
     "@sprucelabs/schema": "^33.0.10",
+    "@sprucelabs/spruce-skill-utils": "^33.0.13",
     "eta": "3.5.0",
     "openai": "^6.9.1"
   },

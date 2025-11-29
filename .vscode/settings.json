@@ -66,5 +66,11 @@
 	},
 	"circleci.persistedProjectSelection": [
 		"gh/sprucelabsai-community/sprucebot-llm"
-	]
+	],
+	"terminal.integrated.automationProfile.osx": {
+		"path": "/bin/zsh",
+		"args": [
+			"-l"
+		]
+	}
 }
