@@ -10,6 +10,7 @@ import OpenAI from 'openai'
 import {
     ChatCompletionCreateParamsNonStreaming,
     ChatCompletionMessageParam,
+    ReasoningEffort,
 } from 'openai/resources'
 import OpenAiAdapter, {
     MESSAGE_RESPONSE_ERROR_MESSAGE,
@@ -43,6 +44,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         this.bot = this.Bot()
 
         delete process.env.OPENAI_CHAT_HISTORY_LIMIT
+        delete process.env.OPENAI_REASONING_EFFORT
     }
 
     @test()
@@ -537,6 +539,22 @@ export default class OpenAiTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected async canSetReasoningEffortViaEnv() {
+        process.env.OPENAI_REASONING_EFFORT = generateId()
+
+        const message = generateId()
+
+        await this.setAndSendMessage(message)
+
+        this.assertLastCompletionEquals([
+            {
+                role: 'user',
+                content: message,
+            },
+        ])
+    }
+
     private buildPleaseKeepInMindMessage(
         pleaseKeepInMind: string[]
     ): OpenAI.Chat.Completions.ChatCompletionMessageParam {
@@ -677,20 +695,28 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     private assertLastCompletionEquals(expected: Message[]) {
+        const params: ChatCompletionCreateParamsNonStreaming = {
+            model: 'gpt-4o',
+            messages: [
+                {
+                    role: 'system',
+                    content: `You are ${this.youAre}.`,
+                },
+                ...expected,
+            ],
+        }
+
+        if (process.env.OPENAI_REASONING_EFFORT) {
+            params.reasoning_effort = process.env
+                .OPENAI_REASONING_EFFORT as ReasoningEffort
+        }
+
         assert.isEqualDeep(
             this.stripTabsAndNewlinesFromCompletion(
                 SpyOpenAiApi.lastSentCompletion!
             ),
-            this.stripTabsAndNewlinesFromCompletion({
-                model: 'gpt-4o',
-                messages: [
-                    {
-                        role: 'system',
-                        content: `You are ${this.youAre}.`,
-                    },
-                    ...expected,
-                ],
-            })
+            this.stripTabsAndNewlinesFromCompletion(params),
+            'Last completion does not match expected.'
         )
     }
 

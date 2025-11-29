@@ -2,6 +2,10 @@ import { assertOptions } from '@sprucelabs/schema'
 import { buildLog } from '@sprucelabs/spruce-skill-utils'
 import OpenAI from 'openai'
 import {
+    ChatCompletionCreateParamsNonStreaming,
+    ReasoningEffort,
+} from 'openai/resources'
+import {
     LlmAdapter,
     SendMessageOptions,
     SprucebotLlmBot,
@@ -34,10 +38,17 @@ export default class OpenAiAdapter implements LlmAdapter {
             JSON.stringify(messages, null, 2)
         )
 
-        const response = await this.api.chat.completions.create({
+        const params: ChatCompletionCreateParamsNonStreaming = {
             messages,
             model: options?.model ?? 'gpt-4o',
-        })
+        }
+
+        if (process.env.OPENAI_REASONING_EFFORT) {
+            params.reasoning_effort = process.env
+                .OPENAI_REASONING_EFFORT as ReasoningEffort
+        }
+
+        const response = await this.api.chat.completions.create(params)
 
         const message =
             response.choices?.[0]?.message?.content?.trim() ??
