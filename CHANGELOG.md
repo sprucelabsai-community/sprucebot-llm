@@ -1,3 +1,10 @@
+## <small>11.0.17 (2025-11-29)</small>
+
+* chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([03a849f](https://github.com/sprucelabsai-community/sprucebot-llm/commit/03a849f))
+* chore(auto-upgrade): upgraded packages [upgrade-all] ([bd21be0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/bd21be0))
+* patch: logging for help debugging chat ([6babfb1](https://github.com/sprucelabsai-community/sprucebot-llm/commit/6babfb1))
+* patch: logs ([a5a14d0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a5a14d0))
+
 ## <small>11.0.16 (2025-11-27)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([31701f1](https://github.com/sprucelabsai-community/sprucebot-llm/commit/31701f1))
