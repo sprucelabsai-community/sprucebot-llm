@@ -1,3 +1,7 @@
+## 11.1.0 (2025-11-29)
+
+* minor: OPENAI_REASONING_EFFORT ([90acd64](https://github.com/sprucelabsai-community/sprucebot-llm/commit/90acd64))
+
 ## <small>11.0.17 (2025-11-29)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([03a849f](https://github.com/sprucelabsai-community/sprucebot-llm/commit/03a849f))
