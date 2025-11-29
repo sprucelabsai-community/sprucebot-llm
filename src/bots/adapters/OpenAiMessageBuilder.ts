@@ -49,7 +49,9 @@ export default class OpenAiMessageBuilder {
         ) as ChatCompletionMessageParam[]
     }
 
-    private mapMessageToCompletion(message: LlmMessage) {
+    private mapMessageToCompletion(
+        message: LlmMessage
+    ): ChatCompletionMessageParam {
         let content: ChatCompletionContentPart[] | string = message.message
         if (message.imageBase64) {
             content = [
@@ -67,9 +69,9 @@ export default class OpenAiMessageBuilder {
         }
 
         return {
-            role: message.from === 'Me' ? 'user' : 'assistant',
+            role: message.from === 'Me' ? 'user' : 'developer',
             content,
-        }
+        } as ChatCompletionMessageParam
     }
 
     private buildFirstMessage(youAre: string): ChatCompletionMessageParam {

@@ -130,7 +130,7 @@ export default class OpenAiTest extends AbstractLlmTest {
                 content: message1,
             },
             {
-                role: 'assistant',
+                role: 'developer',
                 content: message2,
             },
         ])
@@ -369,7 +369,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         this.assertLastCompletionEquals([
             {
-                role: 'assistant',
+                role: 'developer',
                 content: 'hello world',
             },
         ])
@@ -398,7 +398,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         this.assertLastCompletionEquals([
             {
-                role: 'assistant',
+                role: 'developer',
                 content: 'hello world',
             },
             {
