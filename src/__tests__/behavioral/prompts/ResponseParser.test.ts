@@ -170,6 +170,20 @@ export default class ResponseParserTest extends AbstractLlmTest {
     }
 
     @test()
+    protected async throwsIfMoreThanOneCallbackRequested() {
+        this.setCallback('firstCallback', this.defaultCallback(generateId()))
+        this.setCallback('secondCallback', this.defaultCallback(generateId()))
+
+        const err = await assert.doesThrowAsync(() =>
+            this.parse(
+                `${renderCallbackMarkup('firstCallback')} ${renderCallbackMarkup('secondCallback')}`
+            )
+        )
+
+        errorAssert.assertError(err, 'CALLBACK_ERROR')
+    }
+
+    @test()
     protected async canParseWithoutSpaceInHandlebars() {
         const results = generateId()
         this.setCallback('availableTimes', this.defaultCallback(results))

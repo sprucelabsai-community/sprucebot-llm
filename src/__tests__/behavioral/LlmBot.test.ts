@@ -337,7 +337,11 @@ export default class LlmBotTest extends AbstractLlmTest {
         })
 
         await this.sendRandomMessage()
-        assert.isEqual(this.parser.lastCallbacks, callbacks)
+        assert.isEqual(
+            this.parser.lastCallbacks,
+            callbacks,
+            'did not pass callbacks to parser'
+        )
     }
 
     @test()

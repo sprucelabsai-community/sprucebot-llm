@@ -21,6 +21,7 @@ export default class ResponseParser {
         let message = response.replace(DONE_TOKEN, '').trim()
         let state: Record<string, any> | undefined
         let callbackResults: SendMessage | undefined | void
+        let callbacksInvoked = 0
 
         for (const key of Object.keys(callbacks || {})) {
             const match = message.match(renderPlaceholder(key))
@@ -59,6 +60,8 @@ export default class ResponseParser {
             }
 
             if (xmlCallMatches) {
+                this.assertAtMostOneCallback(++callbacksInvoked)
+
                 try {
                     callbackResults = await callbacks?.[key]?.cb(data)
                     message = message.replace(xmlCallMatches[0], '').trim()
@@ -133,6 +136,12 @@ export default class ResponseParser {
         const match = stateMatches?.[1]
 
         return { match, fullMatch: stateMatches?.[0] }
+    }
+
+    private assertAtMostOneCallback(invocations: number) {
+        if (invocations > 1) {
+            throw new SpruceError({ code: 'CALLBACK_ERROR' })
+        }
     }
 }
 export interface ParsedResponse {
