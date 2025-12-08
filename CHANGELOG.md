@@ -1,3 +1,8 @@
+## <small>11.1.12 (2025-12-08)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([1a9999e](https://github.com/sprucelabsai-community/sprucebot-llm/commit/1a9999e))
+* patch: error massage fix ([71f3f3b](https://github.com/sprucelabsai-community/sprucebot-llm/commit/71f3f3b))
+
 ## <small>11.1.11 (2025-12-08)</small>
 
 * patch: only one callback at a time or error ([1c1fc90](https://github.com/sprucelabsai-community/sprucebot-llm/commit/1c1fc90))
