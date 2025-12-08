@@ -1,3 +1,7 @@
+## <small>11.1.11 (2025-12-08)</small>
+
+* patch: only one callback at a time or error ([1c1fc90](https://github.com/sprucelabsai-community/sprucebot-llm/commit/1c1fc90))
+
 ## <small>11.1.10 (2025-12-08)</small>
 
 * patch: role fix in chat history ([33ad2c9](https://github.com/sprucelabsai-community/sprucebot-llm/commit/33ad2c9))
