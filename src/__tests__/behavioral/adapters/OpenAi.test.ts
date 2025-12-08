@@ -130,7 +130,7 @@ export default class OpenAiTest extends AbstractLlmTest {
                 content: message1,
             },
             {
-                role: 'developer',
+                role: 'assistant',
                 content: message2,
             },
         ])
@@ -369,7 +369,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         this.assertLastCompletionEquals([
             {
-                role: 'developer',
+                role: 'assistant',
                 content: 'hello world',
             },
         ])
@@ -398,7 +398,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         this.assertLastCompletionEquals([
             {
-                role: 'developer',
+                role: 'assistant',
                 content: 'hello world',
             },
             {
@@ -739,7 +739,11 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     private async assertResponseEquals(expected: string) {
         const response = await this.setAndSendMessage()
-        assert.isEqual(response, expected)
+        assert.isEqual(
+            response,
+            expected,
+            'Response does not match expected value.'
+        )
     }
 
     private async setAndSendMessage(

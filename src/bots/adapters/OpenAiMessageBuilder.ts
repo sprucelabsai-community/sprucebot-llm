@@ -68,8 +68,15 @@ export default class OpenAiMessageBuilder {
             ]
         }
 
+        const role: ChatCompletionMessageParam['role'] =
+            message.from === 'Me'
+                ? 'user'
+                : message.from === 'You'
+                  ? 'assistant'
+                  : 'developer'
+
         return {
-            role: message.from === 'Me' ? 'user' : 'developer',
+            role,
             content,
         } as ChatCompletionMessageParam
     }
