@@ -1,3 +1,8 @@
+## <small>11.1.13 (2025-12-08)</small>
+
+* chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([4ce7fa9](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4ce7fa9))
+* chore(auto-upgrade): upgraded packages [upgrade-all] ([3ad212c](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3ad212c))
+
 ## <small>11.1.12 (2025-12-08)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([1a9999e](https://github.com/sprucelabsai-community/sprucebot-llm/commit/1a9999e))
