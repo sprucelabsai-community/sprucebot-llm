@@ -140,7 +140,11 @@ export default class ResponseParser {
 
     private assertAtMostOneCallback(invocations: number) {
         if (invocations > 1) {
-            throw new SpruceError({ code: 'CALLBACK_ERROR' })
+            throw new SpruceError({
+                code: 'CALLBACK_ERROR',
+                friendlyMessage:
+                    'You can only invoke one callback per message.',
+            })
         }
     }
 }
