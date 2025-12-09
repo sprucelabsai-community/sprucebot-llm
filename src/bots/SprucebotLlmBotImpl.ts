@@ -104,7 +104,7 @@ export default class SprucebotLlmBotImpl<
         this.trackMessage(llmMessage)
 
         const { model, callbacks } = this.skill?.serialize() ?? {}
-        const response = await this.sendMessageToAdapter(model)
+        const llmResponse = await this.sendMessageToAdapter(model)
 
         let parsedMessage: string
         let isDone: boolean
@@ -112,17 +112,24 @@ export default class SprucebotLlmBotImpl<
         let callbackResults: SendMessage | undefined
 
         try {
-            const parsed = await this.parseResponse(response, callbacks)
+            const parsed = await this.parseResponse(llmResponse, callbacks)
             parsedMessage = parsed.message
             isDone = parsed.isDone
             state = parsed.state
             callbackResults = parsed.callbackResults
         } catch (err: any) {
+            this.trackMessage({
+                from: 'You',
+                message: llmResponse,
+            })
             if (
                 err.options?.code === 'INVALID_CALLBACK' ||
                 err.options?.code === 'CALLBACK_ERROR'
             ) {
-                return this.sendMessage(`Error: ${err.message}`, cb)
+                return this._sendMessageInternal(
+                    { from: 'Api', message: `Error: ${err.message}` },
+                    cb
+                )
             }
             throw err
         }
@@ -133,7 +140,7 @@ export default class SprucebotLlmBotImpl<
 
         this.trackMessage({
             from: 'You',
-            message: response,
+            message: llmResponse,
         })
 
         cb?.(parsedMessage)

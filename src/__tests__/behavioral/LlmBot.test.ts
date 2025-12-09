@@ -482,7 +482,7 @@ export default class LlmBotTest extends AbstractLlmTest {
         await this.sendMessage(generateId(), (message) => {
             passedMessages.push(message)
         })
-        assert.isEqual(this.messages[1].message, 'Error: ' + error)
+        assert.isEqual(this.messages[2].message, 'Error: ' + error)
         assert.isEqualDeep(passedMessages, [parserResponse])
     }
 
@@ -497,7 +497,7 @@ export default class LlmBotTest extends AbstractLlmTest {
             passedMessages.push(message)
         })
         assert.isEqual(
-            this.messages[1].message,
+            this.messages[2].message,
             'Error: A Callback error just happened!'
         )
         assert.isEqualDeep(passedMessages, [parserResponse])
@@ -506,8 +506,33 @@ export default class LlmBotTest extends AbstractLlmTest {
     @test()
     protected async responseThatThrowsIsStillTracked() {
         const error = generateId()
+        this.adapter.messageResponse = generateId()
         this.parser.invalidParseErrorOnNextParse = error
-        await this.sendMessage(generateId())
+        const initialMessage = generateId()
+        await this.sendMessage(initialMessage)
+
+        assert.isEqualDeep(
+            this.messages,
+            [
+                {
+                    from: 'Me',
+                    message: initialMessage,
+                },
+                {
+                    from: 'You',
+                    message: this.adapter.messageResponse,
+                },
+                {
+                    from: 'Api',
+                    message: 'Error: ' + error,
+                },
+                {
+                    from: 'You',
+                    message: this.adapter.messageResponse,
+                },
+            ],
+            'Messages'
+        )
     }
 
     @test()
