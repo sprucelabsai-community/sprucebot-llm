@@ -1,3 +1,11 @@
+## <small>11.1.14 (2025-12-09)</small>
+
+* patch: bump ([7b23a1e](https://github.com/sprucelabsai-community/sprucebot-llm/commit/7b23a1e))
+* patch: messag improvements ([4c85c40](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4c85c40))
+* patch: missed files ([ac294f5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ac294f5))
+* patch: pushed the wrong build last time ([b8fbd72](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b8fbd72))
+* patch: version bump ([476d592](https://github.com/sprucelabsai-community/sprucebot-llm/commit/476d592))
+
 ## <small>11.1.13 (2025-12-08)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([4ce7fa9](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4ce7fa9))
