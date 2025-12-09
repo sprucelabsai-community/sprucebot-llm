@@ -504,6 +504,13 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
+    protected async responseThatThrowsIsStillTracked() {
+        const error = generateId()
+        this.parser.invalidParseErrorOnNextParse = error
+        await this.sendMessage(generateId())
+    }
+
+    @test()
     protected async canSendImage() {
         const base64 = generateId()
         const description = generateId()
