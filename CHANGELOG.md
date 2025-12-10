@@ -1,3 +1,8 @@
+## <small>11.1.18 (2025-12-10)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([b5d2476](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b5d2476))
+* patch: visibility tweak ([0b2bc13](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0b2bc13))
+
 ## <small>11.1.17 (2025-12-10)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([2fe9ef5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2fe9ef5))
