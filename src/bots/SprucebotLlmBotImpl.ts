@@ -27,7 +27,7 @@ export default class SprucebotLlmBotImpl<
     implements SprucebotLlmBot<StateSchema, State>
 {
     public static messageMemoryLimit = 10
-    protected adapter: LlmAdapter
+    private adapter: LlmAdapter
     private youAre: string
     private stateSchema?: StateSchema
     protected state?: Partial<State>
