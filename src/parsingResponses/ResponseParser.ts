@@ -143,7 +143,7 @@ export default class ResponseParser {
             throw new SpruceError({
                 code: 'CALLBACK_ERROR',
                 friendlyMessage:
-                    'You can only invoke one callback per message.',
+                    'You can only invoke one callback per message. You will need to try to send that message again, but with only one callback invocation.',
             })
         }
     }
