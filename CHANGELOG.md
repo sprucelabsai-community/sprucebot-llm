@@ -1,3 +1,8 @@
+## <small>11.1.16 (2025-12-10)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([03f9c1a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/03f9c1a))
+* patch: version bump ([eac1a98](https://github.com/sprucelabsai-community/sprucebot-llm/commit/eac1a98))
+
 ## <small>11.1.15 (2025-12-10)</small>
 
 * patch: need tests passing for now ([8340d7b](https://github.com/sprucelabsai-community/sprucebot-llm/commit/8340d7b))
