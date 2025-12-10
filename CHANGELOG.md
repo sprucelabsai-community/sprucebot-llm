@@ -1,3 +1,8 @@
+## <small>11.1.19 (2025-12-10)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([cf4f4c8](https://github.com/sprucelabsai-community/sprucebot-llm/commit/cf4f4c8))
+* patch: error message improvement ([68902d9](https://github.com/sprucelabsai-community/sprucebot-llm/commit/68902d9))
+
 ## <small>11.1.18 (2025-12-10)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([b5d2476](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b5d2476))
