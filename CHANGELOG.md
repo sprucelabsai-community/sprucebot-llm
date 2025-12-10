@@ -1,3 +1,8 @@
+## <small>11.1.17 (2025-12-10)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([2fe9ef5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2fe9ef5))
+* patch: first attempt at cancelling turns in action. lets user send another message and the last one  ([a8b5d1b](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a8b5d1b))
+
 ## <small>11.1.16 (2025-12-10)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([03f9c1a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/03f9c1a))
