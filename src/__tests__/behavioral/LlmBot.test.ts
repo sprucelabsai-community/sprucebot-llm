@@ -545,11 +545,44 @@ export default class LlmBotTest extends AbstractLlmTest {
             imageDescription: description,
         })
 
-        assert.isEqualDeep(this.messages[0], {
-            from: 'Me',
-            message: description,
-            imageBase64: base64,
-        })
+        assert.isEqualDeep(
+            this.messages[0],
+            {
+                from: 'Me',
+                message: description,
+                imageBase64: base64,
+            },
+            `the initial message did not contain an image`
+        )
+    }
+
+    @test()
+    protected async secondMessageSendingAfterFirstCausesFirstsResponseToBeIgnored() {
+        this.adapter.messageResponse = generateId()
+        this.adapter.responseDelayMs = 10
+
+        const promise = this.sendMessage('hey there!')
+        await this.sendMessage('dear sir')
+        await promise
+
+        assert.isEqualDeep(
+            this.messages,
+            [
+                {
+                    from: 'Me',
+                    message: 'hey there!',
+                },
+                {
+                    from: 'Me',
+                    message: 'dear sir',
+                },
+                {
+                    from: 'You',
+                    message: this.adapter.messageResponse,
+                },
+            ],
+            'only the second response should be recorded'
+        )
     }
 
     private setParserResponseCallbackResults(results?: SendMessage) {
