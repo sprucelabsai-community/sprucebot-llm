@@ -1,3 +1,8 @@
+## <small>11.1.15 (2025-12-10)</small>
+
+* patch: need tests passing for now ([8340d7b](https://github.com/sprucelabsai-community/sprucebot-llm/commit/8340d7b))
+* WIP: mesage in flight canceled test written, production fails ([9d7e0f6](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9d7e0f6))
+
 ## <small>11.1.14 (2025-12-09)</small>
 
 * patch: bump ([7b23a1e](https://github.com/sprucelabsai-community/sprucebot-llm/commit/7b23a1e))
