@@ -8,7 +8,6 @@ import {
 import {
     BotOptions,
     LlmAdapter,
-    LlmCallbackMap,
     llmEventContract,
     LlmEventContract,
     LlmMessage,
@@ -18,7 +17,7 @@ import {
     SprucebotLlmBot,
     SprucebotLLmSkill,
 } from '../llm.types'
-import ResponseParser from '../parsingResponses/ResponseParser'
+import TurnRequest from './TurnRequest'
 
 export default class SprucebotLlmBotImpl<
     StateSchema extends Schema = Schema,
@@ -35,6 +34,7 @@ export default class SprucebotLlmBotImpl<
     private isDone = false
     protected messages: LlmMessage[] = []
     protected skill?: SprucebotLLmSkill
+    private activeTurn?: TurnRequest
 
     public constructor(options: BotOptions<StateSchema, State>) {
         const { adapter, youAre, stateSchema, state, skill } = options
@@ -94,75 +94,18 @@ export default class SprucebotLlmBotImpl<
             llmMessage.imageBase64 = message.imageBase64
         }
 
-        return this._sendMessageInternal(llmMessage, cb)
-    }
+        this.activeTurn?.cancel()
 
-    private async _sendMessageInternal(
-        llmMessage: LlmMessage,
-        cb?: MessageResponseCallback
-    ): Promise<string> {
-        this.trackMessage(llmMessage)
-
-        const { model, callbacks } = this.skill?.serialize() ?? {}
-        const llmResponse = await this.sendMessageToAdapter(model)
-
-        let parsedMessage: string
-        let isDone: boolean
-        let state: Record<string, any> | undefined
-        let callbackResults: SendMessage | undefined
-
-        try {
-            const parsed = await this.parseResponse(llmResponse, callbacks)
-            parsedMessage = parsed.message
-            isDone = parsed.isDone
-            state = parsed.state
-            callbackResults = parsed.callbackResults
-        } catch (err: any) {
-            this.trackMessage({
-                from: 'You',
-                message: llmResponse,
-            })
-            if (
-                err.options?.code === 'INVALID_CALLBACK' ||
-                err.options?.code === 'CALLBACK_ERROR'
-            ) {
-                return this._sendMessageInternal(
-                    { from: 'Api', message: `Error: ${err.message}` },
-                    cb
-                )
-            }
-            throw err
-        }
-
-        this.isDone = isDone
-
-        await this.optionallyUpdateState(state)
-
-        this.trackMessage({
-            from: 'You',
-            message: llmResponse,
+        this.activeTurn = new TurnRequest({
+            adapter: this.adapter,
+            bot: this,
+            optionallyUpdateState: this.optionallyUpdateState.bind(this),
+            setDone: (isDone) => (this.isDone = isDone),
+            skill: this.skill,
+            trackMessage: this.trackMessage.bind(this),
         })
 
-        cb?.(parsedMessage)
-
-        if (callbackResults) {
-            let message: LlmMessage | undefined
-            if (typeof callbackResults === 'string') {
-                message = {
-                    from: 'Api',
-                    message: `API Results: ${callbackResults}`,
-                }
-            } else {
-                message = {
-                    from: 'Api',
-                    imageBase64: callbackResults.imageBase64,
-                    message: `API Results: ${callbackResults.imageDescription}`,
-                }
-            }
-            await this._sendMessageInternal(message, cb)
-        }
-
-        return parsedMessage
+        return this.activeTurn.sendMessage(llmMessage, cb)
     }
 
     private async optionallyUpdateState(
@@ -173,18 +116,6 @@ export default class SprucebotLlmBotImpl<
         } else if (state) {
             await this.skill?.updateState(state)
         }
-    }
-
-    private async parseResponse(response: string, callbacks?: LlmCallbackMap) {
-        const parser = ResponseParser.getInstance()
-        const parsed = await parser.parse(response, callbacks)
-        return parsed
-    }
-
-    private async sendMessageToAdapter(model: string | undefined) {
-        return await this.adapter.sendMessage(this, {
-            model,
-        })
     }
 
     private trackMessage(m: LlmMessage) {

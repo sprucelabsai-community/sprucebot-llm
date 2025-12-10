@@ -556,7 +556,7 @@ export default class LlmBotTest extends AbstractLlmTest {
         )
     }
 
-    @test.skip()
+    @test()
     protected async secondMessageSendingAfterFirstCausesFirstsResponseToBeIgnored() {
         this.adapter.messageResponse = generateId()
         this.adapter.responseDelayMs = 10
