@@ -1,3 +1,7 @@
+## 11.3.0 (2025-12-11)
+
+* minor: can limit messages that are too long in the chat history. State Boundary improvement ([a7ffac2](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a7ffac2))
+
 ## 11.2.0 (2025-12-11)
 
 * minor: can be set to only send first image ([2d504eb](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2d504eb))
