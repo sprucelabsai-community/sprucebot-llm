@@ -1,3 +1,7 @@
+## 11.2.0 (2025-12-11)
+
+* minor: can be set to only send first image ([2d504eb](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2d504eb))
+
 ## <small>11.1.20 (2025-12-11)</small>
 
 * patch: images always sent from user ([d4503fd](https://github.com/sprucelabsai-community/sprucebot-llm/commit/d4503fd))
