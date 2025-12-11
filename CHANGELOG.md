@@ -1,3 +1,9 @@
+## <small>11.3.1 (2025-12-11)</small>
+
+* patch: error messages improvements ([68659e9](https://github.com/sprucelabsai-community/sprucebot-llm/commit/68659e9))
+* patch: error patch ([0410140](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0410140))
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([2fb5732](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2fb5732))
+
 ## 11.3.0 (2025-12-11)
 
 * minor: can limit messages that are too long in the chat history. State Boundary improvement ([a7ffac2](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a7ffac2))
