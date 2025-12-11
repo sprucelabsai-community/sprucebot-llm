@@ -12,11 +12,17 @@ export default class SpruceError extends BaseSpruceError<ErrorOptions> {
                 break
 
             case 'INVALID_CALLBACK':
-                message = `The callback you tried to invoke (${options.matchedCallback}) is not valid. Valid callbacks are:\n${options.validCallbacks.map((name, idx) => `${idx + 1}: ${name}`).join('\n')}`
+                message = `The callback you tried to invoke (${options.matchedCallback}) is not valid. Make sure you have the syntax correct and are calling a valid callback:\n${options.validCallbacks.map((name, idx) => `${idx + 1}: ${name}`).join('\n')}`
                 break
 
             case 'CALLBACK_ERROR':
-                message = 'A Callback error just happened!'
+                message =
+                    'The callback threw an error! Please check the details and try again'
+
+                if (options.originalError) {
+                    message += `\n\nOriginal Error: ${options.originalError.message}`
+                }
+
                 break
 
             default:
