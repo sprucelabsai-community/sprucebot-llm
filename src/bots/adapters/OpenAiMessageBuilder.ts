@@ -13,8 +13,6 @@ import { DONE_TOKEN, STATE_BOUNDARY } from '../templates'
 
 export default class OpenAiMessageBuilder {
     private bot: SprucebotLlmBot
-    private imagesFound = 0
-    private totalImages = 0
 
     protected constructor(bot: SprucebotLlmBot) {
         this.bot = bot
@@ -46,19 +44,16 @@ export default class OpenAiMessageBuilder {
             )
         }
 
-        this.totalImages = messagesBeingConsidered.filter(
-            (m) => m.imageBase64
-        ).length
+        const total = messagesBeingConsidered.length
 
-        this.imagesFound = 0
-
-        return messagesBeingConsidered.map((message) =>
-            this.mapMessageToCompletion(message)
+        return messagesBeingConsidered.map((message, idx) =>
+            this.mapMessageToCompletion(message, idx === total - 1)
         ) as ChatCompletionMessageParam[]
     }
 
     private mapMessageToCompletion(
-        message: LlmMessage
+        message: LlmMessage,
+        isLast: boolean
     ): ChatCompletionMessageParam {
         let content: ChatCompletionContentPart[] | string = message.message
         let role: ChatCompletionMessageParam['role'] =
@@ -70,10 +65,7 @@ export default class OpenAiMessageBuilder {
 
         if (message.imageBase64) {
             role = 'user'
-            this.imagesFound++
-            const shouldBeIncluded =
-                this.shouldRememberImages() ||
-                this.imagesFound === this.totalImages
+            const shouldBeIncluded = this.shouldRememberImages() || isLast
             content = [
                 {
                     type: 'text',
@@ -93,11 +85,28 @@ export default class OpenAiMessageBuilder {
             ]
         }
 
+        const shouldTruncate =
+            typeof content === 'string' &&
+            !isLast &&
+            this.maxCharsOfPastMessages() > 0 &&
+            content.length > this.maxCharsOfPastMessages()
+
+        if (shouldTruncate) {
+            content = `[omitted due to length]`
+        }
+
         return {
             role,
             content,
         } as ChatCompletionMessageParam
     }
+
+    private maxCharsOfPastMessages() {
+        return process.env.OPENAI_PAST_MESSAGE_MAX_CHARS
+            ? parseInt(process.env.OPENAI_PAST_MESSAGE_MAX_CHARS ?? '1000', 10)
+            : -1
+    }
+
     private shouldRememberImages() {
         return process.env.OPENAI_SHOULD_REMEMBER_IMAGES !== 'false'
     }
@@ -211,7 +220,7 @@ export default class OpenAiMessageBuilder {
     ): ChatCompletionMessageParam {
         return {
             role: 'developer',
-            content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the state is being updated, send it back to me in json format (something in can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by a boundary, like this: ${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`,
+            content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the state is being updated, send it back to me in json format (something in can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by the State Boundary (${STATE_BOUNDARY}), like this:\n\n${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`,
         }
     }
 

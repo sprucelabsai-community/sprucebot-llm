@@ -1,6 +1,6 @@
 import renderPlaceholder from '../parsingResponses/renderPlaceholder'
 
-export const STATE_BOUNDARY = '*****'
+export const STATE_BOUNDARY = '*** STATE BOUNDARY ***'
 export const DONE_TOKEN = `DONE_DONE_DONE`
 export const CALLBACK_BOUNDARY = 'xxxxx'
 

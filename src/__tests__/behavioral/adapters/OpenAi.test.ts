@@ -40,13 +40,15 @@ export default class OpenAiTest extends AbstractLlmTest {
     protected async beforeEach() {
         await super.beforeEach()
 
-        this.setupSpys()
-        this.openAi = this.OpenAi()
-        this.bot = this.Bot()
-
+        delete process.env.OPENAI_PAST_MESSAGE_MAX_CHARS
         delete process.env.OPENAI_SHOULD_REMEMBER_IMAGES
         delete process.env.OPENAI_CHAT_HISTORY_LIMIT
         delete process.env.OPENAI_REASONING_EFFORT
+        delete process.env.OPENAI_MESSAGE_MEMORY_LIMIT
+
+        this.setupSpys()
+        this.openAi = this.OpenAi()
+        this.bot = this.Bot()
     }
 
     @test()
@@ -356,7 +358,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     protected async chatHistoryCanBeLimitedByEnvTo1() {
         this.setMessageMemoryLimit('1')
 
-        this.bot.setMessages([
+        this.setMessages([
             {
                 from: 'Me',
                 message: generateId(),
@@ -381,7 +383,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     protected async chatHistoryCanBeLimitedByEnvTo2() {
         this.setMessageMemoryLimit('2')
 
-        this.bot.setMessages([
+        this.setMessages([
             {
                 from: 'Me',
                 message: 'hey there!',
@@ -437,7 +439,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         const { message, imageBase64: image } = imageMessage
 
-        this.bot.setMessages([imageMessage])
+        this.setMessages([imageMessage])
 
         await this.sendMessage()
         this.assertLastCompletionEquals([
@@ -461,7 +463,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     @test()
     protected async messagesAreAlwaysSentAsUser() {
-        this.bot.setMessages([
+        this.setMessages([
             {
                 from: 'Api',
                 message: generateId(),
@@ -577,7 +579,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         const message1 = this.generateImageMessageValues()
         const message2 = this.generateImageMessageValues()
 
-        this.bot.setMessages([message1, message2])
+        this.setMessages([message1, message2])
 
         await this.sendMessage()
 
@@ -609,7 +611,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         const message1 = this.generateImageMessageValues()
         const message2 = this.generateImageMessageValues()
 
-        this.bot.setMessages([message1, message2])
+        this.setMessages([message1, message2])
 
         await this.sendMessage()
 
@@ -630,6 +632,100 @@ export default class OpenAiTest extends AbstractLlmTest {
             },
             'Last image message not correct.'
         )
+    }
+
+    @test()
+    protected async willOmitImageAfterNextMessageSent() {
+        process.env.OPENAI_SHOULD_REMEMBER_IMAGES = 'false'
+
+        const message1 = this.generateImageMessageValues()
+        const message2 = this.generateImageMessageValues()
+        const message3: LlmMessage = this.generateLlmMessageValues()
+
+        await this.sendMessages([message1, message2, message3])
+
+        assert.isEqualDeep(
+            this.lastSentCompletion.messages[2].content?.[1],
+            {
+                type: 'text',
+                text: '[Image omitted to save context]',
+            },
+            'Image should have been omitted.'
+        )
+    }
+
+    @test()
+    protected async canSetPastMessageLengthLimitViaEnv() {
+        this.setMaxChars(100)
+
+        const message1 = this.generateMessageWithLength(140)
+        const message2 = this.generateLlmMessageValues()
+
+        await this.sendMessages([message1, message2])
+
+        this.assertMessageAtIndexWasOmittedDueToLength(1)
+        this.assertMessageAtIndexWasNotOmitted(2)
+    }
+
+    @test()
+    protected async maxPastCharsHandlesDifferentMaxChars() {
+        this.setMaxChars(75)
+
+        await this.sendMessages([
+            this.generateMessageWithLength(100),
+            this.generateMessageWithLength(60),
+            this.generateMessageWithLength(200),
+            this.generateMessageWithLength(70),
+        ])
+
+        this.assertMessageAtIndexWasOmittedDueToLength(1)
+        this.assertMessageAtIndexWasNotOmitted(2)
+        this.assertMessageAtIndexWasOmittedDueToLength(3)
+        this.assertMessageAtIndexWasNotOmitted(4)
+    }
+
+    private async sendMessages(messages: LlmMessage[]) {
+        this.setMessages(messages)
+        await this.sendMessage()
+    }
+
+    private generateMessageWithLength(length: number) {
+        return this.generateLlmMessageValues({
+            message: generateBodyOfLength(length),
+        })
+    }
+
+    private setMaxChars(maxChars: number) {
+        process.env.OPENAI_PAST_MESSAGE_MAX_CHARS = maxChars.toString()
+        this.resetTrackedMessages()
+    }
+
+    private assertMessageAtIndexWasNotOmitted(idx: number) {
+        assert.isNotEqual(
+            this.getSentMessage(idx)?.content,
+            '[omitted due to length]',
+            'Recent message was incorrectly omitted.'
+        )
+    }
+
+    private assertMessageAtIndexWasOmittedDueToLength(idx: number) {
+        assert.isEqual(
+            this.getSentMessage(idx)?.content,
+            '[omitted due to length]',
+            'Did not omit long past message.'
+        )
+    }
+
+    private getSentMessage(idx: number) {
+        return this.lastSentCompletion.messages[idx]
+    }
+
+    private generateLlmMessageValues(values?: Partial<LlmMessage>): LlmMessage {
+        return {
+            from: 'Me',
+            message: generateId(),
+            ...values,
+        }
     }
 
     private get lastSentCompletion() {
@@ -732,7 +828,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     private renderStateMessage(state: Record<string, any>): Message {
         return {
             role: 'developer',
-            content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the state is being updated, send it back to me in json format (something in can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by a boundary, like this: ${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`,
+            content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the state is being updated, send it back to me in json format (something in can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by the State Boundary (${STATE_BOUNDARY}), like this:\n\n${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`,
         }
     }
 
@@ -837,13 +933,17 @@ export default class OpenAiTest extends AbstractLlmTest {
         message?: string,
         options?: SendMessageOptions
     ) {
-        this.bot.setMessages([
+        this.setMessages([
             {
                 from: 'Me',
                 message: message ?? generateId(),
             },
         ])
         return await this.sendMessage(options)
+    }
+
+    private setMessages(messages: LlmMessage[]) {
+        this.bot.setMessages(messages)
     }
 
     private async sendMessage(options?: SendMessageOptions) {
@@ -856,8 +956,16 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     private setupSpys() {
         OpenAiAdapter.OpenAI = SpyOpenAiApi as any
+        this.resetTrackedMessages()
+    }
+
+    private resetTrackedMessages() {
         SpyOpenAiApi.lastSentCompletion = undefined
     }
 }
 
 type Message = OpenAI.Chat.Completions.ChatCompletionMessageParam
+
+function generateBodyOfLength(length: number): string {
+    return 'A'.repeat(length)
+}
