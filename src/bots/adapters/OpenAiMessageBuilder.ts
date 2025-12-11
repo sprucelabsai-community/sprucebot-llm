@@ -13,6 +13,8 @@ import { DONE_TOKEN, STATE_BOUNDARY } from '../templates'
 
 export default class OpenAiMessageBuilder {
     private bot: SprucebotLlmBot
+    private imagesFound = 0
+    private totalImages = 0
 
     protected constructor(bot: SprucebotLlmBot) {
         this.bot = bot
@@ -44,6 +46,12 @@ export default class OpenAiMessageBuilder {
             )
         }
 
+        this.totalImages = messagesBeingConsidered.filter(
+            (m) => m.imageBase64
+        ).length
+
+        this.imagesFound = 0
+
         return messagesBeingConsidered.map((message) =>
             this.mapMessageToCompletion(message)
         ) as ChatCompletionMessageParam[]
@@ -62,17 +70,26 @@ export default class OpenAiMessageBuilder {
 
         if (message.imageBase64) {
             role = 'user'
+            this.imagesFound++
+            const shouldBeIncluded =
+                this.shouldRememberImages() ||
+                this.imagesFound === this.totalImages
             content = [
                 {
                     type: 'text',
                     text: message.message,
                 },
-                {
-                    type: 'image_url',
-                    image_url: {
-                        url: `data:image/png;base64,${message.imageBase64}`,
-                    },
-                },
+                shouldBeIncluded
+                    ? {
+                          type: 'image_url',
+                          image_url: {
+                              url: `data:image/png;base64,${message.imageBase64}`,
+                          },
+                      }
+                    : {
+                          type: 'text',
+                          text: '[Image omitted to save context]',
+                      },
             ]
         }
 
@@ -80,6 +97,9 @@ export default class OpenAiMessageBuilder {
             role,
             content,
         } as ChatCompletionMessageParam
+    }
+    private shouldRememberImages() {
+        return process.env.OPENAI_SHOULD_REMEMBER_IMAGES !== 'false'
     }
 
     private buildFirstMessage(youAre: string): ChatCompletionMessageParam {

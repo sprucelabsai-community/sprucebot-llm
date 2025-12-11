@@ -19,6 +19,7 @@ import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/templates'
 import {
     LlmCallbackMap,
+    LlmMessage,
     SendMessageOptions,
     SkillOptions,
 } from '../../../llm.types'
@@ -43,6 +44,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         this.openAi = this.OpenAi()
         this.bot = this.Bot()
 
+        delete process.env.OPENAI_SHOULD_REMEMBER_IMAGES
         delete process.env.OPENAI_CHAT_HISTORY_LIMIT
         delete process.env.OPENAI_REASONING_EFFORT
     }
@@ -104,7 +106,7 @@ export default class OpenAiTest extends AbstractLlmTest {
             model,
         })
 
-        assert.isEqual(SpyOpenAiApi.lastSentCompletion?.model, model)
+        assert.isEqual(this.lastSentCompletion?.model, model)
     }
 
     @test()
@@ -431,15 +433,11 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     @test()
     protected async canSendImageAsBase64() {
-        const image = generateId()
-        const message = generateId()
-        this.bot.setMessages([
-            {
-                from: 'Me',
-                message,
-                imageBase64: image,
-            },
-        ])
+        const imageMessage: LlmMessage = this.generateImageMessageValues()
+
+        const { message, imageBase64: image } = imageMessage
+
+        this.bot.setMessages([imageMessage])
 
         await this.sendMessage()
         this.assertLastCompletionEquals([
@@ -472,7 +470,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         ])
 
         await this.sendMessage()
-        const last = SpyOpenAiApi.lastSentCompletion
+        const last = this.lastSentCompletion
         assert.isEqual(
             last?.messages[1].role,
             'user',
@@ -572,6 +570,78 @@ export default class OpenAiTest extends AbstractLlmTest {
                 content: message,
             },
         ])
+    }
+
+    @test()
+    protected async canTrackMultipleImages() {
+        const message1 = this.generateImageMessageValues()
+        const message2 = this.generateImageMessageValues()
+
+        this.bot.setMessages([message1, message2])
+
+        await this.sendMessage()
+
+        assert.isEqualDeep(
+            this.lastSentCompletion.messages[1],
+            {
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: message1.message,
+                    },
+                    {
+                        type: 'image_url',
+                        image_url: {
+                            url: `data:image/png;base64,${message1.imageBase64}`,
+                        },
+                    },
+                ],
+            },
+            'First image message not correct.'
+        )
+    }
+
+    @test()
+    protected async canBeConfiguredToOnlySendLastImage() {
+        process.env.OPENAI_SHOULD_REMEMBER_IMAGES = 'false'
+
+        const message1 = this.generateImageMessageValues()
+        const message2 = this.generateImageMessageValues()
+
+        this.bot.setMessages([message1, message2])
+
+        await this.sendMessage()
+
+        assert.isEqualDeep(
+            this.lastSentCompletion.messages[1],
+            {
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: message1.message,
+                    },
+                    {
+                        type: 'text',
+                        text: '[Image omitted to save context]',
+                    },
+                ],
+            },
+            'Last image message not correct.'
+        )
+    }
+
+    private get lastSentCompletion() {
+        return SpyOpenAiApi.lastSentCompletion!
+    }
+
+    private generateImageMessageValues(): LlmMessage {
+        return {
+            from: 'Me',
+            message: generateId(),
+            imageBase64: generateId(),
+        }
     }
 
     private buildPleaseKeepInMindMessage(
@@ -731,9 +801,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         }
 
         assert.isEqualDeep(
-            this.stripTabsAndNewlinesFromCompletion(
-                SpyOpenAiApi.lastSentCompletion!
-            ),
+            this.stripTabsAndNewlinesFromCompletion(this.lastSentCompletion),
             this.stripTabsAndNewlinesFromCompletion(params),
             'Last completion does not match expected.'
         )
