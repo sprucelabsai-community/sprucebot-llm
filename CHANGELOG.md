@@ -1,3 +1,7 @@
+## <small>11.1.20 (2025-12-11)</small>
+
+* patch: images always sent from user ([d4503fd](https://github.com/sprucelabsai-community/sprucebot-llm/commit/d4503fd))
+
 ## <small>11.1.19 (2025-12-10)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([cf4f4c8](https://github.com/sprucelabsai-community/sprucebot-llm/commit/cf4f4c8))
