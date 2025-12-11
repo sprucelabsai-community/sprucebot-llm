@@ -17,7 +17,7 @@ export default class SpruceError extends BaseSpruceError<ErrorOptions> {
 
             case 'CALLBACK_ERROR':
                 message =
-                    'The callback threw an error! Please check the details and try again'
+                    'The callback threw an error! Please check the details and try again.'
 
                 if (options.originalError) {
                     message += `\n\nOriginal Error: ${options.originalError.message}`

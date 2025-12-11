@@ -498,7 +498,7 @@ export default class LlmBotTest extends AbstractLlmTest {
         })
         assert.isEqual(
             this.messages[2].message,
-            'Error: A Callback error just happened!'
+            'Error: The callback threw an error! Please check the details and try again.'
         )
         assert.isEqualDeep(passedMessages, [parserResponse])
     }
