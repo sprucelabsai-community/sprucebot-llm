@@ -53,7 +53,15 @@ export default class OpenAiMessageBuilder {
         message: LlmMessage
     ): ChatCompletionMessageParam {
         let content: ChatCompletionContentPart[] | string = message.message
+        let role: ChatCompletionMessageParam['role'] =
+            message.from === 'Me'
+                ? 'user'
+                : message.from === 'You'
+                  ? 'assistant'
+                  : 'developer'
+
         if (message.imageBase64) {
+            role = 'user'
             content = [
                 {
                     type: 'text',
@@ -67,13 +75,6 @@ export default class OpenAiMessageBuilder {
                 },
             ]
         }
-
-        const role: ChatCompletionMessageParam['role'] =
-            message.from === 'Me'
-                ? 'user'
-                : message.from === 'You'
-                  ? 'assistant'
-                  : 'developer'
 
         return {
             role,

@@ -462,6 +462,25 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     @test()
+    protected async messagesAreAlwaysSentAsUser() {
+        this.bot.setMessages([
+            {
+                from: 'Api',
+                message: generateId(),
+                imageBase64: generateId(),
+            },
+        ])
+
+        await this.sendMessage()
+        const last = SpyOpenAiApi.lastSentCompletion
+        assert.isEqual(
+            last?.messages[1].role,
+            'user',
+            'Images can only be sent from user messages.'
+        )
+    }
+
+    @test()
     protected async rendersSelectOptionsAsExpected() {
         const callbacks: LlmCallbackMap = {
             test: {
