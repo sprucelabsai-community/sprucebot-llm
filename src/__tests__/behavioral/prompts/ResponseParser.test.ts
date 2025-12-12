@@ -62,11 +62,22 @@ export default class ResponseParserTest extends AbstractLlmTest {
             state: input,
             message: '',
         })
+
+        const state2 = this.generateStateSchema(input, true)
+        await this.parsingEquals(state2, {
+            isDone: false,
+            state: input,
+            message: '',
+        })
     }
 
-    @test()
-    protected async removesStateFromResponse() {
-        const state = this.generateStateSchema({ hello: 'world' })
+    @test('should remove state from response without boundary newlines', false)
+    @test('should remove state from response with boundary newlines', true)
+    protected async removesStateFromResponse(shouldNewlineBoundaries: boolean) {
+        const state = this.generateStateSchema(
+            { hello: 'world' },
+            shouldNewlineBoundaries
+        )
         const message = `hello ${state} world`
         await this.parsingEquals(message, {
             isDone: false,
@@ -303,7 +314,16 @@ export default class ResponseParserTest extends AbstractLlmTest {
         return await this.parser.parse(message, callbacks ?? this.callbacks)
     }
 
-    private generateStateSchema(input: Record<string, any>) {
+    private generateStateSchema(
+        input: Record<string, any>,
+        shouldNewlineBoundaries = false
+    ) {
+        if (shouldNewlineBoundaries) {
+            return `\n${STATE_BOUNDARY}\n${JSON.stringify(
+                input
+            )} \n${STATE_BOUNDARY}\n`
+        }
+
         return `${STATE_BOUNDARY} ${JSON.stringify(input)} ${STATE_BOUNDARY}`
     }
 
