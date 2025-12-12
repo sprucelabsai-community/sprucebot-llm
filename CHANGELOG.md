@@ -1,3 +1,8 @@
+## <small>11.3.3 (2025-12-12)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([4a43d91](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4a43d91))
+* patch: implementation improvements ([5f8ac17](https://github.com/sprucelabsai-community/sprucebot-llm/commit/5f8ac17))
+
 ## <small>11.3.2 (2025-12-12)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([dae4349](https://github.com/sprucelabsai-community/sprucebot-llm/commit/dae4349))
