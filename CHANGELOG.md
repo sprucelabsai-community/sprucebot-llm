@@ -1,3 +1,8 @@
+## <small>11.3.2 (2025-12-12)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([dae4349](https://github.com/sprucelabsai-community/sprucebot-llm/commit/dae4349))
+* patch: better state boundary handling ([0659b69](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0659b69))
+
 ## <small>11.3.1 (2025-12-11)</small>
 
 * patch: error messages improvements ([68659e9](https://github.com/sprucelabsai-community/sprucebot-llm/commit/68659e9))
