@@ -85,31 +85,10 @@ export default class ResponseParser {
             })
         }
 
-        const { match, fullMatch, index } = this.parseState(message)
+        const { match, regex } = this.parseState(message)
 
-        if (match && fullMatch) {
-            const matchStart =
-                typeof index === 'number' ? index : message.indexOf(fullMatch)
-            let removalStart = matchStart
-            if (removalStart > 0 && message[removalStart - 1] === '\n') {
-                removalStart--
-                if (removalStart > 0 && message[removalStart - 1] === '\r') {
-                    removalStart--
-                }
-            }
-
-            let removalEnd = matchStart + fullMatch.length
-            if (message[removalEnd] === '\r') {
-                removalEnd++
-                if (message[removalEnd] === '\n') {
-                    removalEnd++
-                }
-            } else if (message[removalEnd] === '\n') {
-                removalEnd++
-            }
-
-            message = message.slice(0, removalStart) + message.slice(removalEnd)
-            message = message.trim()
+        if (match && regex) {
+            message = message.replace(regex, '').trim()
             state = JSON.parse(match)
         }
 
@@ -151,17 +130,13 @@ export default class ResponseParser {
             '\\$&'
         )
         const searchRegex = new RegExp(
-            `${ESCAPED_BOUNDARY}\\s*(.*?)\\s*${ESCAPED_BOUNDARY}`,
+            `((?:\\r?\\n)+)?${ESCAPED_BOUNDARY}\\s*(.*?)\\s*${ESCAPED_BOUNDARY}((?:\\r?\\n)+)?`,
             's'
         )
         const stateMatches = searchRegex.exec(message)
-        const match = stateMatches?.[1]
+        const match = stateMatches?.[2]
 
-        return {
-            match,
-            fullMatch: stateMatches?.[0],
-            index: stateMatches?.index,
-        }
+        return { match, regex: match ? searchRegex : undefined }
     }
 
     private assertAtMostOneCallback(invocations: number) {
