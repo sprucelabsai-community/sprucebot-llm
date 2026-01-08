@@ -1,3 +1,7 @@
+## 12.0.0 (2026-01-08)
+
+* major: upgrade dependencies ([ae810e1](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ae810e1))
+
 ## <small>11.4.1 (2026-01-07)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([2ea39da](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2ea39da))
