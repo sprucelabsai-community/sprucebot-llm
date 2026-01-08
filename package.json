@@ -66,9 +66,9 @@
   },
   "dependencies": {
     "@sprucelabs/error": "^8.1.2",
-    "@sprucelabs/mercury-event-emitter": "^46.0.0",
-    "@sprucelabs/mercury-types": "^49.1.2",
-    "@sprucelabs/schema": "^33.1.2",
+    "@sprucelabs/mercury-event-emitter": "^46.0.1",
+    "@sprucelabs/mercury-types": "^49.1.3",
+    "@sprucelabs/schema": "^33.1.3",
     "@sprucelabs/spruce-skill-utils": "^34.0.1",
     "eta": "3.5.0",
     "openai": "^6.15.0"
@@ -82,7 +82,7 @@
     "@sprucelabs/resolve-path-aliases": "^4.0.13",
     "@sprucelabs/semantic-release": "^6.0.0",
     "@sprucelabs/test": "^11.1.0",
-    "@sprucelabs/test-utils": "^7.2.2",
+    "@sprucelabs/test-utils": "^7.2.3",
     "@types/node": "^25.0.3",
     "chokidar-cli": "^3.0.0",
     "dotenv": "^17.2.3",
