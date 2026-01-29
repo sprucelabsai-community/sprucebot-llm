@@ -1,3 +1,7 @@
+## <small>12.0.4 (2026-01-29)</small>
+
+* Fix MessageResponseCallback return type ([02fbc34](https://github.com/sprucelabsai-community/sprucebot-llm/commit/02fbc34))
+
 ## <small>12.0.3 (2026-01-27)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([2b17090](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2b17090))
