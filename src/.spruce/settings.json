@@ -9,5 +9,9 @@
     "test",
     "schema",
     "error"
-  ]
+  ],
+  "regressionproof": {
+    "enabled": true,
+    "projectName": "sprucebot-llm"
+  }
 }

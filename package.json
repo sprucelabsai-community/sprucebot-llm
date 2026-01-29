@@ -77,6 +77,8 @@
     "eta": "3.5.0"
   },
   "devDependencies": {
+    "@regressionproof/cli": "^0.8.0",
+    "@regressionproof/jest-reporter": "^0.8.0",
     "@sprucelabs/esm-postbuild": "^9.0.15",
     "@sprucelabs/jest-json-reporter": "^10.0.21",
     "@sprucelabs/resolve-path-aliases": "^4.0.15",
@@ -111,6 +113,10 @@
     ],
     "moduleNameMapper": {
       "^#spruce/(.*)$": "<rootDir>/build/.spruce/$1"
-    }
+    },
+    "reporters": [
+      "default",
+      "@regressionproof/jest-reporter"
+    ]
   }
 }

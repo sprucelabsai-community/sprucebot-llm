@@ -108,7 +108,7 @@ export default class OpenAiTest extends AbstractLlmTest {
             model,
         })
 
-        assert.isEqual(this.lastSentCompletion?.model, model)
+        assert.isEqual(this.lastSentCompletion?.model, model, 'Model not set')
     }
 
     @test()
