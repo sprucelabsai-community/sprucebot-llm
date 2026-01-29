@@ -126,7 +126,7 @@ export type LlmCallbackParameter =
       }
     | (SelectFieldDefinition & { name: string; description?: string })
 
-export type MessageResponseCallback = (message: string) => any
+export type MessageResponseCallback = (message: string) => void
 
 export type SendMessage = string | SendMessageWithImage
 
