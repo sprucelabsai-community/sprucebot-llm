@@ -42,6 +42,10 @@ export default class SprucebotLlmSkillImpl<
         return this.state
     }
 
+    public setModel(model: string): void {
+        this.options.model = model
+    }
+
     public serialize(): SerializedSkill<StateSchema, State> {
         return {
             ...this.options,

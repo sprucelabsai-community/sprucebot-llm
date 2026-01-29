@@ -96,6 +96,7 @@ export interface SprucebotLLmSkill<
     getState(): Partial<State> | undefined
     serialize(): SerializedSkill<StateSchema, State>
     updateState(state: Partial<State>): Promise<void>
+    setModel(model: string): void
 }
 
 export interface SerializedSkill<

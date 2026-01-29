@@ -137,14 +137,17 @@ export default class LlmBotTest extends AbstractLlmTest {
             favoriteColor: 'blue',
         })
 
-        assert.isTrue(wasHit)
+        assert.isTrue(
+            wasHit,
+            'did-update-state should have been hit when updating state'
+        )
     }
 
     @test()
     protected async knowsWhenDone() {
-        assert.isFalse(this.bot.getIsDone())
+        this.assertBotIsNotDone()
         this.bot.markAsDone()
-        assert.isTrue(this.bot.getIsDone())
+        this.assertBotIsDone()
     }
 
     @test()
@@ -152,7 +155,11 @@ export default class LlmBotTest extends AbstractLlmTest {
         this.adapter.messageResponse = generateId()
         const message = generateId()
         const response = await this.sendMessage(message)
-        assert.isEqual(response, this.adapter.messageResponse)
+        assert.isEqual(
+            response,
+            this.adapter.messageResponse,
+            'response returned from send message does not match what was returned from adapter'
+        )
     }
 
     @test()
@@ -200,21 +207,25 @@ export default class LlmBotTest extends AbstractLlmTest {
     protected async isDoneWhenParsesSaysSo() {
         this.setParserResponseIsDone(true)
         await this.sendMessage(generateId())
-        assert.isTrue(this.bot.getIsDone())
+        this.assertBotIsDone()
     }
 
     @test()
     protected async notDoneUntilDone() {
         this.setParserResponseIsDone(false)
         await this.sendMessage(generateId())
-        assert.isFalse(this.bot.getIsDone())
+        this.assertBotIsNotDone()
     }
 
     @test()
     protected async botActuallySendsResponseToParser() {
         this.adapter.messageResponse = generateId()
         await this.sendMessage(generateId())
-        assert.isEqual(this.parser.lastMessage, this.adapter.messageResponse)
+        assert.isEqual(
+            this.parser.lastMessage,
+            this.adapter.messageResponse,
+            'parser did not receive message from adapter'
+        )
     }
 
     @test()
@@ -224,7 +235,11 @@ export default class LlmBotTest extends AbstractLlmTest {
         })
 
         const { stateSchema } = this.serialize()
-        assert.isEqualDeep(stateSchema, personSchema)
+        assert.isEqualDeep(
+            stateSchema,
+            personSchema,
+            'state schema did not match from serialization'
+        )
     }
 
     @test('inherits state from skill when serializing', {
@@ -241,8 +256,7 @@ export default class LlmBotTest extends AbstractLlmTest {
             state: skillState,
         })
 
-        const { state } = this.bot.serialize()
-        assert.isEqualDeep(state, skillState)
+        this.assertSerializedStateEquals(skillState)
     }
 
     @test('inherits state from bot when parsing response', {
@@ -619,6 +633,14 @@ export default class LlmBotTest extends AbstractLlmTest {
         return skill
     }
 
+    private assertBotIsDone() {
+        assert.isTrue(this.bot.getIsDone(), 'should be done')
+    }
+
+    private assertBotIsNotDone() {
+        assert.isFalse(this.bot.getIsDone(), 'should not be done')
+    }
+
     private async sendMessageWithResponseState(state: Record<string, any>) {
         this.setStateInResponse(state)
         await this.sendRandomMessage()
@@ -650,7 +672,11 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     private assertSerializedStateEquals(expected?: Record<string, any>) {
-        assert.isEqualDeep(this.bot.serialize().state, expected)
+        assert.isEqualDeep(
+            this.bot.serialize().state,
+            expected,
+            'Serialized state does not match expected'
+        )
     }
 }
 
