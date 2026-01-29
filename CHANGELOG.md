@@ -1,3 +1,8 @@
+## 12.1.0 (2026-01-29)
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([88aebc0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/88aebc0))
+* minor: can now set model on skill ([b201fbe](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b201fbe))
+
 ## <small>12.0.5 (2026-01-29)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([3845c0d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3845c0d))
