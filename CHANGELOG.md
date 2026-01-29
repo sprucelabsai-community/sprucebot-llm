@@ -1,3 +1,8 @@
+## <small>12.0.5 (2026-01-29)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([3845c0d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3845c0d))
+* patch: regression proof enabled ([cd39e19](https://github.com/sprucelabsai-community/sprucebot-llm/commit/cd39e19))
+
 ## <small>12.0.4 (2026-01-29)</small>
 
 * Fix MessageResponseCallback return type ([02fbc34](https://github.com/sprucelabsai-community/sprucebot-llm/commit/02fbc34))
