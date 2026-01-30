@@ -16,6 +16,9 @@ export default class OpenAiAdapter implements LlmAdapter {
     public static OpenAI = OpenAI
     private api: OpenAI
     private log = buildLog('SprucebotLLM::OpenAiAdapter')
+    private model = 'gpt-4o'
+    private memoryLimit?: number
+    private reasoningEffort?: ReasoningEffort
 
     protected constructor(apiKey: string) {
         assertOptions({ apiKey }, ['apiKey'])
@@ -30,7 +33,9 @@ export default class OpenAiAdapter implements LlmAdapter {
         bot: SprucebotLlmBot,
         options?: SendMessageOptions
     ): Promise<string> {
-        const messageBuilder = OpenAiMessageBuilder.Builder(bot)
+        const messageBuilder = OpenAiMessageBuilder.Builder(bot, {
+            memoryLimit: this.memoryLimit,
+        })
         const messages = messageBuilder.buildMessages()
 
         this.log.info(
@@ -40,12 +45,12 @@ export default class OpenAiAdapter implements LlmAdapter {
 
         const params: ChatCompletionCreateParamsNonStreaming = {
             messages,
-            model: options?.model ?? 'gpt-4o',
+            model: options?.model ?? this.model,
         }
 
-        if (process.env.OPENAI_REASONING_EFFORT) {
-            params.reasoning_effort = process.env
-                .OPENAI_REASONING_EFFORT as ReasoningEffort
+        const reasoningEffort = this.getReasoningEffort()
+        if (reasoningEffort) {
+            params.reasoning_effort = reasoningEffort
         }
 
         const response = await this.api.chat.completions.create(params)
@@ -57,6 +62,24 @@ export default class OpenAiAdapter implements LlmAdapter {
         this.log.info('Received response from OpenAI', message)
 
         return message
+    }
+
+    private getReasoningEffort() {
+        return (this.reasoningEffort ?? process.env.OPENAI_REASONING_EFFORT) as
+            | ReasoningEffort
+            | undefined
+    }
+
+    public setModel(model: string) {
+        this.model = model
+    }
+
+    public setMessageMemoryLimit(limit: number) {
+        this.memoryLimit = limit
+    }
+
+    public setReasoningEffort(effort: ReasoningEffort) {
+        this.reasoningEffort = effort
     }
 }
 

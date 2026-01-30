@@ -31,6 +31,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     private openAi!: OpenAiAdapter
     private bot!: SpyLlmBot
     private skillJob: string = generateId()
+    private reasoningEffort?: string
 
     protected static async beforeAll(): Promise<void> {
         await super.beforeAll()
@@ -108,7 +109,7 @@ export default class OpenAiTest extends AbstractLlmTest {
             model,
         })
 
-        assert.isEqual(this.lastSentCompletion?.model, model, 'Model not set')
+        this.assertModelSentEquals(model)
     }
 
     @test()
@@ -354,9 +355,10 @@ export default class OpenAiTest extends AbstractLlmTest {
         )
     }
 
-    @test()
-    protected async chatHistoryCanBeLimitedByEnvTo1() {
-        this.setMessageMemoryLimit('1')
+    @test('can set memory limit to 1 via env', 'env')
+    @test('can set memory limit to 1 via direct', 'direct')
+    protected async chatHistoryCanBeLimitedByEnvTo1(strategy: SetterStrategy) {
+        this.setMessageMemoryLimit(1, strategy)
 
         this.setMessages([
             {
@@ -379,9 +381,10 @@ export default class OpenAiTest extends AbstractLlmTest {
         ])
     }
 
-    @test()
-    protected async chatHistoryCanBeLimitedByEnvTo2() {
-        this.setMessageMemoryLimit('2')
+    @test('can set memory limit to 2 via env', 'env')
+    @test('can set memory limit to 2 via direct', 'direct')
+    protected async chatHistoryCanBeLimitedByEnvTo2(strategy: SetterStrategy) {
+        this.setMessageMemoryLimit(2, strategy)
 
         this.setMessages([
             {
@@ -558,9 +561,12 @@ export default class OpenAiTest extends AbstractLlmTest {
         )
     }
 
-    @test()
-    protected async canSetReasoningEffortViaEnv() {
-        process.env.OPENAI_REASONING_EFFORT = generateId()
+    @test('can set reasoning effort via env', 'env')
+    @test('can set reasoning effort via direct', 'direct')
+    protected async canSetReasoningEffortViaEnv(strategy: SetterStrategy) {
+        const effort = generateId()
+
+        this.setReasoningEffort(effort, strategy)
 
         const message = generateId()
 
@@ -684,6 +690,22 @@ export default class OpenAiTest extends AbstractLlmTest {
         this.assertMessageAtIndexWasNotOmitted(4)
     }
 
+    @test()
+    protected async canSetModelDirectlyOnAdapter() {
+        const model = generateId()
+        this.openAi.setModel(model)
+        await this.sendMessage()
+        this.assertModelSentEquals(model)
+    }
+
+    private assertModelSentEquals(model: string) {
+        assert.isEqual(
+            this.lastSentCompletion?.model,
+            model,
+            'Model not passed as expected'
+        )
+    }
+
     private async sendMessages(messages: LlmMessage[]) {
         this.setMessages(messages)
         await this.sendMessage()
@@ -755,8 +777,24 @@ export default class OpenAiTest extends AbstractLlmTest {
         return `During this conversation, please keep the following in mind:\n\n${pleaseKeepInMind.map((m, idx) => `${idx + 1}. ${m}`).join('\n')}.`
     }
 
-    private setMessageMemoryLimit(limit: string) {
-        process.env.OPENAI_MESSAGE_MEMORY_LIMIT = limit
+    private setMessageMemoryLimit(
+        limit: number,
+        setterStrategy: SetterStrategy
+    ) {
+        if (setterStrategy === 'env') {
+            process.env.OPENAI_MESSAGE_MEMORY_LIMIT = limit.toString()
+        } else if (setterStrategy === 'direct') {
+            this.openAi.setMessageMemoryLimit(limit)
+        }
+    }
+
+    private setReasoningEffort(effort: string, setterStrategy: SetterStrategy) {
+        if (setterStrategy === 'env') {
+            process.env.OPENAI_REASONING_EFFORT = effort
+        } else if (setterStrategy === 'direct') {
+            this.reasoningEffort = effort
+            this.openAi.setReasoningEffort(effort)
+        }
     }
 
     private async setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
@@ -891,9 +929,10 @@ export default class OpenAiTest extends AbstractLlmTest {
             ],
         }
 
-        if (process.env.OPENAI_REASONING_EFFORT) {
-            params.reasoning_effort = process.env
-                .OPENAI_REASONING_EFFORT as ReasoningEffort
+        const reasoningEffort =
+            this.reasoningEffort ?? process.env.OPENAI_REASONING_EFFORT
+        if (reasoningEffort) {
+            params.reasoning_effort = reasoningEffort as ReasoningEffort
         }
 
         assert.isEqualDeep(
@@ -969,3 +1008,5 @@ type Message = OpenAI.Chat.Completions.ChatCompletionMessageParam
 function generateBodyOfLength(length: number): string {
     return 'A'.repeat(length)
 }
+
+type SetterStrategy = 'env' | 'direct'

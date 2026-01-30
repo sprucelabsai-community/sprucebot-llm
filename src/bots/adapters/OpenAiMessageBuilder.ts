@@ -13,13 +13,18 @@ import { DONE_TOKEN, STATE_BOUNDARY } from '../templates'
 
 export default class OpenAiMessageBuilder {
     private bot: SprucebotLlmBot
+    private memoryLimit: number
 
-    protected constructor(bot: SprucebotLlmBot) {
+    protected constructor(bot: SprucebotLlmBot, options?: BuildMessageOptions) {
+        const { memoryLimit } = options ?? {}
         this.bot = bot
+        this.memoryLimit =
+            memoryLimit ??
+            parseInt(process.env.OPENAI_MESSAGE_MEMORY_LIMIT ?? '0')
     }
 
-    public static Builder(bot: SprucebotLlmBot) {
-        return new this(bot)
+    public static Builder(bot: SprucebotLlmBot, options?: BuildMessageOptions) {
+        return new this(bot, options)
     }
 
     public buildMessages() {
@@ -36,11 +41,10 @@ export default class OpenAiMessageBuilder {
 
     private buildChatHistoryMessages(messages: LlmMessage[]) {
         let messagesBeingConsidered = messages
-        const limit = parseInt(process.env.OPENAI_MESSAGE_MEMORY_LIMIT ?? '0')
 
-        if (limit > 0) {
+        if (this.memoryLimit > 0) {
             messagesBeingConsidered = messages.slice(
-                Math.max(messages.length - limit, 0)
+                Math.max(messages.length - this.memoryLimit, 0)
             )
         }
 
@@ -248,4 +252,8 @@ export default class OpenAiMessageBuilder {
             content: `We will be tracking state for this conversation. The following schema is what we'll use to define the shape of the state:\n\n${JSON.stringify(schema)}`,
         }
     }
+}
+
+interface BuildMessageOptions {
+    memoryLimit?: number
 }
