@@ -1,3 +1,9 @@
+## 12.2.0 (2026-01-30)
+
+* patch: reasoning effort export in types ([98c722a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/98c722a))
+* patch: type fix ([ada9f48](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ada9f48))
+* minor: can set model, memory limit, and reasoning effort directly on the openai adapter ([b052dce](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b052dce))
+
 ## 12.1.0 (2026-01-29)
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([88aebc0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/88aebc0))
