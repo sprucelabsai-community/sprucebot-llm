@@ -3,6 +3,7 @@ import {
     MercuryEventEmitter,
 } from '@sprucelabs/mercury-types'
 import { Schema, SchemaValues, SelectFieldDefinition } from '@sprucelabs/schema'
+import { ReasoningEffort } from 'openai/resources'
 
 export interface BotOptions<
     StateSchema extends Schema = Schema,
@@ -135,3 +136,5 @@ export interface SendMessageWithImage {
     imageDescription: string
     imageBase64: string
 }
+
+export type OpenAiReasoningEffort = ReasoningEffort
