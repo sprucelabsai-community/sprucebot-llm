@@ -793,7 +793,7 @@ export default class OpenAiTest extends AbstractLlmTest {
             process.env.OPENAI_REASONING_EFFORT = effort
         } else if (setterStrategy === 'direct') {
             this.reasoningEffort = effort
-            this.openAi.setReasoningEffort(effort)
+            this.openAi.setReasoningEffort(effort as ReasoningEffort)
         }
     }
 
