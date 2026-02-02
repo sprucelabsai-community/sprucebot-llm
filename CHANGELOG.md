@@ -1,3 +1,7 @@
+## 12.3.0 (2026-02-02)
+
+* minor: openai adapter supports logging ([1841c35](https://github.com/sprucelabsai-community/sprucebot-llm/commit/1841c35))
+
 ## 12.2.0 (2026-01-30)
 
 * patch: reasoning effort export in types ([98c722a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/98c722a))
