@@ -1,3 +1,8 @@
+## <small>12.3.3 (2026-02-02)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([f2a2344](https://github.com/sprucelabsai-community/sprucebot-llm/commit/f2a2344))
+* patch: state boundary change to test better peformance ([76c0c71](https://github.com/sprucelabsai-community/sprucebot-llm/commit/76c0c71))
+
 ## <small>12.3.2 (2026-02-02)</small>
 
 * patch: state change fix! ([61b3186](https://github.com/sprucelabsai-community/sprucebot-llm/commit/61b3186))
