@@ -1,5 +1,5 @@
 import { assertOptions } from '@sprucelabs/schema'
-import { buildLog } from '@sprucelabs/spruce-skill-utils'
+import { Log } from '@sprucelabs/spruce-skill-utils'
 import OpenAI from 'openai'
 import {
     ChatCompletionCreateParamsNonStreaming,
@@ -15,18 +15,20 @@ import OpenAiMessageBuilder from './OpenAiMessageBuilder'
 export default class OpenAiAdapter implements LlmAdapter {
     public static OpenAI = OpenAI
     private api: OpenAI
-    private log = buildLog('SprucebotLLM::OpenAiAdapter')
+    private log?: Log
     private model = 'gpt-4o'
     private memoryLimit?: number
     private reasoningEffort?: ReasoningEffort
 
-    protected constructor(apiKey: string) {
+    protected constructor(apiKey: string, options?: OpenAiAdapterOptions) {
         assertOptions({ apiKey }, ['apiKey'])
+        const { log } = options || {}
         this.api = new OpenAiAdapter.OpenAI({ apiKey })
+        this.log = log
     }
 
-    public static Adapter(apiKey: string) {
-        return new this(apiKey)
+    public static Adapter(apiKey: string, options?: OpenAiAdapterOptions) {
+        return new this(apiKey, options)
     }
 
     public async sendMessage(
@@ -38,7 +40,7 @@ export default class OpenAiAdapter implements LlmAdapter {
         })
         const messages = messageBuilder.buildMessages()
 
-        this.log.info(
+        this.log?.info(
             'Sending message to OpenAI',
             JSON.stringify(messages, null, 2)
         )
@@ -59,7 +61,7 @@ export default class OpenAiAdapter implements LlmAdapter {
             response.choices?.[0]?.message?.content?.trim() ??
             MESSAGE_RESPONSE_ERROR_MESSAGE
 
-        this.log.info('Received response from OpenAI', message)
+        this.log?.info('Received response from OpenAI', message)
 
         return message
     }
@@ -85,3 +87,7 @@ export default class OpenAiAdapter implements LlmAdapter {
 
 export const MESSAGE_RESPONSE_ERROR_MESSAGE =
     "Oh no! Something went wrong and I can't talk right now!"
+
+interface OpenAiAdapterOptions {
+    log?: Log
+}
