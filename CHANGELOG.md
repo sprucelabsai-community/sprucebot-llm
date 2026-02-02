@@ -1,3 +1,7 @@
+## <small>12.3.2 (2026-02-02)</small>
+
+* patch: state change fix! ([61b3186](https://github.com/sprucelabsai-community/sprucebot-llm/commit/61b3186))
+
 ## <small>12.3.1 (2026-02-02)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([4959fbf](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4959fbf))
