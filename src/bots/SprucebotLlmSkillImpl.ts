@@ -34,8 +34,8 @@ export default class SprucebotLlmSkillImpl<
     }
 
     public async updateState(updates: Partial<State>) {
-        await this.emit('did-update-state')
         this.state = { ...this.state, ...updates }
+        await this.emit('did-update-state')
     }
 
     public getState() {

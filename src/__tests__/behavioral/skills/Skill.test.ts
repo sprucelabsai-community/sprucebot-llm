@@ -79,7 +79,7 @@ export default class SkillTest extends AbstractLlmTest {
             firstName: generateId(),
         })
 
-        assert.isTrue(wasHit)
+        assert.isTrue(wasHit, 'did not update state')
     }
 
     @test()
@@ -192,6 +192,30 @@ export default class SkillTest extends AbstractLlmTest {
         this.skill.setModel(model)
         await this.sendRandomMessage()
         this.assertModelSentToAdapterEquals(model)
+    }
+
+    @test()
+    protected async updatingSkillStateHappensAfterStateIsUpdated() {
+        this.skill = this.Skill({
+            stateSchema: personSchema,
+        })
+
+        let passedName: string | undefined
+        await this.skill.on('did-update-state', async () => {
+            const state = this.skill.getState()
+            //@ts-ignore
+            passedName = state?.firstName
+        })
+
+        await this.updateState({
+            firstName: 'UpdatedName',
+        })
+
+        assert.isEqual(
+            passedName,
+            'UpdatedName',
+            'state was not updated before event fired'
+        )
     }
 
     private assertModelSentToAdapterEquals(model: string) {
