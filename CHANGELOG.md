@@ -1,3 +1,8 @@
+## <small>12.3.1 (2026-02-02)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([4959fbf](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4959fbf))
+* patch: readme update ([6bcaa8d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/6bcaa8d))
+
 ## 12.3.0 (2026-02-02)
 
 * minor: openai adapter supports logging ([1841c35](https://github.com/sprucelabsai-community/sprucebot-llm/commit/1841c35))
