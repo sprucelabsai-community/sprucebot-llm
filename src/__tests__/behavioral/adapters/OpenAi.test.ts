@@ -14,8 +14,9 @@ import {
 } from 'openai/resources'
 import OpenAiAdapter, {
     MESSAGE_RESPONSE_ERROR_MESSAGE,
-} from '../../../bots/adapters/OpenAi'
-import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
+    OpenAiAdapterOptions,
+} from '../../../bots/adapters/OpenAiAdapter'
+import SpyOpenAiModule from '../../../bots/adapters/SpyOpenAiModule'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/templates'
 import {
     LlmCallbackMap,
@@ -31,7 +32,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     private openAi!: OpenAiAdapter
     private bot!: SpyLlmBot
     private skillJob: string = generateId()
-    private reasoningEffort?: string
+    private reasoningEffort?: ReasoningEffort
 
     protected static async beforeAll(): Promise<void> {
         await super.beforeAll()
@@ -65,7 +66,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     protected async instantiatingOpenAiSetsKeyToConfig() {
         const key = generateId()
         this.OpenAi(key)
-        assert.isEqual(SpyOpenAiApi.config?.apiKey, key)
+        assert.isEqual(SpyOpenAiModule.config?.apiKey, key)
     }
 
     @test()
@@ -84,19 +85,19 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     @test()
     protected async returnsResponseFromSendMessage() {
-        SpyOpenAiApi.responseMessage = generateId()
-        await this.assertResponseEquals(SpyOpenAiApi.responseMessage)
+        SpyOpenAiModule.responseMessage = generateId()
+        await this.assertResponseEquals(SpyOpenAiModule.responseMessage)
     }
 
     @test()
     protected async trimsResponseMessage() {
-        SpyOpenAiApi.responseMessage = ' hello world '
+        SpyOpenAiModule.responseMessage = ' hello world '
         await this.assertResponseEquals('hello world')
     }
 
     @test()
     protected async noResponseReturnsDefaultErrorMesssage() {
-        SpyOpenAiApi.responseMessage = false
+        SpyOpenAiModule.responseMessage = false
         await this.assertResponseEquals(MESSAGE_RESPONSE_ERROR_MESSAGE)
     }
 
@@ -357,6 +358,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     @test('can set memory limit to 1 via env', 'env')
     @test('can set memory limit to 1 via direct', 'direct')
+    @test('can set memory limit to 1 via constructor', 'constructor')
     protected async chatHistoryCanBeLimitedByEnvTo1(strategy: SetterStrategy) {
         this.setMessageMemoryLimit(1, strategy)
 
@@ -383,6 +385,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     @test('can set memory limit to 2 via env', 'env')
     @test('can set memory limit to 2 via direct', 'direct')
+    @test('can set memory limit to 2 via constructor', 'constructor')
     protected async chatHistoryCanBeLimitedByEnvTo2(strategy: SetterStrategy) {
         this.setMessageMemoryLimit(2, strategy)
 
@@ -563,8 +566,9 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     @test('can set reasoning effort via env', 'env')
     @test('can set reasoning effort via direct', 'direct')
+    @test('can set reasoning effort via constructor', 'constructor')
     protected async canSetReasoningEffortViaEnv(strategy: SetterStrategy) {
-        const effort = generateId()
+        const effort = generateId() as ReasoningEffort
 
         this.setReasoningEffort(effort, strategy)
 
@@ -694,6 +698,44 @@ export default class OpenAiTest extends AbstractLlmTest {
     protected async canSetModelDirectlyOnAdapter() {
         const model = generateId()
         this.openAi.setModel(model)
+        await this.assertMessageSentWithModel(model)
+    }
+
+    @test()
+    protected async canSetModelInConstructor() {
+        const model = generateId()
+        this.openAi = this.OpenAi(undefined, { model })
+        await this.assertMessageSentWithModel(model)
+    }
+
+    @test()
+    protected async baseUrlPassedToOpenAiModule() {
+        const baseUrl = generateId()
+        this.OpenAi(generateId(), { baseUrl })
+        assert.isEqual(
+            SpyOpenAiModule.config?.baseURL,
+            baseUrl,
+            'baseUrl not passed to OpenAi module'
+        )
+    }
+
+    @test()
+    protected async randomOptionsPassedToSendPassedToOpenAiModule() {
+        const options = {
+            [generateId()]: generateId(),
+            [generateId()]: generateId(),
+        }
+
+        await this.sendMessage(options)
+
+        assert.doesInclude(
+            SpyOpenAiModule.lastSentCompletion,
+            options,
+            'Options not passed to OpenAi module sendMessage'
+        )
+    }
+
+    private async assertMessageSentWithModel(model: string) {
         await this.sendMessage()
         this.assertModelSentEquals(model)
     }
@@ -751,7 +793,7 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     private get lastSentCompletion() {
-        return SpyOpenAiApi.lastSentCompletion!
+        return SpyOpenAiModule.lastSentCompletion!
     }
 
     private generateImageMessageValues(): LlmMessage {
@@ -785,15 +827,27 @@ export default class OpenAiTest extends AbstractLlmTest {
             process.env.OPENAI_MESSAGE_MEMORY_LIMIT = limit.toString()
         } else if (setterStrategy === 'direct') {
             this.openAi.setMessageMemoryLimit(limit)
+        } else if (setterStrategy === 'constructor') {
+            this.openAi = this.OpenAi(undefined, {
+                memoryLimit: limit,
+            })
         }
     }
 
-    private setReasoningEffort(effort: string, setterStrategy: SetterStrategy) {
+    private setReasoningEffort(
+        effort: ReasoningEffort,
+        setterStrategy: SetterStrategy
+    ) {
         if (setterStrategy === 'env') {
-            process.env.OPENAI_REASONING_EFFORT = effort
+            process.env.OPENAI_REASONING_EFFORT = effort as string
         } else if (setterStrategy === 'direct') {
             this.reasoningEffort = effort
-            this.openAi.setReasoningEffort(effort as ReasoningEffort)
+            this.openAi.setReasoningEffort(effort)
+        } else if (setterStrategy === 'constructor') {
+            this.reasoningEffort = effort
+            this.openAi = this.OpenAi(undefined, {
+                reasoningEffort: effort,
+            })
         }
     }
 
@@ -989,17 +1043,17 @@ export default class OpenAiTest extends AbstractLlmTest {
         return await this.openAi.sendMessage(this.bot, options)
     }
 
-    private OpenAi(key?: string) {
-        return OpenAiAdapter.Adapter(key ?? generateId())
+    private OpenAi(key?: string, options?: OpenAiAdapterOptions) {
+        return OpenAiAdapter.Adapter(key ?? generateId(), options)
     }
 
     private setupSpys() {
-        OpenAiAdapter.OpenAI = SpyOpenAiApi as any
+        OpenAiAdapter.OpenAI = SpyOpenAiModule as any
         this.resetTrackedMessages()
     }
 
     private resetTrackedMessages() {
-        SpyOpenAiApi.lastSentCompletion = undefined
+        SpyOpenAiModule.lastSentCompletion = undefined
     }
 }
 
@@ -1009,4 +1063,4 @@ function generateBodyOfLength(length: number): string {
     return 'A'.repeat(length)
 }
 
-type SetterStrategy = 'env' | 'direct'
+type SetterStrategy = 'env' | 'direct' | 'constructor'

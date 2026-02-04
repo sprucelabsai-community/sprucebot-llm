@@ -6,8 +6,8 @@ import {
     errorAssert,
     generateId,
 } from '@sprucelabs/test-utils'
-import OpenAiAdapter from '../../../bots/adapters/OpenAi'
-import SpyOpenAiApi from '../../../bots/adapters/SpyOpenAiApi'
+import OpenAiAdapter from '../../../bots/adapters/OpenAiAdapter'
+import SpyOpenAiModule from '../../../bots/adapters/SpyOpenAiModule'
 import SprucebotLlmSkillImpl from '../../../bots/SprucebotLlmSkillImpl'
 import { LlmCallbackMap, SprucebotLLmSkill } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
@@ -163,7 +163,7 @@ export default class SkillTest extends AbstractLlmTest {
 
     @test()
     protected async skillCanSetModel() {
-        OpenAiAdapter.OpenAI = SpyOpenAiApi as any
+        OpenAiAdapter.OpenAI = SpyOpenAiModule as any
 
         const model =
             'davinci:ft-personal:sprucebot-concierge-2023-04-28-04-42-19'

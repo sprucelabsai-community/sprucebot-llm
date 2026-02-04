@@ -13,6 +13,10 @@ import {
 import OpenAiMessageBuilder from './OpenAiMessageBuilder'
 
 export default class OpenAiAdapter implements LlmAdapter {
+    public static Class: new (
+        apiKey: string,
+        options?: OpenAiAdapterOptions
+    ) => OpenAiAdapter
     public static OpenAI = OpenAI
     private api: OpenAI
     private log?: Log
@@ -22,13 +26,18 @@ export default class OpenAiAdapter implements LlmAdapter {
 
     protected constructor(apiKey: string, options?: OpenAiAdapterOptions) {
         assertOptions({ apiKey }, ['apiKey'])
-        const { log } = options || {}
-        this.api = new OpenAiAdapter.OpenAI({ apiKey })
+        const { log, memoryLimit, model, reasoningEffort, baseUrl } =
+            options || {}
+
+        this.api = new OpenAiAdapter.OpenAI({ apiKey, baseURL: baseUrl })
         this.log = log
+        this.memoryLimit = memoryLimit
+        this.model = model ?? this.model
+        this.reasoningEffort = reasoningEffort
     }
 
     public static Adapter(apiKey: string, options?: OpenAiAdapterOptions) {
-        return new this(apiKey, options)
+        return new (this.Class ?? this)(apiKey, options)
     }
 
     public async sendMessage(
@@ -47,7 +56,8 @@ export default class OpenAiAdapter implements LlmAdapter {
 
         const params: ChatCompletionCreateParamsNonStreaming = {
             messages,
-            model: options?.model ?? this.model,
+            model: this.model,
+            ...options,
         }
 
         const reasoningEffort = this.getReasoningEffort()
@@ -88,6 +98,10 @@ export default class OpenAiAdapter implements LlmAdapter {
 export const MESSAGE_RESPONSE_ERROR_MESSAGE =
     "Oh no! Something went wrong and I can't talk right now!"
 
-interface OpenAiAdapterOptions {
+export interface OpenAiAdapterOptions {
     log?: Log
+    memoryLimit?: number
+    model?: string
+    reasoningEffort?: ReasoningEffort
+    baseUrl?: string
 }
