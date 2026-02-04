@@ -1,4 +1,9 @@
-import { LlmAdapter, SendMessageOptions, SprucebotLlmBot } from '../llm.types'
+import {
+    LllmReasoningEffort,
+    LlmAdapter,
+    SendMessageOptions,
+    SprucebotLlmBot,
+} from '../llm.types'
 
 export default class SpyLlmAdapter implements LlmAdapter {
     public lastBot?: SprucebotLlmBot
@@ -22,4 +27,7 @@ export default class SpyLlmAdapter implements LlmAdapter {
 
         return this.messageResponse
     }
+
+    public setModel(_model: string): void {}
+    public setReasoningEffort(_effort: LllmReasoningEffort): void {}
 }

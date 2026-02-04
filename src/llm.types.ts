@@ -35,6 +35,8 @@ export interface LlmAdapter {
         bot: SprucebotLlmBot<Schema>,
         options?: SendMessageOptions
     ): Promise<string>
+    setModel(model: string): void
+    setReasoningEffort(effort: LllmReasoningEffort): void
 }
 
 export interface PromptOptions<
@@ -106,7 +108,6 @@ export interface SerializedSkill<
 > extends SkillOptions<StateSchema, State> {}
 
 export type LlmCallbackMap = Record<string, LlmCallback>
-
 export type LmmCallbackResponse = void | SendMessage
 
 export interface LlmCallback {
@@ -137,4 +138,4 @@ export interface SendMessageWithImage {
     imageBase64: string
 }
 
-export type OpenAiReasoningEffort = ReasoningEffort
+export type LllmReasoningEffort = ReasoningEffort

@@ -3,7 +3,11 @@ import OllamaAdapter from '../../../bots/adapters/OllamaAdapter'
 import OpenAiAdapter, {
     OpenAiAdapterOptions,
 } from '../../../bots/adapters/OpenAiAdapter'
-import { SendMessageOptions, SprucebotLlmBot } from '../../../llm.types'
+import {
+    LllmReasoningEffort,
+    SendMessageOptions,
+    SprucebotLlmBot,
+} from '../../../llm.types'
 import SpyLlmBot from '../../../tests/SpyLlmBot'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 
@@ -53,7 +57,7 @@ export default class OllamaTest extends AbstractLlmTest {
         )
 
         assert.isEqualDeep(
-            this.spyOpenAi.lastSendMessageOptions,
+            this.lastSendMessageOptions,
             { ...options, think: false },
             'Options not passed correctly'
         )
@@ -73,11 +77,60 @@ export default class OllamaTest extends AbstractLlmTest {
     protected async thinkingPassedToSendMessage() {
         this.ollama = OllamaAdapter.Adapter({ think: true })
         await this.sendMessage()
+        this.assertSentWithThinking()
+    }
+
+    @test()
+    protected async canSetTheModalDirectly() {
+        const model = generateId()
+        this.ollama.setModel(model)
+        await this.sendMessage()
         assert.isEqual(
-            this.spyOpenAi.lastSendMessageOptions?.think,
-            true,
+            this.spyOpenAi.manuallySetModel,
+            model,
+            'Model not set correctly'
+        )
+    }
+
+    @test()
+    protected async settingReasoningToHighSetsThinkToTrue() {
+        this.setReasoningEffort('high')
+        await this.sendMessage()
+        this.assertSentWithThinking()
+    }
+
+    @test('medium reasoning sets think to false', 'medium')
+    @test('low reasoning sets think to false', 'low')
+    protected async mediumReasoningDoesNotSetThinkToTrue(
+        reasoning: LllmReasoningEffort
+    ) {
+        this.setReasoningEffort(reasoning)
+        await this.sendMessage()
+        this.assertThinkingEquals(false)
+    }
+
+    private setReasoningEffort(effort: LllmReasoningEffort) {
+        this.ollama.setReasoningEffort(effort)
+    }
+
+    private assertSentWithThinking() {
+        this.assertThinkingEquals(true)
+    }
+
+    private assertThinkingEquals(expected: boolean) {
+        assert.isEqual(
+            this.lastSendMessageOptions.think,
+            expected,
             'Think not passed correctly'
         )
+    }
+
+    private get lastSendMessageOptions() {
+        assert.isTruthy(
+            this.spyOpenAi.lastSendMessageOptions,
+            'No send message options recorded'
+        )
+        return this.spyOpenAi.lastSendMessageOptions
     }
 
     private async sendMessage(options?: SendMessageOptions) {
@@ -99,6 +152,7 @@ export class SpyOpenAiAdapter extends OpenAiAdapter {
     public lastSendMessageBot?: SprucebotLlmBot
     public lastSendMessageOptions?: SendMessageOptions & { think?: boolean }
     public lastMessageResponse = generateId()
+    public manuallySetModel?: string
 
     public constructor(apiKey: string, options?: OpenAiAdapterOptions) {
         super(apiKey, options)
@@ -114,5 +168,9 @@ export class SpyOpenAiAdapter extends OpenAiAdapter {
         this.lastSendMessageOptions = options
         this.lastMessageResponse = generateId()
         return this.lastMessageResponse
+    }
+
+    public setModel(model: string): void {
+        this.manuallySetModel = model
     }
 }

@@ -3,6 +3,7 @@ import {
     LlmAdapter,
     SprucebotLlmBot,
     SendMessageOptions,
+    LllmReasoningEffort,
 } from '../../llm.types'
 import OpenAiAdapter from './OpenAiAdapter'
 
@@ -27,6 +28,13 @@ export default class OllamaAdapter implements LlmAdapter {
     ): Promise<string> {
         //@ts-ignore
         return this.openai.sendMessage(bot, { ...options, think: this.think })
+    }
+
+    public setModel(model: string): void {
+        this.openai.setModel(model)
+    }
+    public setReasoningEffort(effort: LllmReasoningEffort): void {
+        this.think = effort === 'high'
     }
 }
 
