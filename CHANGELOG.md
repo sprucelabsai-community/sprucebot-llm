@@ -1,3 +1,7 @@
+## 12.4.0 (2026-02-04)
+
+* minor: ollama adapter ([a0cf6f1](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a0cf6f1))
+
 ## <small>12.3.3 (2026-02-02)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([f2a2344](https://github.com/sprucelabsai-community/sprucebot-llm/commit/f2a2344))
