@@ -1,3 +1,7 @@
+## <small>13.0.3 (2026-02-05)</small>
+
+* docs: comprehensive README update with Ollama adapter, badge at top ([9cd0e9a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9cd0e9a))
+
 ## <small>13.0.2 (2026-02-05)</small>
 
 * docs: add AI TDD contributor badge ([91f5b35](https://github.com/sprucelabsai-community/sprucebot-llm/commit/91f5b35))
