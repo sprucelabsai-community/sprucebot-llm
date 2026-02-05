@@ -1,3 +1,7 @@
+## <small>13.0.4 (2026-02-05)</small>
+
+* patch: better validation when calling callbacks ([c974a8a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/c974a8a))
+
 ## <small>13.0.3 (2026-02-05)</small>
 
 * docs: comprehensive README update with Ollama adapter, badge at top ([9cd0e9a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9cd0e9a))
