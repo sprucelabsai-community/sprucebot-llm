@@ -1,3 +1,7 @@
+## <small>13.0.2 (2026-02-05)</small>
+
+* docs: add AI TDD contributor badge ([91f5b35](https://github.com/sprucelabsai-community/sprucebot-llm/commit/91f5b35))
+
 ## <small>13.0.1 (2026-02-05)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([3c269e1](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3c269e1))
