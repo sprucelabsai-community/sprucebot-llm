@@ -1,4 +1,7 @@
 # Sprucebot LLM
+
+[![AI TDD Contributor](https://regressionproof.ai/badge.svg)](https://regressionproof.ai)
+
 A TypeScript library for leveraging large language models to do... anything!
 
 * [Has memory](#message-history-and-context-limits)
@@ -13,8 +16,10 @@ A TypeScript library for leveraging large language models to do... anything!
 * Unlimited use cases
     * Skill architecture for extensibility
     * Leverage Skills to get your bot to complete any task!
-* Adapter interface to create your own adapters
-    * Only support OpenAI models for now (more adapters based on demand)
+* Multiple adapter support
+    * [OpenAI](#openai-adapter-configuration) - GPT-4o, o1, and other OpenAI models
+    * [Ollama](#ollama-adapter) - Run local models like Llama, Mistral, etc.
+    * [Custom adapters](#custom-adapters) - Implement your own
 * Fully typed
 	* Built in modern TypeScript
 	* Fully typed schema-based state management (powered by `@sprucelabs/schema`)
@@ -136,7 +141,7 @@ Additional OpenAI context controls:
 - `OPENAI_PAST_MESSAGE_MAX_CHARS` omits *past* (non-latest) messages longer than the limit, replacing them with `[omitted due to length]`.
 - `OPENAI_SHOULD_REMEMBER_IMAGES=false` omits images from older messages to save context, keeping only the most recent image and replacing older ones with `[Image omitted to save context]`.
 
-> *Note*: OpenAI is currently the only adapter supported. If you would like to see support for other adapters (or programmatic ways to configure memory), please open an issue and we'll get on it!
+## Adapters
 
 ### OpenAI adapter configuration
 
@@ -160,8 +165,13 @@ Runtime configuration options:
 ```ts
 const adapter = OpenAiAdapter.Adapter(process.env.OPEN_AI_API_KEY!, {
 	log: console,
+	model: 'gpt-4o',
+	memoryLimit: 10,
+	reasoningEffort: 'low',
+	baseUrl: 'https://custom-endpoint/v1', // Optional custom base URL
 })
 
+// Or set after creation
 adapter.setModel('gpt-4o')
 adapter.setMessageMemoryLimit(10)
 adapter.setReasoningEffort('low')
@@ -171,13 +181,52 @@ adapter.setReasoningEffort('low')
 
 `OpenAiAdapter` exposes the following API:
 
-- `OpenAiAdapter.Adapter(apiKey, options?)`: create an adapter instance. `options.log` can be any logger that supports `.info(...)`.
+- `OpenAiAdapter.Adapter(apiKey, options?)`: create an adapter instance. Options include:
+  - `log` - any logger that supports `.info(...)`
+  - `model` - default model (e.g., `'gpt-4o'`)
+  - `memoryLimit` - message memory limit
+  - `reasoningEffort` - for reasoning models (`'low'`, `'medium'`, `'high'`)
+  - `baseUrl` - custom API endpoint
 - `adapter.setModel(model)`: set a default model for all requests unless a Skill overrides it.
 - `adapter.setMessageMemoryLimit(limit)`: limit how many tracked messages are sent to OpenAI.
 - `adapter.setReasoningEffort(effort)`: set `reasoning_effort` for models that support it.
 - `OpenAiAdapter.OpenAI`: assign a custom OpenAI client class (useful for tests).
 
 Requests are sent via `openai.chat.completions.create(...)` with messages built by the adapter from the Bot state and history.
+
+### Ollama adapter
+
+Run local models using [Ollama](https://ollama.ai). No API key required - just have Ollama running locally.
+
+```ts
+import { OllamaAdapter, SprucebotLlmFactory } from '@sprucelabs/sprucebot-llm'
+
+// Create adapter for local Ollama instance
+const adapter = OllamaAdapter.Adapter({
+    model: 'llama2',      // or 'mistral', 'codellama', etc.
+    log: console,         // optional logger
+})
+
+const bots = SprucebotLlmFactory.Factory(adapter)
+
+const bot = bots.Bot({
+    youAre: 'a helpful assistant',
+    skill: bots.Skill({
+        yourJobIfYouChooseToAcceptItIs: 'to answer questions'
+    })
+})
+
+await bot.sendMessage('Hello!')
+```
+
+**Ollama adapter options:**
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| `model` | `string` | - | Which Ollama model to use |
+| `log` | `Log` | - | Optional logger instance |
+
+The Ollama adapter connects to `http://localhost:11434/v1` by default (Ollama's OpenAI-compatible endpoint).
 
 ### Custom adapters
 
@@ -202,12 +251,15 @@ class MyAdapter implements LlmAdapter {
 const bots = SprucebotLlmFactory.Factory(new MyAdapter())
 ```
 
+## Skills & State
+
 ### Adding state to your conversation
 This library depends on `@sprucelabs/schema` to handle the structure and validation rules around your state.
 ```ts
 const skill = bots.Skill({
 	yourJobIfYouChooseToAcceptItIs:
 		'to collect some information from me! You are a receptionist with 20 years experience and are very focused on getting answers needed to complete my profile',
+	model: 'gpt-4o', // Optional: override adapter's default model
 	stateSchema: buildSchema({
 		id: 'profile',
 		fields: {
@@ -369,22 +421,28 @@ const bookingBot = bots.Bot({
 
 If you are using reasoning models that accept `reasoning_effort`, you can set it via `OPENAI_REASONING_EFFORT` or `adapter.setReasoningEffort(...)`.
 
-### Bot and Skill API highlights
+## API Reference
 
-Common Bot methods:
+### Bot methods
 
-- `sendMessage(message, cb?)`: Send a user message (string or `{ imageBase64, imageDescription }`). The optional callback is invoked for each model response, including follow-up responses after a callback/tool result is injected.
-- `getIsDone()` / `markAsDone()`: Check or force completion.
-- `clearMessageHistory()`: Drop all tracked messages.
-- `updateState(partialState)`: Update state and emit `did-update-state`.
-- `setSkill(skill)`: Swap the active skill.
-- `serialize()`: Snapshot of the bot's current state, skill, and history.
+| Method | Description |
+|--------|-------------|
+| `sendMessage(message, cb?)` | Send a user message (string or `{ imageBase64, imageDescription }`). Optional callback for each response. |
+| `getIsDone()` | Check if conversation is complete |
+| `markAsDone()` | Force conversation completion |
+| `clearMessageHistory()` | Drop all tracked messages |
+| `updateState(partialState)` | Update state and emit `did-update-state` |
+| `setSkill(skill)` | Swap the active skill |
+| `serialize()` | Snapshot of bot's current state, skill, and history |
 
-Common Skill methods:
+### Skill methods
 
-- `updateState(partialState)`, `getState()`
-- `setModel(model)`
-- `serialize()`
+| Method | Description |
+|--------|-------------|
+| `updateState(partialState)` | Update skill state |
+| `getState()` | Get current state |
+| `setModel(model)` | Change the model this skill uses |
+| `serialize()` | Snapshot of skill configuration |
 
 ### Factory helpers
 
@@ -396,8 +454,22 @@ Common Skill methods:
 
 ### Errors
 
-`SprucebotLlmError` is exported for structured error handling. Common error codes include:
+`SprucebotLlmError` is exported for structured error handling:
 
+```ts
+import { SprucebotLlmError } from '@sprucelabs/sprucebot-llm'
+
+try {
+    await bot.sendMessage('hello')
+} catch (err) {
+    if (err instanceof SprucebotLlmError) {
+        console.log(err.options?.code) // Error code
+        console.log(err.friendlyMessage()) // Human-readable message
+    }
+}
+```
+
+Common error codes:
 - `NO_BOT_INSTANCE_SET`
 - `INVALID_CALLBACK`
 - `CALLBACK_ERROR`
@@ -406,20 +478,30 @@ Common Skill methods:
 
 These are exported from the package for unit tests:
 
-- `SpyLlmAdapter`: captures the last bot and options passed to the adapter.
-- `SpyLllmBot`: records constructor options and exposes message history helpers. (Note: the export name currently has three "l"s.)
-- `MockLlmSkill`: adds assertion helpers for skill configuration and callbacks.
-- `SpyOpenAiApi`: a drop-in `OpenAI` client stub for adapter tests. Set `OpenAiAdapter.OpenAI = SpyOpenAiApi` before constructing the adapter.
+| Utility | Description |
+|---------|-------------|
+| `SpyLlmAdapter` | Captures the last bot and options passed to the adapter |
+| `SpyLllmBot` | Records constructor options and exposes message history helpers |
+| `MockLlmSkill` | Assertion helpers for skill configuration and callbacks |
+| `SpyOpenAiApi` | Drop-in OpenAI client stub for adapter tests |
 
-### Development scripts
+```ts
+// Example: Using SpyOpenAiApi for tests
+import { OpenAiAdapter, SpyOpenAiApi } from '@sprucelabs/sprucebot-llm'
+
+OpenAiAdapter.OpenAI = SpyOpenAiApi
+const adapter = OpenAiAdapter.Adapter('fake-key')
+```
+
+## Development
 
 Useful commands from `package.json`:
 
-- `yarn test`
-- `yarn build.dev`
-- `yarn build.dist`
-- `yarn chat`
-- `yarn chat.images`
-- `yarn generate.samples`
-
-[![AI TDD Contributor](https://regressionproof.ai/badge.svg)](https://regressionproof.ai)
+```bash
+yarn test           # Run tests
+yarn build.dev      # Development build
+yarn build.dist     # Production build
+yarn chat           # Interactive chat demo
+yarn chat.images    # Chat with image support
+yarn generate.samples
+```
