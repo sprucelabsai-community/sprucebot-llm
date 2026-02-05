@@ -421,3 +421,5 @@ Useful commands from `package.json`:
 - `yarn chat`
 - `yarn chat.images`
 - `yarn generate.samples`
+
+[![AI TDD Contributor](https://regressionproof.ai/badge.svg)](https://regressionproof.ai)
