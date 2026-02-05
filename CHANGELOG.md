@@ -1,3 +1,7 @@
+## 13.0.0 (2026-02-04)
+
+* major: llm adapter enhancements for setting model and reasoning directly ([9f0647c](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9f0647c))
+
 ## 12.4.0 (2026-02-04)
 
 * minor: ollama adapter ([a0cf6f1](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a0cf6f1))
