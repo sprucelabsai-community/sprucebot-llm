@@ -18,11 +18,13 @@ export default class OpenAiAdapter implements LlmAdapter {
         options?: OpenAiAdapterOptions
     ) => OpenAiAdapter
     public static OpenAI = OpenAI
+    public static AbortController = AbortController
     private api: OpenAI
     private log?: Log
     private model = 'gpt-4o'
     private memoryLimit?: number
     private reasoningEffort?: ReasoningEffort
+    private lastAbortController?: AbortController
 
     protected constructor(apiKey: string, options?: OpenAiAdapterOptions) {
         assertOptions({ apiKey }, ['apiKey'])
@@ -65,7 +67,13 @@ export default class OpenAiAdapter implements LlmAdapter {
             params.reasoning_effort = reasoningEffort
         }
 
-        const response = await this.api.chat.completions.create(params)
+        this.lastAbortController?.abort('Interrupted by new message')
+        this.lastAbortController = new OpenAiAdapter.AbortController()
+        const response = await this.api.chat.completions.create(params, {
+            signal: this.lastAbortController.signal,
+        })
+
+        delete this.lastAbortController
 
         const message =
             response.choices?.[0]?.message?.content?.trim() ??

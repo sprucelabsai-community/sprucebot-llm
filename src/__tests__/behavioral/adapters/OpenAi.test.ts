@@ -42,6 +42,9 @@ export default class OpenAiTest extends AbstractLlmTest {
     protected async beforeEach() {
         await super.beforeEach()
 
+        MockAbortController.instances = []
+        OpenAiAdapter.AbortController = MockAbortController
+
         delete process.env.OPENAI_PAST_MESSAGE_MAX_CHARS
         delete process.env.OPENAI_SHOULD_REMEMBER_IMAGES
         delete process.env.OPENAI_CHAT_HISTORY_LIMIT
@@ -735,6 +738,67 @@ export default class OpenAiTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected async sendingMessagePassesAbortSignal() {
+        await this.sendMessage()
+
+        assert.isTruthy(
+            MockAbortController.instances[0],
+            'Did not create AbortController instances'
+        )
+
+        assert.isEqualDeep(
+            SpyOpenAiModule.lastCompletionOptions,
+            {
+                signal: this.abortControllers[0].signal,
+            },
+            'Did not pass signal from AbortController to OpenAi module'
+        )
+    }
+
+    @test()
+    protected async sendingSecondMessageCancelsPreviousMessage() {
+        const promise = this.sendMessage()
+        const promise2 = this.sendMessage()
+        this.firstAbortController.assertWasAborted()
+        await promise
+        await promise2
+    }
+
+    @test()
+    protected async doesNotAbortIfOnlyOneMessageSent() {
+        await this.sendMessage()
+        this.firstAbortController.assertWasNotAborted()
+    }
+
+    @test()
+    protected async doesNotAbortIfPreviousMessageFinished() {
+        await this.sendMessage()
+        await this.sendMessage()
+        this.firstAbortController.assertWasNotAborted()
+    }
+
+    @test()
+    protected async abortReasonGiven() {
+        const promise1 = this.sendMessage()
+        const promise2 = this.sendMessage()
+
+        this.firstAbortController.assertWasAbortedWithReason(
+            'Interrupted by new message'
+        )
+
+        await promise1
+        await promise2
+    }
+
+    private get firstAbortController() {
+        return MockAbortController.instances[0]
+    }
+
+    private get abortControllers() {
+        return MockAbortController.instances
+    }
+
     private async assertMessageSentWithModel(model: string) {
         await this.sendMessage()
         this.assertModelSentEquals(model)
@@ -1064,3 +1128,61 @@ function generateBodyOfLength(length: number): string {
 }
 
 type SetterStrategy = 'env' | 'direct' | 'constructor'
+
+class MockAbortController implements AbortController {
+    public signal = new StubAbortSignal()
+    public static instances: MockAbortController[] = []
+    private wasAborted = false
+    private abortReason?: any
+
+    public constructor() {
+        MockAbortController.instances.push(this)
+    }
+
+    public abort(reason?: any): void {
+        this.abortReason = reason
+        this.wasAborted = true
+    }
+
+    public assertWasAborted() {
+        assert.isTrue(
+            this.wasAborted,
+            'Expected AbortController to have been aborted, but it was not.'
+        )
+    }
+
+    public assertWasNotAborted() {
+        assert.isFalse(
+            this.wasAborted,
+            'Expected AbortController to not have been aborted, but it was.'
+        )
+    }
+
+    public assertWasAbortedWithReason(expected: string) {
+        assert.isEqual(this.abortReason, expected, 'Wrong reason for abortion.')
+    }
+}
+
+class StubAbortSignal implements AbortSignal {
+    public aborted = false
+    public onabort: ((this: AbortSignal, ev: Event) => any) | null = null
+    public reason: any = undefined
+
+    public throwIfAborted(): void {}
+
+    public addEventListener(
+        _type: unknown,
+        _listener: unknown,
+        _options?: unknown
+    ): void {}
+
+    public removeEventListener(
+        _type: unknown,
+        _listener: unknown,
+        _options?: unknown
+    ): void {}
+
+    public dispatchEvent(_event: Event): boolean {
+        return true
+    }
+}

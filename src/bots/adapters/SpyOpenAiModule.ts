@@ -1,4 +1,5 @@
 import OpenAI, { ClientOptions } from 'openai'
+import { RequestOptions } from 'openai/internal/request-options'
 import {
     ChatCompletion,
     ChatCompletionCreateParamsNonStreaming,
@@ -8,6 +9,7 @@ export default class SpyOpenAiModule extends OpenAI {
     public static config?: ClientOptions
     public static lastSentCompletion?: ChatCompletionCreateParamsNonStreaming
     public static responseMessage: string | false = 'hello!'
+    public static lastCompletionOptions?: RequestOptions | undefined
 
     public constructor(config: ClientOptions) {
         super(config)
@@ -22,9 +24,11 @@ export default class SpyOpenAiModule extends OpenAI {
     }
 
     private async createCompletion(
-        options: ChatCompletionCreateParamsNonStreaming
+        completion: ChatCompletionCreateParamsNonStreaming,
+        options?: RequestOptions
     ): Promise<Response> {
-        SpyOpenAiModule.lastSentCompletion = options
+        SpyOpenAiModule.lastSentCompletion = completion
+        SpyOpenAiModule.lastCompletionOptions = options
         const choices: ChatCompletion.Choice[] = []
 
         if (SpyOpenAiModule.responseMessage) {
