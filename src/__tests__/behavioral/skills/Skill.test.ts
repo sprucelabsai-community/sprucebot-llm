@@ -171,7 +171,7 @@ export default class SkillTest extends AbstractLlmTest {
             model,
         })
 
-        assert.isEqual(this.serialize().model, model)
+        assert.isEqual(this.serialize().model, model, 'did not serialize model')
 
         await this.sendRandomMessage()
 
@@ -192,6 +192,13 @@ export default class SkillTest extends AbstractLlmTest {
         this.skill.setModel(model)
         await this.sendRandomMessage()
         this.assertModelSentToAdapterEquals(model)
+    }
+
+    @test()
+    protected async notSettingModelOnSkillDoesNotPassUndefined() {
+        await this.sendRandomMessage()
+        const isIn = 'model' in (this.adapter.lastSendOptions || {})
+        assert.isFalse(isIn, 'model was passed when it should not have been')
     }
 
     @test()

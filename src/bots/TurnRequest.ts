@@ -121,9 +121,14 @@ export default class TurnRequest {
     }
 
     private async sendMessageToAdapter(model: string | undefined) {
-        return await this.adapter.sendMessage(this.bot, {
-            model,
-        })
+        return await this.adapter.sendMessage(
+            this.bot,
+            model
+                ? {
+                      model,
+                  }
+                : undefined
+        )
     }
 
     private async parseResponse(response: string, callbacks?: LlmCallbackMap) {
