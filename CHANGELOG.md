@@ -1,3 +1,8 @@
+## <small>13.0.1 (2026-02-05)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([3c269e1](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3c269e1))
+* patch: don't send undefined model ([a319eec](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a319eec))
+
 ## 13.0.0 (2026-02-04)
 
 * major: llm adapter enhancements for setting model and reasoning directly ([9f0647c](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9f0647c))
