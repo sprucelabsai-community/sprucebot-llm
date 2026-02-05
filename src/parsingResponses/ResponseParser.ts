@@ -1,3 +1,9 @@
+import {
+    Schema,
+    SchemaFieldDefinition,
+    SchemaFieldNames,
+    validateSchemaValues,
+} from '@sprucelabs/schema'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../bots/templates'
 import SpruceError from '../errors/SpruceError'
 import { LlmCallbackMap, SendMessage } from '../llm.types'
@@ -54,16 +60,39 @@ export default class ResponseParser {
                     ? [matchWithJson?.[0]]
                     : null
 
-                data = matchWithJson?.[1]
-                    ? JSON.parse(matchWithJson?.[1])
-                    : undefined
+                try {
+                    data = matchWithJson?.[1]
+                        ? JSON.parse(matchWithJson?.[1])
+                        : undefined
+                } catch (error: any) {
+                    throw new SpruceError({
+                        code: 'CALLBACK_ERROR',
+                        friendlyMessage: `The callback "${key}" was invoked with data that could not be parsed as JSON. The error was: ${error.message}`,
+                        originalError: error,
+                    })
+                }
             }
 
             if (xmlCallMatches) {
                 this.assertAtMostOneCallback(++callbacksInvoked)
 
                 try {
-                    callbackResults = await callbacks?.[key]?.cb(data)
+                    const callback = callbacks?.[key]
+                    if (data) {
+                        const schema: Schema = {
+                            id: 'validationSchema',
+                            fields: {},
+                        }
+
+                        ;(callback?.parameters ?? []).forEach((param) => {
+                            const { name, ...rest } = param
+                            schema.fields![name as SchemaFieldNames<Schema>] =
+                                rest as SchemaFieldDefinition<Schema, never>
+                        })
+
+                        validateSchemaValues(schema, data)
+                    }
+                    callbackResults = await callback?.cb(data)
                     message = message.replace(xmlCallMatches[0], '').trim()
                 } catch (error: any) {
                     throw new SpruceError({

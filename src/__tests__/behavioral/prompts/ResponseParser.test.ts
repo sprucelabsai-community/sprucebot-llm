@@ -1,3 +1,5 @@
+import AbstractSpruceError from '@sprucelabs/error'
+import { ValidationFailedErrorOptions } from '@sprucelabs/schema'
 import {
     test,
     suite,
@@ -6,7 +8,12 @@ import {
     errorAssert,
 } from '@sprucelabs/test-utils'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/templates'
-import { LlmCallback, LlmCallbackMap } from '../../../llm.types'
+import SpruceError from '../../../errors/SpruceError'
+import {
+    LlmCallback,
+    LlmCallbackMap,
+    LlmCallbackParameter,
+} from '../../../llm.types'
 import renderPlaceholder from '../../../parsingResponses/renderPlaceholder'
 import ResponseParser, {
     ParsedResponse,
@@ -219,6 +226,10 @@ export default class ResponseParserTest extends AbstractLlmTest {
                 return generateId()
             },
             useThisWhenever: generateId(),
+            parameters: Object.keys(data).map((key) => ({
+                name: key,
+                type: 'text',
+            })),
         })
 
         await this.parse(renderCallbackMarkup('testing', data))
@@ -276,6 +287,88 @@ export default class ResponseParserTest extends AbstractLlmTest {
         )
 
         errorAssert.assertError(err, 'CALLBACK_ERROR')
+    }
+
+    @test()
+    protected async throwsWhenCallbackPassedNonJsonData() {
+        const err = await assert.doesThrowAsync(() =>
+            this.parse('hey there <<listLocations>>notjson<</listLocations>>', {
+                listLocations: {
+                    cb: () => '',
+                    useThisWhenever: generateId(),
+                },
+            })
+        )
+
+        errorAssert.assertError(err, 'CALLBACK_ERROR')
+    }
+
+    @test()
+    protected async throwsMissingParameters() {
+        const errors = await this.parseAndAssertThrowsSchemaError(
+            [
+                {
+                    name: 'location',
+                    isRequired: true,
+                    type: 'text',
+                },
+            ],
+            '{"hello": "world"}'
+        )
+
+        assert.doesInclude(errors[0], {
+            name: 'hello',
+            code: 'UNEXPECTED_PARAMETER',
+        })
+
+        assert.doesInclude(errors[1], {
+            name: 'location',
+            code: 'MISSING_PARAMETER',
+        })
+    }
+
+    @test()
+    protected async throwsWithUnexpectedParameters() {
+        const errors = await this.parseAndAssertThrowsSchemaError(
+            [
+                {
+                    name: 'location',
+                    isRequired: true,
+                    type: 'text',
+                },
+            ],
+            '{"location": "office", "unexpected": "value"}'
+        )
+
+        assert.doesInclude(errors[0], {
+            name: 'unexpected',
+            code: 'UNEXPECTED_PARAMETER',
+        })
+    }
+
+    private async parseAndAssertThrowsSchemaError(
+        parameters: LlmCallbackParameter[],
+        args: string
+    ) {
+        const err = await assert.doesThrowAsync(() =>
+            this.parse(`hey there <<listLocations>>${args}<</listLocations>>`, {
+                listLocations: {
+                    cb: () => '',
+                    useThisWhenever: generateId(),
+                    parameters,
+                },
+            })
+        )
+
+        errorAssert.assertError(err, 'CALLBACK_ERROR')
+        const spruceError = err as SpruceError
+        const schemaError =
+            spruceError.originalError as AbstractSpruceError<ValidationFailedErrorOptions>
+        assert.isTruthy(
+            schemaError.options?.errors,
+            'Expected validation error back'
+        )
+        return schemaError.options.errors
     }
 
     private async assertPromptThrowsWithErrorIncludingCallbacks(
