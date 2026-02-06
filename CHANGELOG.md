@@ -1,3 +1,8 @@
+## <small>13.1.1 (2026-02-06)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([bfe05cb](https://github.com/sprucelabsai-community/sprucebot-llm/commit/bfe05cb))
+* patch: use system, not developr role for api calls ([3322eec](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3322eec))
+
 ## 13.1.0 (2026-02-06)
 
 * minor: ollama baseUrl can be configured ([782d8a2](https://github.com/sprucelabsai-community/sprucebot-llm/commit/782d8a2))
