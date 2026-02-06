@@ -13,8 +13,8 @@ export default class OllamaAdapter implements LlmAdapter {
     private constructor(options?: OllamaOptions) {
         this.think = options?.think ?? false
         this.openai = OpenAiAdapter.Adapter('***', {
-            ...options,
             baseUrl: 'http://localhost:11434/v1',
+            ...options,
         })
     }
 
@@ -41,4 +41,5 @@ export default class OllamaAdapter implements LlmAdapter {
 interface OllamaOptions {
     model?: string
     think?: boolean
+    baseUrl?: string
 }

@@ -29,17 +29,19 @@ export default class OllamaTest extends AbstractLlmTest {
 
     @test()
     protected async passesOptionsToOpenAiAdapter() {
-        OpenAiAdapter.Class = SpyOpenAiAdapter
         const options = {
             model: generateId(),
         }
         OllamaAdapter.Adapter(options)
 
-        assert.isEqualDeep(
-            this.spyOpenAi.constructorOptions,
-            { ...options, baseUrl: 'http://localhost:11434/v1' },
-            'Options not passed correctly to OpenAiAdapter'
-        )
+        this.assertOpenAiConstructorOptionsEqual(options)
+    }
+
+    @test()
+    protected async canOverrideBaseUrl() {
+        const baseUrl = generateId()
+        OllamaAdapter.Adapter({ baseUrl })
+        this.assertOpenAiConstructorOptionsEqual({ baseUrl })
     }
 
     @test()
@@ -143,6 +145,14 @@ export default class OllamaTest extends AbstractLlmTest {
             'No OpenAiAdapter instance created'
         )
         return SpyOpenAiAdapter.instance
+    }
+
+    private assertOpenAiConstructorOptionsEqual(options: OpenAiAdapterOptions) {
+        assert.isEqualDeep(
+            this.spyOpenAi.constructorOptions,
+            { baseUrl: 'http://localhost:11434/v1', ...options },
+            'Options not passed correctly to OpenAiAdapter'
+        )
     }
 }
 
