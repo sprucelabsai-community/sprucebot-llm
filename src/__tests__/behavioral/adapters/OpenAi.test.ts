@@ -6,7 +6,7 @@ import {
     errorAssert,
     generateId,
 } from '@sprucelabs/test-utils'
-import OpenAI from 'openai'
+import OpenAI, { APIUserAbortError } from 'openai'
 import {
     ChatCompletionCreateParamsNonStreaming,
     ChatCompletionMessageParam,
@@ -44,6 +44,7 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         MockAbortController.instances = []
         OpenAiAdapter.AbortController = MockAbortController
+        delete SpyOpenAiModule.errorToThrowOnCreate
 
         delete process.env.OPENAI_PAST_MESSAGE_MAX_CHARS
         delete process.env.OPENAI_SHOULD_REMEMBER_IMAGES
@@ -789,6 +790,18 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         await promise1
         await promise2
+    }
+
+    @test()
+    protected async openAiAdapterThrowingCausesErrorToBeThrown() {
+        SpyOpenAiModule.errorToThrowOnCreate = new Error(generateId())
+        await assert.doesThrowAsync(() => this.sendMessage())
+    }
+
+    @test()
+    protected async doesNotThrowIfAbortErrorThrown() {
+        SpyOpenAiModule.errorToThrowOnCreate = new APIUserAbortError()
+        await this.sendMessage()
     }
 
     private get firstAbortController() {

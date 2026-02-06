@@ -1,6 +1,6 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { Log } from '@sprucelabs/spruce-skill-utils'
-import OpenAI from 'openai'
+import OpenAI, { APIUserAbortError } from 'openai'
 import {
     ChatCompletionCreateParamsNonStreaming,
     ReasoningEffort,
@@ -67,21 +67,29 @@ export default class OpenAiAdapter implements LlmAdapter {
             params.reasoning_effort = reasoningEffort
         }
 
-        this.lastAbortController?.abort('Interrupted by new message')
-        this.lastAbortController = new OpenAiAdapter.AbortController()
-        const response = await this.api.chat.completions.create(params, {
-            signal: this.lastAbortController.signal,
-        })
+        try {
+            this.lastAbortController?.abort('Interrupted by new message')
+            this.lastAbortController = new OpenAiAdapter.AbortController()
+            const response = await this.api.chat.completions.create(params, {
+                signal: this.lastAbortController.signal,
+            })
 
-        delete this.lastAbortController
+            delete this.lastAbortController
 
-        const message =
-            response.choices?.[0]?.message?.content?.trim() ??
-            MESSAGE_RESPONSE_ERROR_MESSAGE
+            const message =
+                response.choices?.[0]?.message?.content?.trim() ??
+                MESSAGE_RESPONSE_ERROR_MESSAGE
 
-        this.log?.info('Received response from OpenAI', message)
+            this.log?.info('Received response from OpenAI', message)
 
-        return message
+            return message
+        } catch (err: any) {
+            if (err instanceof APIUserAbortError) {
+                this.log?.info('OpenAI request was aborted')
+                return ''
+            }
+            throw err
+        }
     }
 
     private getReasoningEffort() {

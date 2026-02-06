@@ -10,6 +10,7 @@ export default class SpyOpenAiModule extends OpenAI {
     public static lastSentCompletion?: ChatCompletionCreateParamsNonStreaming
     public static responseMessage: string | false = 'hello!'
     public static lastCompletionOptions?: RequestOptions | undefined
+    public static errorToThrowOnCreate?: Error
 
     public constructor(config: ClientOptions) {
         super(config)
@@ -30,6 +31,10 @@ export default class SpyOpenAiModule extends OpenAI {
         SpyOpenAiModule.lastSentCompletion = completion
         SpyOpenAiModule.lastCompletionOptions = options
         const choices: ChatCompletion.Choice[] = []
+
+        if (SpyOpenAiModule.errorToThrowOnCreate) {
+            throw SpyOpenAiModule.errorToThrowOnCreate
+        }
 
         if (SpyOpenAiModule.responseMessage) {
             choices.push({
