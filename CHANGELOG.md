@@ -1,3 +1,9 @@
+## <small>13.0.6 (2026-02-06)</small>
+
+* patch: type fix ([f06a043](https://github.com/sprucelabsai-community/sprucebot-llm/commit/f06a043))
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([224cde8](https://github.com/sprucelabsai-community/sprucebot-llm/commit/224cde8))
+* many: parameter types support arrays ([a8c94ef](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a8c94ef))
+
 ## <small>13.0.5 (2026-02-05)</small>
 
 * patch: abort controller for now messages ([50929d0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/50929d0))
