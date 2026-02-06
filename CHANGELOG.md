@@ -1,3 +1,7 @@
+## 13.1.0 (2026-02-06)
+
+* minor: ollama baseUrl can be configured ([782d8a2](https://github.com/sprucelabsai-community/sprucebot-llm/commit/782d8a2))
+
 ## <small>13.0.6 (2026-02-06)</small>
 
 * patch: type fix ([f06a043](https://github.com/sprucelabsai-community/sprucebot-llm/commit/f06a043))
