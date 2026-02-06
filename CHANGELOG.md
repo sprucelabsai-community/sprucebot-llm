@@ -1,3 +1,7 @@
+## <small>13.0.5 (2026-02-05)</small>
+
+* patch: abort controller for now messages ([50929d0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/50929d0))
+
 ## <small>13.0.4 (2026-02-05)</small>
 
 * patch: better validation when calling callbacks ([c974a8a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/c974a8a))
