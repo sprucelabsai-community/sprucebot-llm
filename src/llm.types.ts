@@ -127,7 +127,7 @@ export type LlmCallbackParameter =
           isRequired?: boolean
           description?: string
           isArray?: boolean
-          minArrayValues?: number
+          minArrayLength?: number
       }
     | (SelectFieldDefinition & { name: string; description?: string })
 
