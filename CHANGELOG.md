@@ -1,3 +1,7 @@
+## <small>13.1.2 (2026-02-06)</small>
+
+* patch: better handling of abort errors ([7974fb8](https://github.com/sprucelabsai-community/sprucebot-llm/commit/7974fb8))
+
 ## <small>13.1.1 (2026-02-06)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([bfe05cb](https://github.com/sprucelabsai-community/sprucebot-llm/commit/bfe05cb))
