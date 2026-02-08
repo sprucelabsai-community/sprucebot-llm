@@ -4,6 +4,7 @@ import {
     defaultSchemaValues,
     Schema,
     SchemaValues,
+    validateSchemaValues,
 } from '@sprucelabs/schema'
 import {
     BotOptions,
@@ -126,6 +127,7 @@ export default class SprucebotLlmBotImpl<
     }
 
     public async updateState(newState: Partial<State>): Promise<void> {
+        validateSchemaValues(this.stateSchema!, newState)
         this.state = { ...this.state!, ...newState }
         await this.emit('did-update-state')
     }

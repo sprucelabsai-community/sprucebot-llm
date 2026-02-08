@@ -178,14 +178,6 @@ export default class SkillTest extends AbstractLlmTest {
         this.assertModelSentToAdapterEquals(model)
     }
 
-    private async sendRandomMessage() {
-        const bot = this.Bot({
-            skill: this.skill,
-        })
-
-        await bot.sendMessage(generateId())
-    }
-
     @test()
     protected async canUpdateModel() {
         const model = generateId()
@@ -225,6 +217,13 @@ export default class SkillTest extends AbstractLlmTest {
         )
     }
 
+    private async sendRandomMessage() {
+        const bot = this.Bot({
+            skill: this.skill,
+        })
+
+        await bot.sendMessage(generateId())
+    }
     private assertModelSentToAdapterEquals(model: string) {
         assert.isEqual(
             this.adapter.lastSendOptions?.model,

@@ -1,3 +1,5 @@
+import AbstractSpruceError from '@sprucelabs/error'
+import { Schema, ValidationFailedErrorOptions } from '@sprucelabs/schema'
 import {
     test,
     suite,
@@ -320,8 +322,47 @@ export default class LlmBotTest extends AbstractLlmTest {
         })
 
         await this.sendMessageWithResponseState(state)
-        assert.isEqualDeep(skill.serialize().state, state)
-        assert.isUndefined(this.bot.getState())
+        assert.isEqualDeep(
+            skill.serialize().state,
+            state,
+            'state in skill did not match state sent in response'
+        )
+        assert.isUndefined(this.bot.getState(), 'state should not be on bot')
+    }
+
+    @test('throws on skill if state does not match schema 1', 'skill')
+    @test('throws on bot if state does not match schema 2', 'bot')
+    protected async updatingStateThrowsIfStateDoesNotMatchSchema(
+        skillOrBot: 'skill' | 'bot'
+    ) {
+        this.setupWithStateSchema(skillOrBot, personSchema)
+
+        const err = await this.assertStateUpdateThrowsValidationError({
+            test: true,
+        })
+
+        assert.doesInclude(err.options.errors[0], {
+            name: 'test',
+            code: 'UNEXPECTED_PARAMETER',
+        })
+    }
+
+    @test(
+        'throws validation error if parameter is wrong type on skill',
+        'skill'
+    )
+    @test('throws validation error if parameter is wrong type on bot', 'bot')
+    protected async throwsWithInvalidParameter(skillOrBot: 'skill' | 'bot') {
+        this.setupWithStateSchema(skillOrBot, carSchema)
+
+        const err = await this.assertStateUpdateThrowsValidationError({
+            year: 'hello world',
+        })
+
+        assert.doesInclude(err.options.errors[0], {
+            name: 'year',
+            code: 'INVALID_PARAMETER',
+        })
     }
 
     @test()
@@ -599,6 +640,18 @@ export default class LlmBotTest extends AbstractLlmTest {
         )
     }
 
+    private setupWithStateSchema(skillOrBot: string, schema: Schema) {
+        if (skillOrBot === 'skill') {
+            this.setupBotWithSkill({
+                stateSchema: schema,
+            })
+        } else {
+            this.bot = this.Bot({
+                stateSchema: schema,
+            })
+        }
+    }
+
     private setParserResponseCallbackResults(results?: SendMessage) {
         this.parser.response.callbackResults = results
     }
@@ -617,6 +670,14 @@ export default class LlmBotTest extends AbstractLlmTest {
 
     private assertTotalMessagesTracked(expected: number) {
         assert.isLength(this.messages, expected)
+    }
+
+    private async assertStateUpdateThrowsValidationError(
+        updates: Record<string, any>
+    ) {
+        return (await assert.doesThrowAsync(() =>
+            this.sendMessageWithResponseState(updates)
+        )) as AbstractSpruceError<ValidationFailedErrorOptions>
     }
 
     private get messages() {
