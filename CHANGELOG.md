@@ -1,3 +1,7 @@
+## <small>13.1.3 (2026-02-08)</small>
+
+* patch: schema update value validation ([16e911f](https://github.com/sprucelabsai-community/sprucebot-llm/commit/16e911f))
+
 ## <small>13.1.2 (2026-02-06)</small>
 
 * patch: better handling of abort errors ([7974fb8](https://github.com/sprucelabsai-community/sprucebot-llm/commit/7974fb8))
