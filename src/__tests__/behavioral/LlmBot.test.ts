@@ -1,5 +1,4 @@
-import AbstractSpruceError from '@sprucelabs/error'
-import { Schema, ValidationFailedErrorOptions } from '@sprucelabs/schema'
+import { Schema } from '@sprucelabs/schema'
 import {
     test,
     suite,
