@@ -4,7 +4,6 @@ import {
     defaultSchemaValues,
     Schema,
     SchemaValues,
-    validateSchemaValues,
 } from '@sprucelabs/schema'
 import {
     BotOptions,
@@ -18,6 +17,7 @@ import {
     SprucebotLlmBot,
     SprucebotLLmSkill,
 } from '../llm.types'
+import InternalStateUpdater from './InternalStateUpdater'
 import TurnRequest from './TurnRequest'
 
 export default class SprucebotLlmBotImpl<
@@ -126,14 +126,24 @@ export default class SprucebotLlmBotImpl<
         this.messages.push(m)
     }
 
-    public async updateState(newState: Partial<State>): Promise<void> {
-        validateSchemaValues(this.stateSchema!, newState)
-        this.state = { ...this.state!, ...newState }
-        await this.emit('did-update-state')
+    public async updateState(updates: Partial<State>): Promise<void> {
+        await InternalStateUpdater.updateState(this, updates)
     }
 
     public setSkill(skill: SprucebotLLmSkill<any>) {
         this.skill = skill
         this.isDone = false
+    }
+
+    public getStateSchema() {
+        return this.stateSchema
+    }
+
+    public getState() {
+        return this.state
+    }
+
+    public silentlySetState(state: Partial<State>) {
+        this.state = state
     }
 }

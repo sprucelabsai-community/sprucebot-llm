@@ -640,6 +640,23 @@ export default class LlmBotTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected async stateUpdatesAreNormalized() {
+        this.bot = this.Bot({
+            stateSchema: personSchema,
+        })
+
+        await this.updateState({
+            nickNames: 'bob',
+        })
+
+        const expected = {
+            nickNames: ['bob'],
+        }
+
+        this.assertSerializedStateEquals(expected)
+    }
+
     private setupWithStateSchema(skillOrBot: string, schema: Schema) {
         if (skillOrBot === 'skill') {
             this.setupBotWithSkill({

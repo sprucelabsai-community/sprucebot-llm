@@ -30,6 +30,10 @@ export const personSchema = buildSchema({
                 ],
             },
         },
+        nickNames: {
+            type: 'text',
+            isArray: true,
+        },
     },
 })
 

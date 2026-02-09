@@ -1,10 +1,5 @@
 import { AbstractEventEmitter } from '@sprucelabs/mercury-event-emitter'
-import {
-    defaultSchemaValues,
-    Schema,
-    SchemaValues,
-    validateSchemaValues,
-} from '@sprucelabs/schema'
+import { defaultSchemaValues, Schema, SchemaValues } from '@sprucelabs/schema'
 import {
     llmEventContract,
     LlmEventContract,
@@ -12,6 +7,7 @@ import {
     SkillOptions,
     SprucebotLLmSkill,
 } from '../llm.types'
+import InternalStateUpdater from './InternalStateUpdater'
 
 export default class SprucebotLlmSkillImpl<
     StateSchema extends Schema = Schema,
@@ -39,9 +35,7 @@ export default class SprucebotLlmSkillImpl<
     }
 
     public async updateState(updates: Partial<State>) {
-        validateSchemaValues(this.stateSchema!, updates)
-        this.state = { ...this.state, ...updates }
-        await this.emit('did-update-state')
+        await InternalStateUpdater.updateState(this, updates)
     }
 
     public getState() {
@@ -58,5 +52,13 @@ export default class SprucebotLlmSkillImpl<
             stateSchema: this.stateSchema,
             state: this.state,
         }
+    }
+
+    public silentlySetState(state: Partial<State>) {
+        this.state = state
+    }
+
+    public getStateSchema() {
+        return this.stateSchema
     }
 }
