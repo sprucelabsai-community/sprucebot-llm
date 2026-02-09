@@ -1,3 +1,8 @@
+## <small>13.1.4 (2026-02-09)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([a7429cf](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a7429cf))
+* patch: state field normalization ([2da9e09](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2da9e09))
+
 ## <small>13.1.3 (2026-02-08)</small>
 
 * patch: schema update value validation ([16e911f](https://github.com/sprucelabsai-community/sprucebot-llm/commit/16e911f))
