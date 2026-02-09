@@ -1,4 +1,5 @@
 import {
+    normalizeSchemaValues,
     Schema,
     SchemaFieldDefinition,
     SchemaFieldNames,
@@ -91,6 +92,7 @@ export default class ResponseParser {
                         })
 
                         validateSchemaValues(schema, data)
+                        data = normalizeSchemaValues(schema, data)
                     }
                     callbackResults = await callback?.cb(data)
                     message = message.replace(xmlCallMatches[0], '').trim()

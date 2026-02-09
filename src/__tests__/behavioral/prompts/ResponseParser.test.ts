@@ -234,7 +234,11 @@ export default class ResponseParserTest extends AbstractLlmTest {
 
         await this.parse(renderCallbackMarkup('testing', data))
 
-        assert.isEqualDeep(passedParams, data)
+        assert.isEqualDeep(
+            passedParams,
+            data,
+            'Expected parameters passed to callback'
+        )
     }
 
     @test()
@@ -344,6 +348,34 @@ export default class ResponseParserTest extends AbstractLlmTest {
             name: 'unexpected',
             code: 'UNEXPECTED_PARAMETER',
         })
+    }
+
+    @test()
+    protected async normalizesParameters() {
+        let passedParams: Record<string, any> | undefined
+
+        this.setCallback('setup', {
+            cb: (params) => {
+                passedParams = params
+                return generateId()
+            },
+            useThisWhenever: generateId(),
+            parameters: [
+                {
+                    name: 'locations',
+                    type: 'text',
+                    isArray: true,
+                },
+            ],
+        })
+
+        await this.parse(renderCallbackMarkup('setup', { locations: 'office' }))
+
+        assert.isEqualDeep(
+            passedParams,
+            { locations: ['office'] },
+            'Expected parameters normalized to array'
+        )
     }
 
     private async parseAndAssertThrowsSchemaError(
