@@ -72,14 +72,18 @@ export default class TurnRequest {
             isDone = parsed.isDone
             state = parsed.state
             callbackResults = parsed.callbackResults
+
+            await this.optionallyUpdateState(state)
         } catch (err: any) {
             this.trackMessage({
                 from: 'You',
                 message: llmResponse,
             })
+
             if (
                 err.options?.code === 'INVALID_CALLBACK' ||
-                err.options?.code === 'CALLBACK_ERROR'
+                err.options?.code === 'CALLBACK_ERROR' ||
+                err.options?.code === 'VALIDATION_FAILED'
             ) {
                 return this.sendMessage(
                     { from: 'Api', message: `Error: ${err.message}` },
@@ -90,8 +94,6 @@ export default class TurnRequest {
         }
 
         this.setDone(isDone)
-
-        await this.optionallyUpdateState(state)
 
         this.trackMessage({
             from: 'You',

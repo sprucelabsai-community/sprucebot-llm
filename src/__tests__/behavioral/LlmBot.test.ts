@@ -146,6 +146,18 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
+    protected async settingBadStateSendsResponseBackToAdapter() {
+        this.parser.response = {
+            message: generateId(),
+            state: {
+                hello: 'world',
+            },
+        }
+
+        await this.sendMessage(generateId())
+    }
+
+    @test()
     protected async knowsWhenDone() {
         this.assertBotIsNotDone()
         this.bot.markAsDone()
@@ -330,39 +342,54 @@ export default class LlmBotTest extends AbstractLlmTest {
         assert.isUndefined(this.bot.getState(), 'state should not be on bot')
     }
 
-    @test('throws on skill if state does not match schema 1', 'skill')
-    @test('throws on bot if state does not match schema 2', 'bot')
+    @test('responds on skill if state does not match schema 1', 'skill')
+    @test('responds on bot if state does not match schema 2', 'bot')
     protected async updatingStateThrowsIfStateDoesNotMatchSchema(
         skillOrBot: 'skill' | 'bot'
     ) {
         this.setupWithStateSchema(skillOrBot, personSchema)
 
-        const err = await this.assertStateUpdateThrowsValidationError({
-            test: true,
-        })
+        const message =
+            await this.sendMessageWithBadStateResponseAndGetErrorSentToAdapter({
+                test: true,
+            })
 
-        assert.doesInclude(err.options.errors[0], {
-            name: 'test',
-            code: 'UNEXPECTED_PARAMETER',
-        })
+        assert.isEqual(
+            message.from,
+            'Api',
+            'Schema error response should be from Api'
+        )
+
+        assert.doesInclude(message.message, '`test` does not exist')
     }
 
     @test(
-        'throws validation error if parameter is wrong type on skill',
+        'responds with validation error if parameter is wrong type on skill',
         'skill'
     )
-    @test('throws validation error if parameter is wrong type on bot', 'bot')
+    @test(
+        'responds with validation error if parameter is wrong type on bot',
+        'bot'
+    )
     protected async throwsWithInvalidParameter(skillOrBot: 'skill' | 'bot') {
         this.setupWithStateSchema(skillOrBot, carSchema)
 
-        const err = await this.assertStateUpdateThrowsValidationError({
-            year: 'hello world',
-        })
+        const msg =
+            await this.sendMessageWithBadStateResponseAndGetErrorSentToAdapter({
+                year: 'hello world',
+            })
 
-        assert.doesInclude(err.options.errors[0], {
-            name: 'year',
-            code: 'INVALID_PARAMETER',
-        })
+        assert.isEqual(
+            msg.from,
+            'Api',
+            'Schema error response should be from Api'
+        )
+
+        assert.doesInclude(
+            msg.message,
+            `""hello world"" is not a number!`,
+            'Error message should include details about invalid parameter'
+        )
     }
 
     @test()
@@ -689,12 +716,12 @@ export default class LlmBotTest extends AbstractLlmTest {
         assert.isLength(this.messages, expected)
     }
 
-    private async assertStateUpdateThrowsValidationError(
+    private async sendMessageWithBadStateResponseAndGetErrorSentToAdapter(
         updates: Record<string, any>
     ) {
-        return (await assert.doesThrowAsync(() =>
-            this.sendMessageWithResponseState(updates)
-        )) as AbstractSpruceError<ValidationFailedErrorOptions>
+        await this.sendMessageWithResponseState(updates)
+        const lastMessage = this.messages[this.messages.length - 2]
+        return lastMessage
     }
 
     private get messages() {
@@ -792,10 +819,15 @@ class FakeResponseParser extends ResponseParser {
 
         this.lastMessage = message
         this.lastCallbacks = callbacks
-        return {
+
+        const results = {
             message,
             isDone: false,
             ...this.response,
         }
+
+        delete this.response.state
+
+        return results as ParsedResponse
     }
 }
