@@ -1,3 +1,8 @@
+## <small>13.1.5 (2026-02-09)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([3d3a894](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3d3a894))
+* patch: callback values are normalized ([823140d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/823140d))
+
 ## <small>13.1.4 (2026-02-09)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([a7429cf](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a7429cf))
