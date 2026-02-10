@@ -1,3 +1,9 @@
+## <small>13.1.8 (2026-02-10)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([161b863](https://github.com/sprucelabsai-community/sprucebot-llm/commit/161b863))
+* patch: better callback parsing ([7e7f5fd](https://github.com/sprucelabsai-community/sprucebot-llm/commit/7e7f5fd))
+* patch: parser improvementns ([050b500](https://github.com/sprucelabsai-community/sprucebot-llm/commit/050b500))
+
 ## <small>13.1.7 (2026-02-10)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([0ece813](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0ece813))
