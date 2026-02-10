@@ -1,3 +1,9 @@
+## <small>13.1.6 (2026-02-09)</small>
+
+* patch: better handling of errors when when bad states updates given ([1295801](https://github.com/sprucelabsai-community/sprucebot-llm/commit/1295801))
+* patch: type fixes ([efd03c5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/efd03c5))
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([6a35e9c](https://github.com/sprucelabsai-community/sprucebot-llm/commit/6a35e9c))
+
 ## <small>13.1.5 (2026-02-09)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([3d3a894](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3d3a894))
