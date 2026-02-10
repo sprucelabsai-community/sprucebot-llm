@@ -1,3 +1,8 @@
+## <small>13.1.7 (2026-02-10)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([0ece813](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0ece813))
+* patch: invalid callback guidance improvements ([2b658d9](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2b658d9))
+
 ## <small>13.1.6 (2026-02-09)</small>
 
 * patch: better handling of errors when when bad states updates given ([1295801](https://github.com/sprucelabsai-community/sprucebot-llm/commit/1295801))
