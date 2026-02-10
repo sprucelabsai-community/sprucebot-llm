@@ -586,7 +586,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
         await this.assertParsesAndCallsCallback({
             callbackName: 'resumeEffort',
             parameters: [{ name: 'effortName', type: 'text' }],
-            message: `<<resumeEffort>>{"effortName":"Recovery Token"}<</resumeEffort>><-----  <go dogs> `,
+            message: `<<resumeEffort >>{"effortName":"Recovery Token"}<</ resumeEffort>><-----  <go dogs> `,
         })
     }
 
