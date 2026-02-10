@@ -106,6 +106,13 @@ export default class ResponseParser {
             }
         }
 
+        const { match, regex } = this.parseState(message)
+
+        if (match && regex) {
+            message = message.replace(regex, '').trim()
+            state = JSON.parse(match)
+        }
+
         const matchedCallback = this.findFirstBadCallback(message)
 
         if (matchedCallback) {
@@ -114,13 +121,6 @@ export default class ResponseParser {
                 validCallbacks: Object.keys(callbacks ?? {}),
                 matchedCallback,
             })
-        }
-
-        const { match, regex } = this.parseState(message)
-
-        if (match && regex) {
-            message = message.replace(regex, '').trim()
-            state = JSON.parse(match)
         }
 
         return {

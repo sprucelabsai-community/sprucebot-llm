@@ -20,6 +20,8 @@ export default class SkillTest extends AbstractLlmTest {
 
     protected async beforeEach() {
         await super.beforeEach()
+
+        OpenAiAdapter.OpenAI = SpyOpenAiModule as any
         this.skill = this.Skill()
     }
 
@@ -163,10 +165,7 @@ export default class SkillTest extends AbstractLlmTest {
 
     @test()
     protected async skillCanSetModel() {
-        OpenAiAdapter.OpenAI = SpyOpenAiModule as any
-
-        const model =
-            'davinci:ft-personal:sprucebot-concierge-2023-04-28-04-42-19'
+        const model = generateId()
         this.skill = this.Skill({
             model,
         })

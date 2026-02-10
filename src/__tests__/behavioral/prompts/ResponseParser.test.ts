@@ -378,6 +378,248 @@ export default class ResponseParserTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected async callbackParsingHandlesVariousSurroundingText() {
+        let wasHit = false
+
+        this.setCallback('cheesePizza', {
+            cb: () => {
+                wasHit = true
+                return ''
+            },
+            parameters: [
+                {
+                    name: 'toppings',
+                    type: 'text',
+                    isArray: true,
+                },
+            ],
+            useThisWhenever: generateId(),
+        })
+
+        const message =
+            renderCallbackMarkup('cheesePizza', { toppings: ['beef'] }) +
+            ' ' +
+            STATE_BOUNDARY +
+            JSON.stringify({}) +
+            STATE_BOUNDARY
+        await this.parse(message.replaceAll(' ', ''))
+        assert.isTrue(wasHit, 'callback was not hit')
+    }
+
+    @test()
+    protected async parsesCallbackWithStateBoundaryDirectlyAdjacent() {
+        let wasHit = false
+        this.setCallback('resumeEffort', {
+            cb: () => {
+                wasHit = true
+                return 'Resumed'
+            },
+            parameters: [{ name: 'effortName', type: 'text' }],
+            useThisWhenever: generateId(),
+        })
+
+        // No space between closing callback tag and state boundary
+        const message = `<<resumeEffort>>{"effortName":"Recovery Token"}<</resumeEffort>>${STATE_BOUNDARY}{"currentGoal":"Resume efforts"}${STATE_BOUNDARY}`
+        await this.parse(message)
+        assert.isTrue(wasHit, 'callback was not hit')
+    }
+
+    @test()
+    protected async parsesCallbackWithManyRegisteredCallbacks() {
+        let wasHit = false
+        const callbackNames = [
+            'startEffort',
+            'updateEffort',
+            'addGuardrails',
+            'removeGuardrails',
+            'addTacticalAdvice',
+            'removeTacticalAdvice',
+            'addObjective',
+            'listEfforts',
+            'getEffortStatus',
+            'getEffortContext',
+            'sendMessageToEffort',
+            'pauseEffort',
+            'stopEffort',
+            'restartEffort',
+            'resumeEffort',
+            'duplicateEffort',
+            'openEffortConsole',
+            'shutdown',
+            'listInputDevices',
+            'getCurrentInputDevice',
+            'setInputDevice',
+            'sendGuidanceToEffort',
+            'ls',
+            'confirmDir',
+            'getCurrentJarvisModel',
+            'listAvailableJarvisModels',
+            'setJarvisModel',
+            'getJarvisReasoningEffort',
+            'setJarvisReasoningEffort',
+            'listSttAdapters',
+        ]
+
+        for (const name of callbackNames) {
+            this.setCallback(name, {
+                cb: () => {
+                    if (name === 'resumeEffort') {
+                        wasHit = true
+                    }
+                    return `${name} called`
+                },
+                parameters:
+                    name === 'resumeEffort'
+                        ? [{ name: 'effortName', type: 'text' }]
+                        : [],
+                useThisWhenever: generateId(),
+            })
+        }
+
+        const message = `<<resumeEffort>>{"effortName":"Recovery Token"}<</resumeEffort>> ${STATE_BOUNDARY} {"currentGoal":"Resume efforts"} ${STATE_BOUNDARY}`
+        await this.parse(message)
+        assert.isTrue(wasHit, 'resumeEffort callback was not hit')
+    }
+
+    @test()
+    protected async parsesCallbackWithNarrativeTextBeforeAndState() {
+        let wasHit = false
+        this.setCallback('resumeEffort', {
+            cb: () => {
+                wasHit = true
+                return 'Resumed'
+            },
+            parameters: [{ name: 'effortName', type: 'text' }],
+            useThisWhenever: generateId(),
+        })
+
+        const message = `I'll resume the Recovery Token effort now.\n\n<<resumeEffort>>{"effortName":"Recovery Token"}<</resumeEffort>>\n\n${STATE_BOUNDARY} {"currentGoal":"Resume efforts"} ${STATE_BOUNDARY}`
+        await this.parse(message)
+        assert.isTrue(wasHit, 'callback was not hit with narrative text')
+    }
+
+    @test()
+    protected async throwsWhenClosingTagMissesOneAngleBracket() {
+        this.setCallback('resumeEffort', {
+            cb: () => 'Resumed',
+            parameters: [{ name: 'effortName', type: 'text' }],
+            useThisWhenever: generateId(),
+        })
+
+        const message = `<<resumeEffort>>{"effortName":"Recovery Token"}</resumeEffort>>`
+        const err = await assert.doesThrowAsync(() => this.parse(message))
+        errorAssert.assertError(err, 'INVALID_CALLBACK')
+    }
+
+    @test()
+    protected async throwsWhenClosingTagUsesSelfClosingFormat() {
+        this.setCallback('resumeEffort', {
+            cb: () => 'Resumed',
+            parameters: [{ name: 'effortName', type: 'text' }],
+            useThisWhenever: generateId(),
+        })
+
+        const message = `<<resumeEffort>>{"effortName":"Recovery Token"}<<resumeEffort/>>`
+        const err = await assert.doesThrowAsync(() => this.parse(message))
+        errorAssert.assertError(err, 'INVALID_CALLBACK')
+    }
+
+    @test()
+    protected async parsesCallbackWithNewlinesInJson() {
+        let passedParams: Record<string, any> | undefined
+        this.setCallback('resumeEffort', {
+            cb: (params) => {
+                passedParams = params
+                return 'Resumed'
+            },
+            parameters: [{ name: 'effortName', type: 'text' }],
+            useThisWhenever: generateId(),
+        })
+
+        const message = `<<resumeEffort>>{\n  "effortName": "Recovery Token"\n}<</resumeEffort>>`
+        await this.parse(message)
+        assert.isEqualDeep(passedParams, { effortName: 'Recovery Token' })
+    }
+
+    @test()
+    protected async throwsWhenLlmNarratesCallbackNameInAngleBrackets() {
+        this.setCallback('resumeEffort', {
+            cb: () => 'Resumed',
+            parameters: [{ name: 'effortName', type: 'text' }],
+            useThisWhenever: generateId(),
+        })
+
+        const message = `I'll use <<resumeEffort>> to resume it. <<resumeEffort>>{"effortName":"Recovery Token"}<</resumeEffort>>`
+        await assert.doesThrowAsync(() => this.parse(message))
+    }
+
+    @test()
+    protected async doesNotThrowWhenStateJsonContainsAngleBracketPatterns() {
+        const stateJson = {
+            currentGoal: 'Resume efforts',
+            stepsCompleted: ['Called <<resumeEffort>> for Handbid Tests'],
+        }
+        await this.assertParsesAndCallsCallback({
+            callbackName: 'resumeEffort',
+            parameters: [{ name: 'effortName', type: 'text' }],
+            message: `<<resumeEffort>>{"effortName":"Recovery Token"}<</resumeEffort>> ${STATE_BOUNDARY} ${JSON.stringify(stateJson)} ${STATE_BOUNDARY}`,
+            expectedState: stateJson,
+        })
+    }
+
+    @test()
+    protected async doesNotThrowWhenStateJsonContainsGenericAngleBrackets() {
+        const stateJson = {
+            note: 'Value was <<much higher>> than expected',
+        }
+
+        await this.assertParsesAndCallsCallback({
+            callbackName: 'myCallback',
+            message: `<<myCallback/>> ${STATE_BOUNDARY} ${JSON.stringify(stateJson)} ${STATE_BOUNDARY}`,
+            expectedState: stateJson,
+        })
+    }
+
+    @test()
+    protected async doesNotThrowWhenStateLikeBoundaryPatternsAppearInNarrativeText() {
+        await this.assertParsesAndCallsCallback({
+            callbackName: 'resumeEffort',
+            parameters: [{ name: 'effortName', type: 'text' }],
+            message: `<<resumeEffort>>{"effortName":"Recovery Token"}<</resumeEffort>><-----  <go dogs> `,
+        })
+    }
+
+    private async assertParsesAndCallsCallback(options: {
+        callbackName: string
+        message: string
+        parameters?: LlmCallbackParameter[]
+        expectedState?: Record<string, any>
+    }) {
+        const { parameters, message, expectedState, callbackName } = options
+
+        let wasHit = false
+        this.setCallback(callbackName, {
+            cb: () => {
+                wasHit = true
+                return 'Resumed'
+            },
+            parameters,
+            useThisWhenever: generateId(),
+        })
+
+        const result = await this.parse(message)
+        assert.isTrue(wasHit, 'callback was not hit')
+
+        if (expectedState) {
+            assert.isEqualDeep(
+                result.state,
+                expectedState,
+                'Did not update state correctly'
+            )
+        }
+    }
+
     private async parseAndAssertThrowsSchemaError(
         parameters: LlmCallbackParameter[],
         args: string
