@@ -23,7 +23,7 @@ Next steps:
 
 1. Don't just takes stabs at it, review the syntax rules for callbacks and make sure your tags are properly formatted.
     1a. <<callbackName/>> for callbacks with no arguments.
-    1b. <<callbackName>>{{JSON arguments}}<</callbackName>> for callbacks with arguments.
+    1b. <<callbackName>>{"valid": "json"}<</callbackName>> for callbacks with arguments.
 2. Check the list of valid callbacks (below) below to ensure the callback you are trying to invoke actually exists.
 
 Valid callbacks:
