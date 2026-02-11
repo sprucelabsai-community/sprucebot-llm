@@ -1,3 +1,8 @@
+## <small>13.1.10 (2026-02-11)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([053e1c5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/053e1c5))
+* patch: error report tweak ([a01a8d0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a01a8d0))
+
 ## <small>13.1.9 (2026-02-11)</small>
 
 * Merge branches 'master' and 'master' of https://github.com/sprucelabsai/sprucebot-llm ([a8efc94](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a8efc94))
