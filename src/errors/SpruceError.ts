@@ -19,6 +19,13 @@ export default class SpruceError extends BaseSpruceError<ErrorOptions> {
 3. Syntax error in tags with arguments. Make sure the callback is in the form of <<callbackName>>{{JSON arguments}}<</callbackName>> and not <<callbackName>>{{JSON arguments}}<</callbackName> (missing closing >> in the opening tag).
 4. Syntax error in the JSON arguments. Make sure the JSON is valid and properly formatted.
 
+Next steps:
+
+1. Don't just takes stabs at it, review the syntax rules for callbacks and make sure your tags are properly formatted.
+    1a. <<callbackName/>> for callbacks with no arguments.
+    1b. <<callbackName>>{{JSON arguments}}<</callbackName>> for callbacks with arguments.
+2. Check the list of valid callbacks (below) below to ensure the callback you are trying to invoke actually exists.
+
 Valid callbacks:
 
 ${options.validCallbacks.map((name, idx) => `${idx + 1}: ${name}`).join('\n')}`
