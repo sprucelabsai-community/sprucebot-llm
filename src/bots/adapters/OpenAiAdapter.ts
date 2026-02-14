@@ -1,16 +1,14 @@
 import { assertOptions } from '@sprucelabs/schema'
 import { Log } from '@sprucelabs/spruce-skill-utils'
-import OpenAI, { APIUserAbortError } from 'openai'
-import {
-    ChatCompletionCreateParamsNonStreaming,
-    ReasoningEffort,
-} from 'openai/resources'
+import OpenAI from 'openai'
+import { RequestOptions } from 'openai/internal/request-options'
+import { ReasoningEffort } from 'openai/resources'
 import {
     LlmAdapter,
     SendMessageOptions,
     SprucebotLlmBot,
 } from '../../llm.types'
-import OpenAiMessageBuilder from './OpenAiMessageBuilder'
+import MessageSenderImpl, { MessageSender } from './MessageSender'
 
 export default class OpenAiAdapter implements LlmAdapter {
     public static Class: new (
@@ -20,11 +18,10 @@ export default class OpenAiAdapter implements LlmAdapter {
     public static OpenAI = OpenAI
     public static AbortController = AbortController
     private api: OpenAI
-    private log?: Log
     private model = 'gpt-4o'
     private memoryLimit?: number
     private reasoningEffort?: ReasoningEffort
-    private lastAbortController?: AbortController
+    private sender: MessageSender
 
     protected constructor(apiKey: string, options?: OpenAiAdapterOptions) {
         assertOptions({ apiKey }, ['apiKey'])
@@ -32,10 +29,10 @@ export default class OpenAiAdapter implements LlmAdapter {
             options || {}
 
         this.api = new OpenAiAdapter.OpenAI({ apiKey, baseURL: baseUrl })
-        this.log = log
         this.memoryLimit = memoryLimit
         this.model = model ?? this.model
         this.reasoningEffort = reasoningEffort
+        this.sender = MessageSenderImpl.Sender(this.sendHandler.bind(this), log)
     }
 
     public static Adapter(apiKey: string, options?: OpenAiAdapterOptions) {
@@ -46,50 +43,25 @@ export default class OpenAiAdapter implements LlmAdapter {
         bot: SprucebotLlmBot,
         options?: SendMessageOptions
     ): Promise<string> {
-        const messageBuilder = OpenAiMessageBuilder.Builder(bot, {
-            memoryLimit: this.memoryLimit,
-        })
-        const messages = messageBuilder.buildMessages()
-
-        this.log?.info(
-            'Sending message to OpenAI',
-            JSON.stringify(messages, null, 2)
-        )
-
-        const params: ChatCompletionCreateParamsNonStreaming = {
-            messages,
+        return this.sender.sendMessage(bot, {
             model: this.model,
+            memoryLimit: this.memoryLimit,
+            reasoningEffort: this.getReasoningEffort(),
             ...options,
-        }
+        })
+    }
 
-        const reasoningEffort = this.getReasoningEffort()
-        if (reasoningEffort) {
-            params.reasoning_effort = reasoningEffort
-        }
+    private async sendHandler(
+        params: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming,
+        sendOptions: RequestOptions
+    ) {
+        const response = await this.api.chat.completions.create(
+            params,
+            sendOptions
+        )
+        const responseMessage = response.choices?.[0]?.message?.content?.trim()
 
-        try {
-            this.lastAbortController?.abort('Interrupted by new message')
-            this.lastAbortController = new OpenAiAdapter.AbortController()
-            const response = await this.api.chat.completions.create(params, {
-                signal: this.lastAbortController.signal,
-            })
-
-            delete this.lastAbortController
-
-            const message =
-                response.choices?.[0]?.message?.content?.trim() ??
-                MESSAGE_RESPONSE_ERROR_MESSAGE
-
-            this.log?.info('Received response from OpenAI', message)
-
-            return message
-        } catch (err: any) {
-            if (err instanceof APIUserAbortError) {
-                this.log?.info('OpenAI request was aborted')
-                return ''
-            }
-            throw err
-        }
+        return responseMessage
     }
 
     private getReasoningEffort() {
