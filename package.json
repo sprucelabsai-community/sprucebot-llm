@@ -65,6 +65,7 @@
     "chat.images": "node ./build/chatWithImages.js"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.74.0",
     "@sprucelabs/error": "^8.1.4",
     "@sprucelabs/mercury-event-emitter": "^46.1.2",
     "@sprucelabs/mercury-types": "^49.1.5",

@@ -6,10 +6,11 @@ import {
     ChatCompletionCreateParamsNonStreaming,
 } from 'openai/resources'
 import { SprucebotLlmBot, SendMessageOptions } from '../../llm.types'
-import OpenAiAdapter, { MESSAGE_RESPONSE_ERROR_MESSAGE } from './OpenAiAdapter'
+import { MESSAGE_RESPONSE_ERROR_MESSAGE } from './OpenAiAdapter'
 import OpenAiMessageBuilder from './OpenAiMessageBuilder'
 
 export default class MessageSenderImpl implements MessageSender {
+    public static AbortController = AbortController
     private log?: Log
     private lastAbortController?: AbortController
     private sendHandler: MessageSenderSendHandler
@@ -25,7 +26,7 @@ export default class MessageSenderImpl implements MessageSender {
 
     public async sendMessage(
         bot: SprucebotLlmBot,
-        options: SendMessageSendOptionsTbd
+        options: MessageSenderSendMessageOptions
     ): Promise<string> {
         const { memoryLimit, ...rest } = options
 
@@ -39,7 +40,7 @@ export default class MessageSenderImpl implements MessageSender {
 
         try {
             this.lastAbortController?.abort('Interrupted by new message')
-            this.lastAbortController = new OpenAiAdapter.AbortController()
+            this.lastAbortController = new MessageSenderImpl.AbortController()
 
             const response = await this.send({
                 messages,
@@ -51,7 +52,7 @@ export default class MessageSenderImpl implements MessageSender {
 
             const message = response ?? MESSAGE_RESPONSE_ERROR_MESSAGE
 
-            this.log?.info('Received response from OpenAI', message)
+            this.log?.info('Received response', message)
 
             return message
         } catch (err: any) {
@@ -97,11 +98,11 @@ export type MessageSenderSendHandler = (
 export interface MessageSender {
     sendMessage(
         bot: SprucebotLlmBot,
-        options: SendMessageSendOptionsTbd
+        options: MessageSenderSendMessageOptions
     ): Promise<string>
 }
 
-type SendMessageSendOptionsTbd = SendMessageOptions & {
+export type MessageSenderSendMessageOptions = SendMessageOptions & {
     memoryLimit?: number
     reasoningEffort?: ReasoningEffort
     model: string

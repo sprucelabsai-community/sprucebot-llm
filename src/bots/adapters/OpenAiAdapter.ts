@@ -16,7 +16,6 @@ export default class OpenAiAdapter implements LlmAdapter {
         options?: OpenAiAdapterOptions
     ) => OpenAiAdapter
     public static OpenAI = OpenAI
-    public static AbortController = AbortController
     private api: OpenAI
     private model = 'gpt-4o'
     private memoryLimit?: number

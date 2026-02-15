@@ -12,6 +12,7 @@ import {
     ChatCompletionMessageParam,
     ReasoningEffort,
 } from 'openai/resources'
+import MessageSenderImpl from '../../../bots/adapters/MessageSender'
 import OpenAiAdapter, {
     MESSAGE_RESPONSE_ERROR_MESSAGE,
     OpenAiAdapterOptions,
@@ -26,6 +27,7 @@ import {
 } from '../../../llm.types'
 import SpyLlmBot from '../../../tests/SpyLlmBot'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
+import { MockAbortController } from './MockAbortController'
 
 @suite()
 export default class OpenAiTest extends AbstractLlmTest {
@@ -43,7 +45,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         await super.beforeEach()
 
         MockAbortController.instances = []
-        OpenAiAdapter.AbortController = MockAbortController
+        MessageSenderImpl.AbortController = MockAbortController
         delete SpyOpenAiModule.errorToThrowOnCreate
 
         delete process.env.OPENAI_PAST_MESSAGE_MAX_CHARS
@@ -1141,61 +1143,3 @@ function generateBodyOfLength(length: number): string {
 }
 
 type SetterStrategy = 'env' | 'direct' | 'constructor'
-
-class MockAbortController implements AbortController {
-    public signal = new StubAbortSignal()
-    public static instances: MockAbortController[] = []
-    private wasAborted = false
-    private abortReason?: any
-
-    public constructor() {
-        MockAbortController.instances.push(this)
-    }
-
-    public abort(reason?: any): void {
-        this.abortReason = reason
-        this.wasAborted = true
-    }
-
-    public assertWasAborted() {
-        assert.isTrue(
-            this.wasAborted,
-            'Expected AbortController to have been aborted, but it was not.'
-        )
-    }
-
-    public assertWasNotAborted() {
-        assert.isFalse(
-            this.wasAborted,
-            'Expected AbortController to not have been aborted, but it was.'
-        )
-    }
-
-    public assertWasAbortedWithReason(expected: string) {
-        assert.isEqual(this.abortReason, expected, 'Wrong reason for abortion.')
-    }
-}
-
-class StubAbortSignal implements AbortSignal {
-    public aborted = false
-    public onabort: ((this: AbortSignal, ev: Event) => any) | null = null
-    public reason: any = undefined
-
-    public throwIfAborted(): void {}
-
-    public addEventListener(
-        _type: unknown,
-        _listener: unknown,
-        _options?: unknown
-    ): void {}
-
-    public removeEventListener(
-        _type: unknown,
-        _listener: unknown,
-        _options?: unknown
-    ): void {}
-
-    public dispatchEvent(_event: Event): boolean {
-        return true
-    }
-}
