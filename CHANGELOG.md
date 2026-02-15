@@ -1,3 +1,8 @@
+## 13.2.0 (2026-02-15)
+
+* minor: anthropic adapter ([9d8d889](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9d8d889))
+* patch: extracted out message sender ([a78cdab](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a78cdab))
+
 ## <small>13.1.10 (2026-02-11)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([053e1c5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/053e1c5))
