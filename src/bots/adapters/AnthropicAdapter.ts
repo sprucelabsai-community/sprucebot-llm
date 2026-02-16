@@ -2,7 +2,7 @@ import { assertOptions, Schema } from '@sprucelabs/schema'
 import { Log } from '@sprucelabs/spruce-skill-utils'
 import Anthropic from '@anthropic-ai/sdk'
 import { RequestOptions } from '@anthropic-ai/sdk/internal/request-options'
-import { MessageParam, TextBlock } from '@anthropic-ai/sdk/resources'
+import { MessageParam } from '@anthropic-ai/sdk/resources'
 import OpenAI from 'openai'
 import { RequestOptions as OpenAiRequestOptions } from 'openai/internal/request-options'
 import {
@@ -75,7 +75,10 @@ export default class AnthropicAdapter implements LlmAdapter {
             sendOptions as RequestOptions
         )
 
-        const text = (response.content?.[0] as TextBlock)?.text
+        const text = response.content.find(
+            (block) => block.type === 'text'
+        )?.text
+
         return text
     }
 

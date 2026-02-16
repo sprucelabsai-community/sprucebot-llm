@@ -101,12 +101,7 @@ export default class AthropicTest extends AbstractLlmTest {
             },
         ])
 
-        const response = await this.sendMessage()
-        assert.isEqual(
-            response,
-            expected,
-            'Adapter did not return first text block content'
-        )
+        await this.sendMessageAndAssertResponseEquals(expected)
     }
 
     @test()
@@ -171,6 +166,34 @@ export default class AthropicTest extends AbstractLlmTest {
         this.setReasoningEffort('none')
         await this.sendMessage()
         this.assertSentExpectedBodyToCreate()
+    }
+
+    @test()
+    protected async handlesTextBlockComingInSecond() {
+        const expected = generateId()
+        this.mockAnthropic.setResponseContent([
+            {
+                type: 'thinking',
+                signature: generateId(),
+                thinking: generateId(),
+            },
+            {
+                type: 'text',
+                text: expected,
+                citations: [],
+            },
+        ])
+
+        await this.sendMessageAndAssertResponseEquals(expected)
+    }
+
+    private async sendMessageAndAssertResponseEquals(expected: string) {
+        const response = await this.sendMessage()
+        assert.isEqual(
+            response,
+            expected,
+            'Adapter did not return first text block content'
+        )
     }
 
     private setReasoningEffort(effort: LllmReasoningEffort) {
