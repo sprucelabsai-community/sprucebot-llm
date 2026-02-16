@@ -11,6 +11,11 @@ import OpenAiMessageBuilder from './OpenAiMessageBuilder'
 
 export default class MessageSenderImpl implements MessageSender {
     public static AbortController = AbortController
+    public static Class: new (
+        send: MessageSenderSendHandler,
+        log?: Log
+    ) => MessageSender
+
     private log?: Log
     private lastAbortController?: AbortController
     private sendHandler: MessageSenderSendHandler
@@ -21,7 +26,7 @@ export default class MessageSenderImpl implements MessageSender {
     }
 
     public static Sender(send: MessageSenderSendHandler, log?: Log) {
-        return new this(send, log) as MessageSender
+        return new (this.Class ?? this)(send, log) as MessageSender
     }
 
     public async sendMessage(

@@ -15,8 +15,13 @@ import {
     Usage,
 } from '@anthropic-ai/sdk/resources/messages'
 
-import AthropicAdapter from '../../../bots/adapters/AthropicAdapter'
-import MessageSenderImpl from '../../../bots/adapters/MessageSender'
+import AnthropicAdapter, {
+    AnthropicAdapterOptions,
+} from '../../../bots/adapters/AnthropicAdapter'
+import MessageSenderImpl, {
+    MessageSender,
+    MessageSenderSendMessageOptions,
+} from '../../../bots/adapters/MessageSender'
 import OpenAiMessageBuilder from '../../../bots/adapters/OpenAiMessageBuilder'
 import { SendMessageOptions, SprucebotLlmBot } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
@@ -26,20 +31,18 @@ import { MockAbortController, StubAbortSignal } from './MockAbortController'
 export default class AthropicTest extends AbstractLlmTest {
     private bot!: SprucebotLlmBot
     private apiKey = generateId()
-    private anthropic!: AthropicAdapter
+    private anthropic!: AnthropicAdapter
     private messages!: OpenAiMessageBuilder
     private maxTokens = Date.now() * Math.random()
     private model = 'claude-sonnet-4-5'
 
     protected async beforeEach() {
         await super.beforeEach()
-        AthropicAdapter.Anthropic = MockAthropicModule
+        AnthropicAdapter.Anthropic = MockAthropicModule
         MockAbortController.instances = []
         MessageSenderImpl.AbortController = MockAbortController
 
-        this.anthropic = new AthropicAdapter(this.apiKey, {
-            maxTokens: this.maxTokens,
-        })
+        this.anthropic = this.Anthropic()
         this.bot = this.Bot()
         this.messages = OpenAiMessageBuilder.Builder(this.bot)
     }
@@ -47,7 +50,7 @@ export default class AthropicTest extends AbstractLlmTest {
     @test()
     protected async throwsWithMissing() {
         //@ts-ignore
-        const err = assert.doesThrow(() => new AthropicAdapter())
+        const err = assert.doesThrow(() => new AnthropicAdapter())
         errorAssert.assertError(err, 'MISSING_PARAMETERS', {
             parameters: ['apiKey', 'maxTokens'],
         })
@@ -122,6 +125,19 @@ export default class AthropicTest extends AbstractLlmTest {
         this.assertSentExpectedBodyToCreate()
     }
 
+    @test()
+    protected async passesThroughMemoryLimitToModuleFromConstructor() {
+        MessageSenderImpl.Class = MockMessegeSender
+        const memoryLimit = Math.round(Date.now() * Math.random())
+        this.anthropic = this.Anthropic({
+            memoryLimit,
+        })
+
+        await this.sendMessage()
+
+        MockMessegeSender.instance.assertSendReceivedMemoryLimit(memoryLimit)
+    }
+
     private assertSentExpectedBodyToCreate() {
         this.mockAnthropic.assertSendMessageBodyEquals({
             max_tokens: this.maxTokens,
@@ -155,6 +171,15 @@ export default class AthropicTest extends AbstractLlmTest {
 
     private async send(options?: SendMessageOptions) {
         return await this.anthropic.sendMessage(this.bot, options)
+    }
+
+    private Anthropic(
+        options?: Partial<AnthropicAdapterOptions>
+    ): AnthropicAdapter {
+        return new AnthropicAdapter(this.apiKey, {
+            maxTokens: this.maxTokens,
+            ...options,
+        })
     }
 
     private get mockAnthropic() {
@@ -240,6 +265,31 @@ class MockAthropicModule extends Anthropic {
             this.sendMessageOptions?.signal,
             expected,
             'Expected to pass the AbortController signal to messages.create()'
+        )
+    }
+}
+
+class MockMessegeSender implements MessageSender {
+    public static instance: MockMessegeSender
+    private sendOptions?: MessageSenderSendMessageOptions
+
+    public constructor() {
+        MockMessegeSender.instance = this
+    }
+
+    public async sendMessage(
+        _bot: SprucebotLlmBot,
+        options: MessageSenderSendMessageOptions
+    ): Promise<string> {
+        this.sendOptions = options
+        return generateId()
+    }
+
+    public assertSendReceivedMemoryLimit(memoryLimit: number) {
+        assert.isEqual(
+            this.sendOptions?.memoryLimit,
+            memoryLimit,
+            'Expected to receive memory limit in send options'
         )
     }
 }

@@ -1,4 +1,5 @@
 import { assertOptions, Schema } from '@sprucelabs/schema'
+import { Log } from '@sprucelabs/spruce-skill-utils'
 import Anthropic from '@anthropic-ai/sdk'
 import { RequestOptions } from '@anthropic-ai/sdk/internal/request-options'
 import { MessageParam, TextBlock } from '@anthropic-ai/sdk/resources'
@@ -12,21 +13,26 @@ import {
 } from '../../llm.types'
 import MessageSenderImpl, { MessageSender } from './MessageSender'
 
-export default class AthropicAdapter implements LlmAdapter {
+export default class AnthropicAdapter implements LlmAdapter {
     public static Anthropic = Anthropic
     private api: Anthropic
     private model = 'claude-sonnet-4-5'
     private maxTokens: number
     private sender: MessageSender
+    private memoryLimit?: number
 
-    public constructor(apiKey: string, options: { maxTokens: number }) {
+    public constructor(apiKey: string, options: AnthropicAdapterOptions) {
         assertOptions({ apiKey, maxTokens: options?.maxTokens }, [
             'apiKey',
             'maxTokens',
         ])
-        this.api = new AthropicAdapter.Anthropic({ apiKey })
-        this.maxTokens = options.maxTokens
-        this.sender = MessageSenderImpl.Sender(this.sendHandler.bind(this))
+
+        const { log, memoryLimit, maxTokens } = options
+
+        this.api = new AnthropicAdapter.Anthropic({ apiKey })
+        this.maxTokens = maxTokens
+        this.memoryLimit = memoryLimit
+        this.sender = MessageSenderImpl.Sender(this.sendHandler.bind(this), log)
     }
 
     public async sendMessage(
@@ -35,6 +41,7 @@ export default class AthropicAdapter implements LlmAdapter {
     ): Promise<string> {
         const text = await this.sender.sendMessage(bot, {
             model: this.model,
+            memoryLimit: this.memoryLimit,
             ...options,
         })
 
@@ -72,4 +79,12 @@ export default class AthropicAdapter implements LlmAdapter {
     }
 
     public setReasoningEffort(_effort: LllmReasoningEffort): void {}
+}
+
+export interface AnthropicAdapterOptions {
+    log?: Log
+    memoryLimit?: number
+    model?: string
+    baseUrl?: string
+    maxTokens: number
 }
