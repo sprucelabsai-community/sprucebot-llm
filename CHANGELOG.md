@@ -1,3 +1,8 @@
+## <small>13.2.3 (2026-02-16)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([266014f](https://github.com/sprucelabsai-community/sprucebot-llm/commit/266014f))
+* patch: anthropic handles thanking in response better ([873a426](https://github.com/sprucelabsai-community/sprucebot-llm/commit/873a426))
+
 ## <small>13.2.2 (2026-02-16)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([8f9a85d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/8f9a85d))
