@@ -20,6 +20,7 @@ export default class AnthropicAdapter implements LlmAdapter {
     private maxTokens: number
     private sender: MessageSender
     private memoryLimit?: number
+    private isThinkingEnabled = false
 
     public constructor(apiKey: string, options: AnthropicAdapterOptions) {
         assertOptions({ apiKey, maxTokens: options?.maxTokens }, [
@@ -27,11 +28,12 @@ export default class AnthropicAdapter implements LlmAdapter {
             'maxTokens',
         ])
 
-        const { log, memoryLimit, maxTokens } = options
+        const { log, memoryLimit, maxTokens, thinking } = options
 
         this.api = new AnthropicAdapter.Anthropic({ apiKey })
         this.maxTokens = maxTokens
         this.memoryLimit = memoryLimit
+        this.isThinkingEnabled = thinking ?? false
         this.sender = MessageSenderImpl.Sender(this.sendHandler.bind(this), log)
     }
 
@@ -66,6 +68,9 @@ export default class AnthropicAdapter implements LlmAdapter {
                 max_tokens: this.maxTokens,
                 model,
                 messages,
+                thinking: {
+                    type: this.isThinkingEnabled ? 'adaptive' : 'disabled',
+                },
             },
             sendOptions as RequestOptions
         )
@@ -78,7 +83,9 @@ export default class AnthropicAdapter implements LlmAdapter {
         this.model = model
     }
 
-    public setReasoningEffort(_effort: LllmReasoningEffort): void {}
+    public setReasoningEffort(effort: LllmReasoningEffort): void {
+        this.isThinkingEnabled = effort !== 'none'
+    }
 }
 
 export interface AnthropicAdapterOptions {
@@ -87,4 +94,5 @@ export interface AnthropicAdapterOptions {
     model?: string
     baseUrl?: string
     maxTokens: number
+    thinking?: boolean
 }

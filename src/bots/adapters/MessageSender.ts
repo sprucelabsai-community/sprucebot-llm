@@ -11,7 +11,7 @@ import OpenAiMessageBuilder from './OpenAiMessageBuilder'
 
 export default class MessageSenderImpl implements MessageSender {
     public static AbortController = AbortController
-    public static Class: new (
+    public static Class?: new (
         send: MessageSenderSendHandler,
         log?: Log
     ) => MessageSender

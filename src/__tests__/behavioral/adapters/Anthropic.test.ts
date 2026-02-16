@@ -18,14 +18,16 @@ import {
 import AnthropicAdapter, {
     AnthropicAdapterOptions,
 } from '../../../bots/adapters/AnthropicAdapter'
-import MessageSenderImpl, {
-    MessageSender,
-    MessageSenderSendMessageOptions,
-} from '../../../bots/adapters/MessageSender'
+import MessageSenderImpl from '../../../bots/adapters/MessageSender'
 import OpenAiMessageBuilder from '../../../bots/adapters/OpenAiMessageBuilder'
-import { SendMessageOptions, SprucebotLlmBot } from '../../../llm.types'
+import {
+    LllmReasoningEffort,
+    SendMessageOptions,
+    SprucebotLlmBot,
+} from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { MockAbortController, StubAbortSignal } from './MockAbortController'
+import MockMessegeSender from './MockMessageSender'
 
 @suite()
 export default class AthropicTest extends AbstractLlmTest {
@@ -35,12 +37,14 @@ export default class AthropicTest extends AbstractLlmTest {
     private messages!: OpenAiMessageBuilder
     private maxTokens = Date.now() * Math.random()
     private model = 'claude-sonnet-4-5'
+    private isThinkingEnabled = false
 
     protected async beforeEach() {
         await super.beforeEach()
         AnthropicAdapter.Anthropic = MockAthropicModule
         MockAbortController.instances = []
         MessageSenderImpl.AbortController = MockAbortController
+        delete MessageSenderImpl.Class
 
         this.anthropic = this.Anthropic()
         this.bot = this.Bot()
@@ -138,11 +142,50 @@ export default class AthropicTest extends AbstractLlmTest {
         MockMessegeSender.instance.assertSendReceivedMemoryLimit(memoryLimit)
     }
 
+    @test()
+    protected async thinkingThrouhConstructorPassesThrough() {
+        this.isThinkingEnabled = true
+
+        this.anthropic = this.Anthropic({
+            thinking: true,
+        })
+
+        await this.sendMessage()
+
+        this.assertSentExpectedBodyToCreate()
+    }
+
+    @test('enables thinking with reasoning effort high', 'high')
+    @test('enables thinking with reasoning effort medium', 'medium')
+    protected async canEnableThinkingWithPublicSetter(
+        effort: LllmReasoningEffort
+    ) {
+        this.setReasoningEffort(effort)
+        await this.sendMessage()
+        this.assertSentExpectedBodyToCreate()
+    }
+
+    @test()
+    protected async canDisableThinkingWithPublicSetter() {
+        this.setReasoningEffort('high')
+        this.setReasoningEffort('none')
+        await this.sendMessage()
+        this.assertSentExpectedBodyToCreate()
+    }
+
+    private setReasoningEffort(effort: LllmReasoningEffort) {
+        this.isThinkingEnabled = effort !== 'none'
+        this.anthropic.setReasoningEffort(effort)
+    }
+
     private assertSentExpectedBodyToCreate() {
         this.mockAnthropic.assertSendMessageBodyEquals({
             max_tokens: this.maxTokens,
             model: this.model,
             messages: this.expectedMessages,
+            thinking: !this.isThinkingEnabled
+                ? { type: 'disabled' }
+                : { type: 'adaptive' },
         })
     }
 
@@ -265,31 +308,6 @@ class MockAthropicModule extends Anthropic {
             this.sendMessageOptions?.signal,
             expected,
             'Expected to pass the AbortController signal to messages.create()'
-        )
-    }
-}
-
-class MockMessegeSender implements MessageSender {
-    public static instance: MockMessegeSender
-    private sendOptions?: MessageSenderSendMessageOptions
-
-    public constructor() {
-        MockMessegeSender.instance = this
-    }
-
-    public async sendMessage(
-        _bot: SprucebotLlmBot,
-        options: MessageSenderSendMessageOptions
-    ): Promise<string> {
-        this.sendOptions = options
-        return generateId()
-    }
-
-    public assertSendReceivedMemoryLimit(memoryLimit: number) {
-        assert.isEqual(
-            this.sendOptions?.memoryLimit,
-            memoryLimit,
-            'Expected to receive memory limit in send options'
         )
     }
 }
