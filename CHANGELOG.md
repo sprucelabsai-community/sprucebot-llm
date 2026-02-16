@@ -1,3 +1,8 @@
+## <small>13.2.2 (2026-02-16)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([8f9a85d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/8f9a85d))
+* patch: reasoning effort mapped to thinking, anthropic at 100% adapter interface support ([e7ea003](https://github.com/sprucelabsai-community/sprucebot-llm/commit/e7ea003))
+
 ## <small>13.2.1 (2026-02-16)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([0970d77](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0970d77))
