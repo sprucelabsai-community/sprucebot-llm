@@ -21,6 +21,7 @@ export default class AnthropicAdapter implements LlmAdapter {
     private sender: MessageSender
     private memoryLimit?: number
     private isThinkingEnabled = false
+    private log?: Log
 
     public constructor(apiKey: string, options: AnthropicAdapterOptions) {
         assertOptions({ apiKey, maxTokens: options?.maxTokens }, [
@@ -34,6 +35,7 @@ export default class AnthropicAdapter implements LlmAdapter {
         this.maxTokens = maxTokens
         this.memoryLimit = memoryLimit
         this.isThinkingEnabled = thinking ?? false
+        this.log = log?.buildLog('AnthropicAdapter')
         this.sender = MessageSenderImpl.Sender(this.sendHandler.bind(this), log)
     }
 
@@ -75,9 +77,16 @@ export default class AnthropicAdapter implements LlmAdapter {
             sendOptions as RequestOptions
         )
 
-        const text = response.content.find(
-            (block) => block.type === 'text'
-        )?.text
+        this.log?.info(
+            'Received response from Anthropic',
+            JSON.stringify(response, null, 2)
+        )
+
+        const text = response.content
+            .filter((block) => block.type === 'text')
+            ?.map((block) => block.text)
+            .join('')
+            .trim()
 
         return text
     }

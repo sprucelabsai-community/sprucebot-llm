@@ -93,7 +93,7 @@ export default class AthropicTest extends AbstractLlmTest {
     @test()
     protected async returnsMessageFromAdapter() {
         const expected = generateId()
-        this.mockAnthropic.setResponseContent([
+        this.setResponseContent([
             {
                 type: 'text',
                 text: expected,
@@ -171,7 +171,7 @@ export default class AthropicTest extends AbstractLlmTest {
     @test()
     protected async handlesTextBlockComingInSecond() {
         const expected = generateId()
-        this.mockAnthropic.setResponseContent([
+        this.setResponseContent([
             {
                 type: 'thinking',
                 signature: generateId(),
@@ -185,6 +185,45 @@ export default class AthropicTest extends AbstractLlmTest {
         ])
 
         await this.sendMessageAndAssertResponseEquals(expected)
+    }
+
+    @test()
+    protected async combinesMultipleTextBlocks() {
+        const expected1 = generateId()
+        const expected2 = generateId()
+
+        this.setResponseContent([
+            {
+                type: 'text',
+                text: expected1,
+                citations: [],
+            },
+            {
+                type: 'text',
+                text: expected2,
+                citations: [],
+            },
+        ])
+
+        await this.sendMessageAndAssertResponseEquals(expected1 + expected2)
+    }
+
+    @test()
+    protected async trimsTextBlocks() {
+        const expected = '\n\n' + generateId() + '   \n'
+        this.setResponseContent([
+            {
+                type: 'text',
+                text: expected,
+                citations: [],
+            },
+        ])
+
+        await this.sendMessageAndAssertResponseEquals(expected.trim())
+    }
+
+    private setResponseContent(content: ContentBlock[]) {
+        this.mockAnthropic.setResponseContent(content)
     }
 
     private async sendMessageAndAssertResponseEquals(expected: string) {
