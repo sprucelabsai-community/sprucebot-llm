@@ -1,3 +1,8 @@
+## <small>13.2.4 (2026-02-16)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([0409dd1](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0409dd1))
+* patch: better handling of anthropic response ([94771ff](https://github.com/sprucelabsai-community/sprucebot-llm/commit/94771ff))
+
 ## <small>13.2.3 (2026-02-16)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([266014f](https://github.com/sprucelabsai-community/sprucebot-llm/commit/266014f))
