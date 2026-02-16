@@ -1,3 +1,8 @@
+## <small>13.2.1 (2026-02-16)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([0970d77](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0970d77))
+* patch: anthropic memory limit ([ebc45a3](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ebc45a3))
+
 ## 13.2.0 (2026-02-15)
 
 * minor: anthropic adapter ([9d8d889](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9d8d889))
