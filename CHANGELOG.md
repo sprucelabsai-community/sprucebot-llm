@@ -1,3 +1,8 @@
+## <small>13.2.5 (2026-02-18)</small>
+
+* patch: fix test failures ([50d0538](https://github.com/sprucelabsai-community/sprucebot-llm/commit/50d0538))
+* patch: upgrade dependencies and fix lint errors ([05804d3](https://github.com/sprucelabsai-community/sprucebot-llm/commit/05804d3))
+
 ## <small>13.2.4 (2026-02-16)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([0409dd1](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0409dd1))
