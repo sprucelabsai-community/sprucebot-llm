@@ -1,3 +1,8 @@
+## <small>13.3.1 (2026-02-18)</small>
+
+* chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([397d702](https://github.com/sprucelabsai-community/sprucebot-llm/commit/397d702))
+* chore(auto-upgrade): upgraded packages [upgrade-all] ([231b688](https://github.com/sprucelabsai-community/sprucebot-llm/commit/231b688))
+
 ## 13.3.0 (2026-02-18)
 
 * minor: will update state with blocking mechanism ([5445531](https://github.com/sprucelabsai-community/sprucebot-llm/commit/5445531))
