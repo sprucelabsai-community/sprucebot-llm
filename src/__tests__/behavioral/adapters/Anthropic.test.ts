@@ -308,6 +308,7 @@ class MockAthropicModule extends Anthropic {
         role: 'assistant',
         type: 'message',
         usage: {} as Usage,
+        container: null,
     }
     private constructorOptions?: ClientOptions
     private didCreateMessage = false
