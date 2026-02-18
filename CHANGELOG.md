@@ -1,3 +1,7 @@
+## 13.3.0 (2026-02-18)
+
+* minor: will update state with blocking mechanism ([5445531](https://github.com/sprucelabsai-community/sprucebot-llm/commit/5445531))
+
 ## <small>13.2.8 (2026-02-18)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([b7e8ebe](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b7e8ebe))
