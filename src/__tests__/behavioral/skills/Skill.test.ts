@@ -164,6 +164,79 @@ export default class SkillTest extends AbstractLlmTest {
     }
 
     @test()
+    protected async emitsWillUpdateState() {
+        const changes = {
+            firstName: generateId(),
+        }
+
+        this.skill = this.Skill({
+            stateSchema: personSchema,
+        })
+
+        let passedUpdates: Record<string, any> = {}
+        await this.skill.on('will-update-state', ({ updates }) => {
+            passedUpdates = updates
+        })
+
+        await this.updateState(changes)
+
+        assert.isEqualDeep(passedUpdates, changes, 'updates were not passed')
+    }
+
+    @test()
+    protected async throwingInWillUpdateBlocksStateUpdate() {
+        this.skill = this.Skill({
+            stateSchema: personSchema,
+        })
+
+        await this.updateState({
+            firstName: 'Taylor',
+        })
+
+        await this.skill.on('will-update-state', () => {
+            throw new Error('nope')
+        })
+
+        await assert.doesThrowAsync(() =>
+            this.updateState({
+                firstName: 'NotTaylor',
+            })
+        )
+
+        const state = this.skill.getState() as SchemaPartialValues<
+            typeof personSchema
+        >
+        assert.isEqual(
+            state?.firstName,
+            'Taylor',
+            'state was updated when it should not have been'
+        )
+    }
+
+    @test()
+    protected async willUpdateNotHitIfStateInvalid() {
+        this.skill = this.Skill({
+            stateSchema: personSchema,
+        })
+
+        let wasHit = false
+        await this.skill.on('will-update-state', () => {
+            wasHit = true
+        })
+
+        await assert.doesThrowAsync(() =>
+            this.updateState({
+                taco: 123,
+            })
+        )
+
+        assert.isFalse(
+            wasHit,
+            'will-update-state was hit when it should not have been'
+        )
+    }
+
+    @test()
     protected async skillCanSetModel() {
         const model = generateId()
         this.skill = this.Skill({

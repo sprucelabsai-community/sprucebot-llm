@@ -8,6 +8,9 @@ export default class InternalStateUpdater {
         updates: Record<string, any>
     ) {
         validateSchemaValues(skill.getStateSchema()!, updates)
+
+        await skill.emitAndFlattenResponses('will-update-state', { updates })
+
         const state = { ...skill.getState(), ...updates }
         const normalized = normalizeSchemaValues(
             skill.getStateSchema()!,

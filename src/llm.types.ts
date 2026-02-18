@@ -2,7 +2,12 @@ import {
     buildEventContract,
     MercuryEventEmitter,
 } from '@sprucelabs/mercury-types'
-import { Schema, SchemaValues, SelectFieldDefinition } from '@sprucelabs/schema'
+import {
+    buildSchema,
+    Schema,
+    SchemaValues,
+    SelectFieldDefinition,
+} from '@sprucelabs/schema'
 import { ReasoningEffort } from 'openai/resources'
 
 export interface BotOptions<
@@ -66,6 +71,20 @@ export interface SerializedBot<
 export const llmEventContract = buildEventContract({
     eventSignatures: {
         'did-update-state': {},
+        'will-update-state': {
+            emitPayloadSchema: buildSchema({
+                id: 'willUpdateStateEmitPayload',
+                fields: {
+                    updates: {
+                        type: 'raw',
+                        isRequired: true,
+                        options: {
+                            valueType: 'Record<string, any>',
+                        },
+                    },
+                },
+            }),
+        },
     },
 })
 
