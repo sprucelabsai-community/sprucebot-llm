@@ -278,13 +278,11 @@ export default class AthropicTest extends AbstractLlmTest {
         return await this.anthropic.sendMessage(this.bot, options)
     }
 
-    private Anthropic(
-        options?: Partial<AnthropicAdapterOptions>
-    ): AnthropicAdapter {
+    private Anthropic(options?: Partial<AnthropicAdapterOptions>) {
         return AnthropicAdapter.Adapter(this.apiKey, {
             maxTokens: this.maxTokens,
             ...options,
-        })
+        }) as AnthropicAdapter
     }
 
     private get mockAnthropic() {

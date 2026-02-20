@@ -21,7 +21,7 @@ export default class OllamaTest extends AbstractLlmTest {
         await super.beforeEach()
 
         OpenAiAdapter.Class = SpyLlmAdapter
-        this.ollama = OllamaAdapter.Adapter()
+        this.ollama = OllamaAdapter.Adapter() as OllamaAdapter
         this.bot = new SpyLlmBot({
             adapter: this.ollama,
             youAre: generateId(),
@@ -79,7 +79,7 @@ export default class OllamaTest extends AbstractLlmTest {
 
     @test()
     protected async thinkingPassedToSendMessage() {
-        this.ollama = OllamaAdapter.Adapter({ think: true })
+        this.ollama = OllamaAdapter.Adapter({ think: true }) as OllamaAdapter
         await this.sendMessage()
         this.assertSentWithThinking()
     }
@@ -123,6 +123,7 @@ export default class OllamaTest extends AbstractLlmTest {
 
     private assertThinkingEquals(expected: boolean) {
         assert.isEqual(
+            //@ts-ignore
             this.lastSendMessageOptions.think,
             expected,
             'Think not passed correctly'

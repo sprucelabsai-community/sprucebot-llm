@@ -44,7 +44,7 @@ export default class AnthropicAdapter implements LlmAdapter {
     }
 
     public static Adapter(apiKey: string, options: AnthropicAdapterOptions) {
-        return new this(apiKey, options)
+        return new (this.Class ?? this)(apiKey, options)
     }
 
     public async sendMessage(

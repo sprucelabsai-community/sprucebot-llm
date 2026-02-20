@@ -1,4 +1,3 @@
-import { assertOptions } from '@sprucelabs/schema'
 import {
     test,
     suite,
@@ -6,11 +5,16 @@ import {
     errorAssert,
     generateId,
 } from '@sprucelabs/test-utils'
-import AnthropicAdapter from '../../../bots/adapters/AnthropicAdapter'
+import AnthropicAdapter, {
+    AnthropicAdapterOptions,
+} from '../../../bots/adapters/AnthropicAdapter'
+import LlmAdapterLoader from '../../../bots/adapters/LlmAdapterLoader'
+import OllamaAdapter, {
+    OllamaAdapterOptions,
+} from '../../../bots/adapters/OllamaAdapter'
 import OpenAiAdapter, {
     OpenAiAdapterOptions,
 } from '../../../bots/adapters/OpenAiAdapter'
-import SpruceError from '../../../errors/SpruceError'
 import { LllmReasoningEffort } from '../../../llm.types'
 import SpyLlmAdapter from '../../../tests/SpyAdapter'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
@@ -24,9 +28,13 @@ export default class AdapterLoaderTest extends AbstractLlmTest {
         process.env.SPRUCE_LLM_MEMORY_LIMIT = `${Math.floor(Math.random() * 1000)}`
         process.env.SPRUCE_LLM_MODEL = generateId()
         process.env.SPRUCE_LLM_REASONING_EFFORT = generateId()
+        process.env.SPRUCE_LLM_MAX_TOKENS = `${Math.floor(Math.random() * 1000)}`
+        process.env.SPRUCE_LLM_THINKING = 'true'
+        process.env.SPRUCE_LLM_BASE_URL = generateId()
 
         OpenAiAdapter.Class = SpyLlmAdapter
         AnthropicAdapter.Class = SpyLlmAdapter
+        OllamaAdapter.Class = SpyLlmAdapter
     }
 
     @test()
@@ -67,9 +75,10 @@ export default class AdapterLoaderTest extends AbstractLlmTest {
         )
     }
 
-    @test()
-    protected async passesApiKeyToTheAdapter() {
-        const adapter = this.Adapter('OpenAi')
+    @test('passes through api key to OpenAi', 'OpenAi')
+    @test('passes through api key to Anthropic', 'Anthropic')
+    protected async passesApiKeyToTheAdapter(name: string) {
+        const adapter = this.Adapter(name)
         assert.isEqual(
             adapter.apiKey,
             process.env.SPRUCE_LLM_API_KEY,
@@ -78,7 +87,7 @@ export default class AdapterLoaderTest extends AbstractLlmTest {
     }
 
     @test()
-    protected async passesThroughOptionsToTheAdapter() {
+    protected async passesThroughOptionsToTheOpenAiAdapter() {
         const expected: OpenAiAdapterOptions = {
             memoryLimit: parseInt(process.env.SPRUCE_LLM_MEMORY_LIMIT!, 10),
             model: process.env.SPRUCE_LLM_MODEL,
@@ -88,6 +97,27 @@ export default class AdapterLoaderTest extends AbstractLlmTest {
         }
 
         const adapter = this.Adapter('OpenAi')
+
+        assert.isEqualDeep(
+            adapter.constructorOptions,
+            expected,
+            'Options not passed correctly to adapter'
+        )
+    }
+
+    @test('anthropic gets expected options with thinking true', 'true')
+    @test('anthropic gets expected options with thinking false', 'false')
+    protected async passesThroughOptionsToTheAnthropicAdapter(value: string) {
+        process.env.SPRUCE_LLM_THINKING = value
+        const expected: AnthropicAdapterOptions = {
+            baseUrl: process.env.SPRUCE_LLM_BASE_URL,
+            maxTokens: parseInt(process.env.SPRUCE_LLM_MAX_TOKENS!, 10),
+            memoryLimit: parseInt(process.env.SPRUCE_LLM_MEMORY_LIMIT!, 10),
+            thinking: process.env.SPRUCE_LLM_THINKING === 'true',
+            model: process.env.SPRUCE_LLM_MODEL,
+        }
+
+        const adapter = this.Adapter('Anthropic')
 
         assert.isEqualDeep(
             adapter.constructorOptions,
@@ -108,7 +138,60 @@ export default class AdapterLoaderTest extends AbstractLlmTest {
     }
 
     @test()
-    protected async passesApiKeyToAnthropicAdapter() {}
+    protected async canLoadAnthropicKey() {
+        delete AnthropicAdapter.Class
+
+        const adapter = this.Adapter('Anthropic')
+        assert.isInstanceOf(
+            adapter,
+            //@ts-ignore
+            AnthropicAdapter,
+            'Loader should return an instance of AnthropicAdapter'
+        )
+    }
+
+    @test()
+    protected async anthropicThrowsWithoutMaxTokens() {
+        delete process.env.SPRUCE_LLM_MAX_TOKENS
+        this.setLlmAdapter('Anthropic')
+        const err = this.assertLoaderThrows()
+        errorAssert.assertError(err, 'MISSING_PARAMETERS', {
+            parameters: ['env.SPRUCE_LLM_MAX_TOKENS'],
+        })
+    }
+
+    @test()
+    protected async canLoadOllammAdapter() {
+        delete OllamaAdapter.Class
+
+        const adapter = this.Adapter('Ollama')
+        assert.isInstanceOf(
+            adapter,
+            //@ts-ignore
+            OllamaAdapter,
+            'Loader should return an instance of OllamaAdapter'
+        )
+    }
+
+    @test('passes through options to OllamaAdapter with think true', 'true')
+    @test('passes through options to OllamaAdapter with think false', 'false')
+    protected async passesThroughOptionsToOllamaAdapter(think: string) {
+        process.env.SPRUCE_LLM_THINKING = think
+        const expected: OllamaAdapterOptions = {
+            baseUrl: process.env.SPRUCE_LLM_BASE_URL,
+            model: process.env.SPRUCE_LLM_MODEL,
+            think: process.env.SPRUCE_LLM_THINKING === 'true',
+            memoryLimit: parseInt(process.env.SPRUCE_LLM_MEMORY_LIMIT!, 10),
+        }
+
+        const adapter = this.Adapter('Ollama')
+
+        assert.isEqualDeep(
+            adapter.constructorOptions,
+            expected,
+            'Options not passed correctly to adapter'
+        )
+    }
 
     private Adapter(name: string) {
         this.setLlmAdapter(name)
@@ -122,46 +205,10 @@ export default class AdapterLoaderTest extends AbstractLlmTest {
     }
 
     private assertLoaderThrows() {
-        return assert.doesThrow(() => AdapterLoader.Loader())
+        return assert.doesThrow(() => LlmAdapterLoader.Loader())
     }
 
     private Loader() {
-        return AdapterLoader.Loader()
-    }
-}
-
-class AdapterLoader {
-    public static VALID_ADAPTERS = ['openai', 'anthropic', 'ollama']
-    public static Loader() {
-        const {
-            env: { SPRUCE_LLM_ADAPTER },
-        } = assertOptions(
-            {
-                env: process.env,
-            },
-            ['env.SPRUCE_LLM_ADAPTER']
-        )
-
-        const name = SPRUCE_LLM_ADAPTER!.toLowerCase()
-        if (!AdapterLoader.VALID_ADAPTERS.includes(name)) {
-            throw new SpruceError({
-                code: 'INVALID_LLM_ADAPTER',
-                adapter: SPRUCE_LLM_ADAPTER!,
-            })
-        }
-
-        return new this()
-    }
-
-    public Adapter() {
-        return OpenAiAdapter.Adapter(process.env.SPRUCE_LLM_API_KEY!, {
-            memoryLimit: process.env.SPRUCE_LLM_MEMORY_LIMIT
-                ? parseInt(process.env.SPRUCE_LLM_MEMORY_LIMIT!, 10)
-                : undefined,
-            model: process.env.SPRUCE_LLM_MODEL,
-            reasoningEffort: process.env
-                .SPRUCE_LLM_REASONING_EFFORT as LllmReasoningEffort,
-            baseUrl: process.env.SPRUCE_LLM_BASE_URL,
-        })
+        return LlmAdapterLoader.Loader()
     }
 }

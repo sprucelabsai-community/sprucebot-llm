@@ -1,4 +1,5 @@
 import { Schema } from '@sprucelabs/schema'
+import { Log } from '@sprucelabs/spruce-skill-utils'
 import {
     LlmAdapter,
     SprucebotLlmBot,
@@ -8,9 +9,15 @@ import {
 import OpenAiAdapter from './OpenAiAdapter'
 
 export default class OllamaAdapter implements LlmAdapter {
+    public static Class?: new (
+        apiKey: string,
+        options?: OllamaAdapterOptions
+    ) => LlmAdapter
+
     private openai: LlmAdapter
     private think: boolean
-    private constructor(options?: OllamaOptions) {
+
+    private constructor(_apiKey: string, options?: OllamaAdapterOptions) {
         this.think = options?.think ?? false
         this.openai = OpenAiAdapter.Adapter('***', {
             baseUrl: 'http://localhost:11434/v1',
@@ -18,8 +25,8 @@ export default class OllamaAdapter implements LlmAdapter {
         })
     }
 
-    public static Adapter(options?: OllamaOptions) {
-        return new this(options)
+    public static Adapter(options?: OllamaAdapterOptions) {
+        return new (this.Class ?? this)('***', options)
     }
 
     public async sendMessage(
@@ -38,8 +45,10 @@ export default class OllamaAdapter implements LlmAdapter {
     }
 }
 
-interface OllamaOptions {
+export interface OllamaAdapterOptions {
+    log?: Log
     model?: string
     think?: boolean
     baseUrl?: string
+    memoryLimit?: number
 }
