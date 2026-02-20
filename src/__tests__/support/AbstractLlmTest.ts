@@ -14,7 +14,7 @@ export default abstract class AbstractLlmTest extends AbstractSpruceTest {
         await super.beforeEach()
 
         this.youAre = generateId()
-        this.adapter = new SpyLlmAdapter()
+        this.adapter = new SpyLlmAdapter(generateId())
         this.bots = SprucebotLlmFactory.Factory(this.adapter)
 
         SprucebotLlmFactory.reset()

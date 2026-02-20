@@ -1123,7 +1123,10 @@ export default class OpenAiTest extends AbstractLlmTest {
     }
 
     private OpenAi(key?: string, options?: OpenAiAdapterOptions) {
-        return OpenAiAdapter.Adapter(key ?? generateId(), options)
+        return OpenAiAdapter.Adapter(
+            key ?? generateId(),
+            options
+        ) as OpenAiAdapter
     }
 
     private setupSpys() {

@@ -8,7 +8,7 @@ export default class SpyLlmBotTest extends AbstractLlmTest {
     @test()
     protected async spyBotInstanceSetToLastIntsance() {
         const options = {
-            adapter: new SpyLlmAdapter(),
+            adapter: new SpyLlmAdapter(generateId()),
             youAre: generateId(),
         }
         const spyLlmBot = new SpyLlmBot(options)

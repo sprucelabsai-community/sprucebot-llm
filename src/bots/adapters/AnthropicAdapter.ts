@@ -14,6 +14,10 @@ import {
 import MessageSenderImpl, { MessageSender } from './MessageSender'
 
 export default class AnthropicAdapter implements LlmAdapter {
+    public static Class?: new (
+        apiKey: string,
+        options?: AnthropicAdapterOptions
+    ) => LlmAdapter
     public static Anthropic = Anthropic
     private api: Anthropic
     private model = 'claude-sonnet-4-5'
@@ -23,7 +27,7 @@ export default class AnthropicAdapter implements LlmAdapter {
     private isThinkingEnabled = false
     private log?: Log
 
-    public constructor(apiKey: string, options: AnthropicAdapterOptions) {
+    private constructor(apiKey: string, options: AnthropicAdapterOptions) {
         assertOptions({ apiKey, maxTokens: options?.maxTokens }, [
             'apiKey',
             'maxTokens',
@@ -37,6 +41,10 @@ export default class AnthropicAdapter implements LlmAdapter {
         this.isThinkingEnabled = thinking ?? false
         this.log = log?.buildLog('AnthropicAdapter')
         this.sender = MessageSenderImpl.Sender(this.sendHandler.bind(this), log)
+    }
+
+    public static Adapter(apiKey: string, options: AnthropicAdapterOptions) {
+        return new this(apiKey, options)
     }
 
     public async sendMessage(

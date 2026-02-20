@@ -41,6 +41,10 @@ ${options.validCallbacks.map((name, idx) => `${idx + 1}: ${name}`).join('\n')}`
 
                 break
 
+            case 'INVALID_LLM_ADAPTER':
+                message = `SPRUCE_LLM_ADAPTER=${options.adapter} is not a valid adapter. Please set SPRUCE_LLM_ADAPTER to a valid adapter (OpenAi, Anthropic, Ollama) and try again.`
+                break
+
             default:
                 message = super.friendlyMessage()
         }

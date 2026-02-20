@@ -261,7 +261,7 @@ export default class SkillTest extends AbstractLlmTest {
     @test()
     protected async notSettingModelOnSkillDoesNotPassUndefined() {
         await this.sendRandomMessage()
-        const isIn = 'model' in (this.adapter.lastSendOptions || {})
+        const isIn = 'model' in (this.adapter.lastSendMessageOptions || {})
         assert.isFalse(isIn, 'model was passed when it should not have been')
     }
 
@@ -298,7 +298,7 @@ export default class SkillTest extends AbstractLlmTest {
     }
     private assertModelSentToAdapterEquals(model: string) {
         assert.isEqual(
-            this.adapter.lastSendOptions?.model,
+            this.adapter.lastSendMessageOptions?.model,
             model,
             'model sent to adapter does not match expected'
         )

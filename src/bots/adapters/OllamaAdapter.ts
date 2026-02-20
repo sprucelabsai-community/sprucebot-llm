@@ -8,7 +8,7 @@ import {
 import OpenAiAdapter from './OpenAiAdapter'
 
 export default class OllamaAdapter implements LlmAdapter {
-    private openai: OpenAiAdapter
+    private openai: LlmAdapter
     private think: boolean
     private constructor(options?: OllamaOptions) {
         this.think = options?.think ?? false

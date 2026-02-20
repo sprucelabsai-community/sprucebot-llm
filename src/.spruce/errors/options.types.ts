@@ -4,6 +4,9 @@ import { ErrorOptions as ISpruceErrorOptions} from "@sprucelabs/error"
 export interface NoBotInstanceSetErrorOptions extends SpruceErrors.SprucebotLlm.NoBotInstanceSet, ISpruceErrorOptions {
 	code: 'NO_BOT_INSTANCE_SET'
 }
+export interface InvalidLlmAdapterErrorOptions extends SpruceErrors.SprucebotLlm.InvalidLlmAdapter, ISpruceErrorOptions {
+	code: 'INVALID_LLM_ADAPTER'
+}
 export interface InvalidCallbackErrorOptions extends SpruceErrors.SprucebotLlm.InvalidCallback, ISpruceErrorOptions {
 	code: 'INVALID_CALLBACK'
 }
@@ -11,6 +14,6 @@ export interface CallbackErrorErrorOptions extends SpruceErrors.SprucebotLlm.Cal
 	code: 'CALLBACK_ERROR'
 }
 
-type ErrorOptions =  | NoBotInstanceSetErrorOptions  | InvalidCallbackErrorOptions  | CallbackErrorErrorOptions 
+type ErrorOptions =  | NoBotInstanceSetErrorOptions  | InvalidLlmAdapterErrorOptions  | InvalidCallbackErrorOptions  | CallbackErrorErrorOptions 
 
 export default ErrorOptions

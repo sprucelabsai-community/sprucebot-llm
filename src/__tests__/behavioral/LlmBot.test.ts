@@ -51,7 +51,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     protected async sendsItselfToTheLlmAdapter() {
         const message = generateId()
         await this.sendMessage(message)
-        assert.isEqual(this.adapter.lastBot, this.bot)
+        assert.isEqual(this.adapter.lastSendMessageBot, this.bot)
     }
 
     @test()
@@ -165,12 +165,12 @@ export default class LlmBotTest extends AbstractLlmTest {
 
     @test()
     protected async sendMessageReturnsResponseFromAdapter() {
-        this.adapter.messageResponse = generateId()
+        this.adapter.lastSendMessageResponse = generateId()
         const message = generateId()
         const response = await this.sendMessage(message)
         assert.isEqual(
             response,
-            this.adapter.messageResponse,
+            this.adapter.lastSendMessageResponse,
             'response returned from send message does not match what was returned from adapter'
         )
     }
@@ -178,7 +178,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     @test()
     protected async tracksMessageHistory() {
         const message = generateId()
-        this.adapter.messageResponse = generateId()
+        this.adapter.lastSendMessageResponse = generateId()
         await this.sendMessage(message)
         const { messages } = this.bot.serialize()
         assert.isEqualDeep(messages, [
@@ -188,13 +188,15 @@ export default class LlmBotTest extends AbstractLlmTest {
             },
             {
                 from: 'You',
-                message: this.adapter.messageResponse,
+                message: this.adapter.lastSendMessageResponse,
             },
         ])
     }
 
     @test()
     protected async trackedMessageUsesResponseFromAdapterNotParser() {
+        this.adapter.shouldRandomizeResponseMessage = false
+
         this.setupBotWithSkill({
             callbacks: {
                 helloWorld: {
@@ -204,7 +206,7 @@ export default class LlmBotTest extends AbstractLlmTest {
             },
         })
 
-        this.adapter.messageResponse =
+        this.adapter.lastSendMessageResponse =
             'should use this response to track message history'
         this.parser.response.message = generateId()
         await this.sendMessage(generateId())
@@ -232,11 +234,11 @@ export default class LlmBotTest extends AbstractLlmTest {
 
     @test()
     protected async botActuallySendsResponseToParser() {
-        this.adapter.messageResponse = generateId()
+        this.adapter.lastSendMessageResponse = generateId()
         await this.sendMessage(generateId())
         assert.isEqual(
             this.parser.lastMessage,
-            this.adapter.messageResponse,
+            this.adapter.lastSendMessageResponse,
             'parser did not receive message from adapter'
         )
     }
@@ -497,14 +499,15 @@ export default class LlmBotTest extends AbstractLlmTest {
         const response1 = generateId()
         const response2 = generateId()
 
-        this.adapter.messageResponse = response1
+        this.adapter.shouldRandomizeResponseMessage = false
+        this.adapter.lastSendMessageResponse = response1
         this.setParserResponseCallbackResults(functionCallResponse)
 
         let passedMessages: string[] = []
         const message = await this.sendRandomMessage((message) => {
             passedMessages.push(message)
             this.setParserResponseCallbackResults(undefined)
-            this.adapter.messageResponse = response2
+            this.adapter.lastSendMessageResponse = response2
         })
 
         assert.isEqualDeep(this.messages, [
@@ -586,8 +589,9 @@ export default class LlmBotTest extends AbstractLlmTest {
 
     @test()
     protected async responseThatThrowsIsStillTracked() {
+        this.adapter.shouldRandomizeResponseMessage = false
         const error = generateId()
-        this.adapter.messageResponse = generateId()
+        this.adapter.lastSendMessageResponse = generateId()
         this.parser.invalidParseErrorOnNextParse = error
         const initialMessage = generateId()
         await this.sendMessage(initialMessage)
@@ -601,7 +605,7 @@ export default class LlmBotTest extends AbstractLlmTest {
                 },
                 {
                     from: 'You',
-                    message: this.adapter.messageResponse,
+                    message: this.adapter.lastSendMessageResponse,
                 },
                 {
                     from: 'Api',
@@ -609,7 +613,7 @@ export default class LlmBotTest extends AbstractLlmTest {
                 },
                 {
                     from: 'You',
-                    message: this.adapter.messageResponse,
+                    message: this.adapter.lastSendMessageResponse,
                 },
             ],
             'Messages'
@@ -639,7 +643,7 @@ export default class LlmBotTest extends AbstractLlmTest {
 
     @test()
     protected async secondMessageSendingAfterFirstCausesFirstsResponseToBeIgnored() {
-        this.adapter.messageResponse = generateId()
+        this.adapter.lastSendMessageResponse = generateId()
         this.adapter.responseDelayMs = 10
 
         const promise = this.sendMessage('hey there!')
@@ -659,7 +663,7 @@ export default class LlmBotTest extends AbstractLlmTest {
                 },
                 {
                     from: 'You',
-                    message: this.adapter.messageResponse,
+                    message: this.adapter.lastSendMessageResponse,
                 },
             ],
             'only the second response should be recorded'

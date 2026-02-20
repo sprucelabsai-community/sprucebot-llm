@@ -1,3 +1,5 @@
+import { generateId } from '@sprucelabs/test-utils'
+import { OpenAiAdapterOptions } from '../bots/adapters/OpenAiAdapter'
 import {
     LllmReasoningEffort,
     LlmAdapter,
@@ -6,18 +8,29 @@ import {
 } from '../llm.types'
 
 export default class SpyLlmAdapter implements LlmAdapter {
-    public lastBot?: SprucebotLlmBot
+    public static instance: SpyLlmAdapter
+    public lastSendMessageBot?: SprucebotLlmBot
     public lastMessage?: string
-    public messageResponse = ''
-    public lastSendOptions?: SendMessageOptions
+    public lastSendMessageResponse = generateId()
+    public lastSendMessageOptions?: SendMessageOptions
     public responseDelayMs?: number
+    public manuallySetModel?: string
+    public apiKey: string
+    public constructorOptions?: OpenAiAdapterOptions
+    public shouldRandomizeResponseMessage = true
+
+    public constructor(apiKey: string, options?: OpenAiAdapterOptions) {
+        SpyLlmAdapter.instance = this
+        this.apiKey = apiKey
+        this.constructorOptions = options
+    }
 
     public async sendMessage(
         bot: SprucebotLlmBot,
         options?: SendMessageOptions
     ) {
-        this.lastBot = bot
-        this.lastSendOptions = options
+        this.lastSendMessageBot = bot
+        this.lastSendMessageOptions = options
 
         if (this.responseDelayMs) {
             await new Promise((resolve) =>
@@ -25,9 +38,15 @@ export default class SpyLlmAdapter implements LlmAdapter {
             )
         }
 
-        return this.messageResponse
+        if (this.shouldRandomizeResponseMessage) {
+            this.lastSendMessageResponse = generateId()
+        }
+        return this.lastSendMessageResponse
     }
 
-    public setModel(_model: string): void {}
+    public setModel(model: string): void {
+        this.manuallySetModel = model
+    }
+
     public setReasoningEffort(_effort: LllmReasoningEffort): void {}
 }

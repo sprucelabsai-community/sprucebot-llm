@@ -11,10 +11,10 @@ import {
 import MessageSenderImpl, { MessageSender } from './MessageSender'
 
 export default class OpenAiAdapter implements LlmAdapter {
-    public static Class: new (
+    public static Class?: new (
         apiKey: string,
         options?: OpenAiAdapterOptions
-    ) => OpenAiAdapter
+    ) => LlmAdapter
     public static OpenAI = OpenAI
     private api: OpenAI
     private model = 'gpt-4o'

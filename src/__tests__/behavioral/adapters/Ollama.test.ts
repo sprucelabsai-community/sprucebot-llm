@@ -8,6 +8,7 @@ import {
     SendMessageOptions,
     SprucebotLlmBot,
 } from '../../../llm.types'
+import SpyLlmAdapter from '../../../tests/SpyAdapter'
 import SpyLlmBot from '../../../tests/SpyLlmBot'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 
@@ -19,7 +20,7 @@ export default class OllamaTest extends AbstractLlmTest {
     protected async beforeEach() {
         await super.beforeEach()
 
-        OpenAiAdapter.Class = SpyOpenAiAdapter
+        OpenAiAdapter.Class = SpyLlmAdapter
         this.ollama = OllamaAdapter.Adapter()
         this.bot = new SpyLlmBot({
             adapter: this.ollama,
@@ -60,6 +61,7 @@ export default class OllamaTest extends AbstractLlmTest {
 
         assert.isEqualDeep(
             this.lastSendMessageOptions,
+            //@ts-ignore
             { ...options, think: false },
             'Options not passed correctly'
         )
@@ -70,7 +72,7 @@ export default class OllamaTest extends AbstractLlmTest {
         const response = await this.sendMessage()
         assert.isEqual(
             response,
-            this.spyOpenAi.lastMessageResponse,
+            this.spyOpenAi.lastSendMessageResponse,
             'sendMessage response not returned correctly'
         )
     }
@@ -141,10 +143,10 @@ export default class OllamaTest extends AbstractLlmTest {
 
     private get spyOpenAi() {
         assert.isTruthy(
-            SpyOpenAiAdapter.instance,
+            SpyLlmAdapter.instance,
             'No OpenAiAdapter instance created'
         )
-        return SpyOpenAiAdapter.instance
+        return SpyLlmAdapter.instance
     }
 
     private assertOpenAiConstructorOptionsEqual(options: OpenAiAdapterOptions) {
@@ -153,34 +155,5 @@ export default class OllamaTest extends AbstractLlmTest {
             { baseUrl: 'http://localhost:11434/v1', ...options },
             'Options not passed correctly to OpenAiAdapter'
         )
-    }
-}
-
-export class SpyOpenAiAdapter extends OpenAiAdapter {
-    public static instance: SpyOpenAiAdapter
-    public constructorOptions?: OpenAiAdapterOptions
-    public lastSendMessageBot?: SprucebotLlmBot
-    public lastSendMessageOptions?: SendMessageOptions & { think?: boolean }
-    public lastMessageResponse = generateId()
-    public manuallySetModel?: string
-
-    public constructor(apiKey: string, options?: OpenAiAdapterOptions) {
-        super(apiKey, options)
-        SpyOpenAiAdapter.instance = this
-        this.constructorOptions = options
-    }
-
-    public async sendMessage(
-        bot: SprucebotLlmBot,
-        options?: SendMessageOptions
-    ): Promise<string> {
-        this.lastSendMessageBot = bot
-        this.lastSendMessageOptions = options
-        this.lastMessageResponse = generateId()
-        return this.lastMessageResponse
-    }
-
-    public setModel(model: string): void {
-        this.manuallySetModel = model
     }
 }

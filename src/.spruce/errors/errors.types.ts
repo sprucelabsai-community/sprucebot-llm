@@ -7,6 +7,7 @@ import * as SpruceSchema from '@sprucelabs/schema'
 
 
 
+
 export declare namespace SpruceErrors.SprucebotLlm {
 
 	
@@ -23,6 +24,34 @@ export declare namespace SpruceErrors.SprucebotLlm {
 	}
 
 	export type NoBotInstanceSetEntity = SchemaEntity<SpruceErrors.SprucebotLlm.NoBotInstanceSetSchema>
+
+}
+
+
+export declare namespace SpruceErrors.SprucebotLlm {
+
+	
+	export interface InvalidLlmAdapter {
+		
+			
+			'adapter': string
+	}
+
+	export interface InvalidLlmAdapterSchema extends SpruceSchema.Schema {
+		id: 'invalidLlmAdapter',
+		namespace: 'SprucebotLlm',
+		name: 'Invalid Llm Adapter',
+		    fields: {
+		            /** . */
+		            'adapter': {
+		                type: 'text',
+		                isRequired: true,
+		                options: undefined
+		            },
+		    }
+	}
+
+	export type InvalidLlmAdapterEntity = SchemaEntity<SpruceErrors.SprucebotLlm.InvalidLlmAdapterSchema>
 
 }
 

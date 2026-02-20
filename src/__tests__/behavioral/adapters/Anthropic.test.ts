@@ -281,7 +281,7 @@ export default class AthropicTest extends AbstractLlmTest {
     private Anthropic(
         options?: Partial<AnthropicAdapterOptions>
     ): AnthropicAdapter {
-        return new AnthropicAdapter(this.apiKey, {
+        return AnthropicAdapter.Adapter(this.apiKey, {
             maxTokens: this.maxTokens,
             ...options,
         })
