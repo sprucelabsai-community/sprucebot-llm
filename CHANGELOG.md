@@ -1,3 +1,8 @@
+## 14.0.0 (2026-02-20)
+
+* major: adapter loader, anthropic uses builder method ([9d54300](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9d54300))
+* patch: adapter loader progress ([2bfd93f](https://github.com/sprucelabsai-community/sprucebot-llm/commit/2bfd93f))
+
 ## <small>13.3.1 (2026-02-18)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([397d702](https://github.com/sprucelabsai-community/sprucebot-llm/commit/397d702))
