@@ -1,3 +1,8 @@
+## <small>14.1.1 (2026-02-20)</small>
+
+* chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([9e44d5d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9e44d5d))
+* chore(auto-upgrade): upgraded packages [upgrade-all] ([d54156c](https://github.com/sprucelabsai-community/sprucebot-llm/commit/d54156c))
+
 ## 14.1.0 (2026-02-20)
 
 * minor: mock adapter loader ([0f0737c](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0f0737c))
