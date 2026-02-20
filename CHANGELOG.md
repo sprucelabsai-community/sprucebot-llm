@@ -1,3 +1,7 @@
+## 14.1.0 (2026-02-20)
+
+* minor: mock adapter loader ([0f0737c](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0f0737c))
+
 ## 14.0.0 (2026-02-20)
 
 * major: adapter loader, anthropic uses builder method ([9d54300](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9d54300))
