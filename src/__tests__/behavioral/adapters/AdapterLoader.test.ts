@@ -8,7 +8,7 @@ import {
 import AnthropicAdapter, {
     AnthropicAdapterOptions,
 } from '../../../bots/adapters/AnthropicAdapter'
-import LlmAdapterLoader from '../../../bots/adapters/LlmAdapterLoader'
+import LlmAdapterLoaderImpl from '../../../bots/adapters/LlmAdapterLoader'
 import OllamaAdapter, {
     OllamaAdapterOptions,
 } from '../../../bots/adapters/OllamaAdapter'
@@ -205,10 +205,10 @@ export default class AdapterLoaderTest extends AbstractLlmTest {
     }
 
     private assertLoaderThrows() {
-        return assert.doesThrow(() => LlmAdapterLoader.Loader())
+        return assert.doesThrow(() => LlmAdapterLoaderImpl.Loader())
     }
 
     private Loader() {
-        return LlmAdapterLoader.Loader()
+        return LlmAdapterLoaderImpl.Loader()
     }
 }
