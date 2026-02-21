@@ -1,3 +1,8 @@
+## <small>14.2.1 (2026-02-21)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([5892c73](https://github.com/sprucelabsai-community/sprucebot-llm/commit/5892c73))
+* patch: log ([5863384](https://github.com/sprucelabsai-community/sprucebot-llm/commit/5863384))
+
 ## 14.2.0 (2026-02-21)
 
 * minor: assert did not create adapter loader ([5cbdf28](https://github.com/sprucelabsai-community/sprucebot-llm/commit/5cbdf28))
