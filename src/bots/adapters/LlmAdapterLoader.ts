@@ -1,4 +1,5 @@
 import { assertOptions } from '@sprucelabs/schema'
+import { Log } from '@sprucelabs/spruce-skill-utils'
 import SpruceError from '../../errors/SpruceError'
 import { LllmReasoningEffort, LlmAdapter } from '../../llm.types'
 import AnthropicAdapter, { AnthropicAdapterOptions } from './AnthropicAdapter'
@@ -12,12 +13,14 @@ export default class LlmAdapterLoaderImpl implements LlmAdapterLoader {
     public static VALID_ADAPTERS = ['openai', 'anthropic', 'ollama']
 
     private adapterName: ValidAdapterName
+    private log?: Log
 
-    protected constructor(adapterName: ValidAdapterName) {
+    protected constructor(adapterName: ValidAdapterName, log?: Log) {
         this.adapterName = adapterName
+        this.log = log
     }
 
-    public static Loader() {
+    public static Loader(log?: Log) {
         const {
             env: { SPRUCE_LLM_ADAPTER },
         } = assertOptions(
@@ -44,7 +47,7 @@ export default class LlmAdapterLoaderImpl implements LlmAdapterLoader {
             )
         }
 
-        return new (this.Class ?? this)(name as ValidAdapterName)
+        return new (this.Class ?? this)(name as ValidAdapterName, log)
     }
 
     public Adapter() {
@@ -69,6 +72,7 @@ export default class LlmAdapterLoaderImpl implements LlmAdapterLoader {
                 ...options,
                 reasoningEffort: process.env
                     .SPRUCE_LLM_REASONING_EFFORT as LllmReasoningEffort,
+                log: this.log?.buildLog('OpenAiAdapter'),
             })
         },
         anthropic: (key: string, options: Record<string, any>) => {
@@ -76,12 +80,14 @@ export default class LlmAdapterLoaderImpl implements LlmAdapterLoader {
                 ...options,
                 thinking: process.env.SPRUCE_LLM_THINKING === 'true',
                 maxTokens: parseInt(process.env.SPRUCE_LLM_MAX_TOKENS!, 10),
+                log: this.log?.buildLog('AnthropicAdapter'),
             } as AnthropicAdapterOptions)
         },
         ollama: (_key: string, options: Record<string, any>) => {
             return OllamaAdapter.Adapter({
                 ...options,
                 think: process.env.SPRUCE_LLM_THINKING === 'true',
+                log: this.log?.buildLog('OllamaAdapter'),
             })
         },
     }

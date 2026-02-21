@@ -97,6 +97,7 @@ export default class AdapterLoaderTest extends AbstractLlmTest {
         }
 
         const adapter = this.Adapter('OpenAi')
+        delete adapter.constructorOptions?.log
 
         assert.isEqualDeep(
             adapter.constructorOptions,
@@ -118,6 +119,8 @@ export default class AdapterLoaderTest extends AbstractLlmTest {
         }
 
         const adapter = this.Adapter('Anthropic')
+
+        delete adapter.constructorOptions?.log
 
         assert.isEqualDeep(
             adapter.constructorOptions,
@@ -185,6 +188,8 @@ export default class AdapterLoaderTest extends AbstractLlmTest {
         }
 
         const adapter = this.Adapter('Ollama')
+
+        delete adapter.constructorOptions?.log
 
         assert.isEqualDeep(
             adapter.constructorOptions,
