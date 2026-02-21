@@ -76,12 +76,21 @@ export default class LlmAdapterLoaderImpl implements LlmAdapterLoader {
             })
         },
         anthropic: (key: string, options: Record<string, any>) => {
-            return AnthropicAdapter.Adapter(key, {
+            const opts = {
                 ...options,
                 thinking: process.env.SPRUCE_LLM_THINKING === 'true',
                 maxTokens: parseInt(process.env.SPRUCE_LLM_MAX_TOKENS!, 10),
+            } as AnthropicAdapterOptions
+
+            this.log?.info(
+                'Loading Anthropic adapter with options',
+                JSON.stringify(opts, null, 2)
+            )
+
+            return AnthropicAdapter.Adapter(key, {
+                ...opts,
                 log: this.log?.buildLog('AnthropicAdapter'),
-            } as AnthropicAdapterOptions)
+            })
         },
         ollama: (_key: string, options: Record<string, any>) => {
             return OllamaAdapter.Adapter({
