@@ -1,3 +1,7 @@
+## 14.2.0 (2026-02-21)
+
+* minor: assert did not create adapter loader ([5cbdf28](https://github.com/sprucelabsai-community/sprucebot-llm/commit/5cbdf28))
+
 ## <small>14.1.1 (2026-02-20)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([9e44d5d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/9e44d5d))
