@@ -18,6 +18,13 @@ export default class MockAdapterLoader implements LlmAdapterLoader {
         )
     }
 
+    public static assertWasNotCreated() {
+        assert.isFalsy(
+            this.instance,
+            'Expected not to have created an instance of LlmAdapterLoader'
+        )
+    }
+
     public Adapter(): LlmAdapter {
         this.lastAdapter = new SpyLlmAdapter('***')
         return this.lastAdapter

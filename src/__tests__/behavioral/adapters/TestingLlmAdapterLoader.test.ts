@@ -18,6 +18,7 @@ export default class TestingLlmAdapterLoaderTest extends AbstractLlmTest {
         this.assertWasNotCreated()
         LlmAdapterLoaderImpl.Loader()
         MockAdapterLoader.assertWasCreated()
+        assert.doesThrow(() => MockAdapterLoader.assertWasNotCreated())
     }
 
     @test()
@@ -51,5 +52,6 @@ export default class TestingLlmAdapterLoaderTest extends AbstractLlmTest {
     }
     private assertWasNotCreated() {
         assert.doesThrow(() => MockAdapterLoader.assertWasCreated())
+        MockAdapterLoader.assertWasNotCreated()
     }
 }
