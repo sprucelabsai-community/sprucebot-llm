@@ -1,3 +1,8 @@
+## <small>14.2.3 (2026-02-22)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([499c5a0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/499c5a0))
+* patch: model through to anthropic fixed ([ac40aff](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ac40aff))
+
 ## <small>14.2.2 (2026-02-21)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([4b8cc3a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4b8cc3a))
