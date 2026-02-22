@@ -473,7 +473,11 @@ export default class LlmBotTest extends AbstractLlmTest {
     protected async canClearMessageHistory() {
         await this.sendRandomMessage()
         this.bot.clearMessageHistory()
-        assert.isLength(this.messages, 0)
+        assert.isLength(
+            this.messages,
+            0,
+            'message history should be empty after clearing'
+        )
     }
 
     @test()
@@ -483,7 +487,11 @@ export default class LlmBotTest extends AbstractLlmTest {
         await this.sendMessage(generateId(), (message) => {
             passedMessage = message
         })
-        assert.isEqual(passedMessage, this.parserResponse)
+        assert.isEqual(
+            passedMessage,
+            this.parserResponse,
+            'message passed to callback does not match parser response'
+        )
     }
 
     @test()
@@ -510,24 +518,28 @@ export default class LlmBotTest extends AbstractLlmTest {
             this.adapter.lastSendMessageResponse = response2
         })
 
-        assert.isEqualDeep(this.messages, [
-            {
-                from: 'Me',
-                message,
-            },
-            {
-                from: 'You',
-                message: response1,
-            },
-            {
-                from: 'Api',
-                message: `API Results: ${functionCallResponse}`,
-            },
-            {
-                from: 'You',
-                message: response2,
-            },
-        ])
+        assert.isEqualDeep(
+            this.messages,
+            [
+                {
+                    from: 'Me',
+                    message,
+                },
+                {
+                    from: 'You',
+                    message: response1,
+                },
+                {
+                    from: 'Api',
+                    message: `API Results: ${functionCallResponse}`,
+                },
+                {
+                    from: 'You',
+                    message: response2,
+                },
+            ],
+            'Messages should include initial response and callback response in correct order'
+        )
 
         assert.isEqualDeep(
             passedMessages,
@@ -549,11 +561,15 @@ export default class LlmBotTest extends AbstractLlmTest {
             this.setParserResponseCallbackResults(undefined)
         })
 
-        assert.isEqualDeep(this.messages[2], {
-            from: 'Api',
-            message: `API Results: ${description}`,
-            imageBase64: base64Image,
-        })
+        assert.isEqualDeep(
+            this.messages[2],
+            {
+                from: 'Api',
+                message: `API Results: ${description}`,
+                imageBase64: base64Image,
+            },
+            'message from parser with image should be tracked with image details'
+        )
     }
 
     @test()

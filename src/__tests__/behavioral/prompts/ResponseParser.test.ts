@@ -590,6 +590,20 @@ export default class ResponseParserTest extends AbstractLlmTest {
         })
     }
 
+    @test()
+    protected async canHandleRawParameterType() {
+        await this.assertParsesAndCallsCallback({
+            callbackName: 'rawCallback',
+            parameters: [
+                {
+                    name: 'rawData',
+                    type: 'raw',
+                },
+            ],
+            message: `<<rawCallback>>${JSON.stringify({ rawData: { hello: 'world' } })}<</rawCallback>>`,
+        })
+    }
+
     private async assertParsesAndCallsCallback(options: {
         callbackName: string
         message: string

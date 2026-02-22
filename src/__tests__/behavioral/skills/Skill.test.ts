@@ -160,7 +160,11 @@ export default class SkillTest extends AbstractLlmTest {
             callbacks,
         })
 
-        assert.isEqualDeep(this.serialize().callbacks, callbacks)
+        assert.isEqualDeep(
+            this.serialize().callbacks,
+            callbacks,
+            'callbacks did not serialize correctly'
+        )
     }
 
     @test()

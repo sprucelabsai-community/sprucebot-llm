@@ -141,7 +141,14 @@ export type LlmCallbackParameter =
     | {
           name: string
           type:
-              | ('text' | 'number' | 'boolean' | 'dateMs' | 'dateTimeMs')
+              | (
+                    | 'text'
+                    | 'number'
+                    | 'boolean'
+                    | 'dateMs'
+                    | 'dateTimeMs'
+                    | 'raw'
+                )
               | (string & {})
           isRequired?: boolean
           description?: string
