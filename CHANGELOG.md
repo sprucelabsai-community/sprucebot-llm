@@ -1,3 +1,8 @@
+## <small>14.2.2 (2026-02-21)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([4b8cc3a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4b8cc3a))
+* patch: anthropic testing ([5b2808d](https://github.com/sprucelabsai-community/sprucebot-llm/commit/5b2808d))
+
 ## <small>14.2.1 (2026-02-21)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([5892c73](https://github.com/sprucelabsai-community/sprucebot-llm/commit/5892c73))
