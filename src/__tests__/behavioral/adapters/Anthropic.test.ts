@@ -222,6 +222,18 @@ export default class AthropicTest extends AbstractLlmTest {
         await this.sendMessageAndAssertResponseEquals(expected.trim())
     }
 
+    @test()
+    protected async canPassModelThroughConstructor() {
+        this.model = generateId()
+        this.anthropic = this.Anthropic({
+            model: this.model,
+        })
+
+        await this.sendMessage()
+
+        this.assertSentExpectedBodyToCreate()
+    }
+
     private setResponseContent(content: ContentBlock[]) {
         this.mockAnthropic.setResponseContent(content)
     }

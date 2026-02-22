@@ -33,10 +33,11 @@ export default class AnthropicAdapter implements LlmAdapter {
             'maxTokens',
         ])
 
-        const { log, memoryLimit, maxTokens, thinking } = options
+        const { log, memoryLimit, maxTokens, thinking, model } = options
 
         this.api = new AnthropicAdapter.Anthropic({ apiKey })
         this.maxTokens = maxTokens
+        this.model = model ?? this.model
         this.memoryLimit = memoryLimit
         this.isThinkingEnabled = thinking ?? false
         this.log = log?.buildLog('AnthropicAdapter')
