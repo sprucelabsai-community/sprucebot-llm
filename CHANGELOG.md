@@ -1,3 +1,7 @@
+## 14.3.0 (2026-02-22)
+
+* minor: raw field type ([321ce42](https://github.com/sprucelabsai-community/sprucebot-llm/commit/321ce42))
+
 ## <small>14.2.3 (2026-02-22)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([499c5a0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/499c5a0))
