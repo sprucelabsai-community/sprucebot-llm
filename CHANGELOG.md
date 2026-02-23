@@ -1,3 +1,8 @@
+## <small>14.3.1 (2026-02-23)</small>
+
+* chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([3ea6ab5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3ea6ab5))
+* chore(auto-upgrade): upgraded packages [upgrade-all] ([bb99e2f](https://github.com/sprucelabsai-community/sprucebot-llm/commit/bb99e2f))
+
 ## 14.3.0 (2026-02-22)
 
 * minor: raw field type ([321ce42](https://github.com/sprucelabsai-community/sprucebot-llm/commit/321ce42))
