@@ -5,7 +5,7 @@ import {
     errorAssert,
     generateId,
 } from '@sprucelabs/test-utils'
-import Anthropic, { ClientOptions } from '@anthropic-ai/sdk'
+import Anthropic, { APIUserAbortError, ClientOptions } from '@anthropic-ai/sdk'
 import { RequestOptions } from '@anthropic-ai/sdk/internal/request-options'
 import { Message } from '@anthropic-ai/sdk/resources'
 import {
@@ -45,6 +45,7 @@ export default class AthropicTest extends AbstractLlmTest {
         MockAbortController.instances = []
         MessageSenderImpl.AbortController = MockAbortController
         delete MessageSenderImpl.Class
+        delete MockAthropicModule.errorToThrowOnCreate
 
         this.anthropic = this.Anthropic()
         this.bot = this.Bot()
@@ -234,6 +235,12 @@ export default class AthropicTest extends AbstractLlmTest {
         this.assertSentExpectedBodyToCreate()
     }
 
+    @test()
+    protected async doesNotThrowIfAbortErrorThrown() {
+        MockAthropicModule.errorToThrowOnCreate = new APIUserAbortError()
+        await this.sendMessage()
+    }
+
     private setResponseContent(content: ContentBlock[]) {
         this.mockAnthropic.setResponseContent(content)
     }
@@ -309,6 +316,7 @@ export default class AthropicTest extends AbstractLlmTest {
 
 class MockAthropicModule extends Anthropic {
     public static instance: MockAthropicModule
+    public static errorToThrowOnCreate?: Error
     private fakedResponse: Message = {
         content: [],
         id: generateId(),
@@ -338,6 +346,11 @@ class MockAthropicModule extends Anthropic {
             this.sendMessageBody = body
             this.sendMessageOptions = options
             this.didCreateMessage = true
+
+            if (MockAthropicModule.errorToThrowOnCreate) {
+                throw MockAthropicModule.errorToThrowOnCreate
+            }
+
             return this.fakedResponse
         }
     }

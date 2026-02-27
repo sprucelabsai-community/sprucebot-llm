@@ -1,4 +1,5 @@
 import { Log } from '@sprucelabs/spruce-skill-utils'
+import { APIUserAbortError as AnthropicAbortError } from '@anthropic-ai/sdk'
 import OpenAI, { APIUserAbortError } from 'openai'
 import { RequestOptions } from 'openai/internal/request-options'
 import {
@@ -61,7 +62,10 @@ export default class MessageSenderImpl implements MessageSender {
 
             return message
         } catch (err: any) {
-            if (err instanceof APIUserAbortError) {
+            if (
+                err instanceof APIUserAbortError ||
+                err instanceof AnthropicAbortError
+            ) {
                 this.log?.info('Request was aborted')
                 return ''
             }
