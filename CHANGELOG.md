@@ -1,3 +1,7 @@
+## <small>14.3.3 (2026-02-27)</small>
+
+* patch: anthropic abort error ([ca90435](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ca90435))
+
 ## <small>14.3.2 (2026-02-24)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([b7c2974](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b7c2974))
