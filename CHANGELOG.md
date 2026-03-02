@@ -1,3 +1,7 @@
+## <small>14.3.4 (2026-03-02)</small>
+
+* patch: better handling of state throwing in will-update ([b26b594](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b26b594))
+
 ## <small>14.3.3 (2026-02-27)</small>
 
 * patch: anthropic abort error ([ca90435](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ca90435))
