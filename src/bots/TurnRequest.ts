@@ -1,3 +1,4 @@
+import SpruceError from '../errors/SpruceError'
 import {
     LlmAdapter,
     LlmCallbackMap,
@@ -73,7 +74,15 @@ export default class TurnRequest {
             state = parsed.state
             callbackResults = parsed.callbackResults
 
-            await this.optionallyUpdateState(state)
+            try {
+                await this.optionallyUpdateState(state)
+            } catch (err: any) {
+                throw new SpruceError({
+                    code: 'STATE_UPDATE_FAILED',
+                    friendlyMessage: `Updating state failed with error: ${err.message}`,
+                    originalError: err,
+                })
+            }
         } catch (err: any) {
             this.trackMessage({
                 from: 'You',
@@ -83,7 +92,7 @@ export default class TurnRequest {
             if (
                 err.options?.code === 'INVALID_CALLBACK' ||
                 err.options?.code === 'CALLBACK_ERROR' ||
-                err.options?.code === 'VALIDATION_FAILED'
+                err.options?.code === 'STATE_UPDATE_FAILED'
             ) {
                 return this.sendMessage(
                     { from: 'Api', message: `Error: ${err.message}` },

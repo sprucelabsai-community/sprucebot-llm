@@ -8,6 +8,27 @@ import * as SpruceSchema from '@sprucelabs/schema'
 
 
 
+
+export declare namespace SpruceErrors.SprucebotLlm {
+
+	
+	export interface StateUpdateFailed {
+		
+	}
+
+	export interface StateUpdateFailedSchema extends SpruceSchema.Schema {
+		id: 'stateUpdateFailed',
+		namespace: 'SprucebotLlm',
+		name: 'State Update Failed',
+		    fields: {
+		    }
+	}
+
+	export type StateUpdateFailedEntity = SchemaEntity<SpruceErrors.SprucebotLlm.StateUpdateFailedSchema>
+
+}
+
+
 export declare namespace SpruceErrors.SprucebotLlm {
 
 	

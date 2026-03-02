@@ -394,6 +394,16 @@ export default class LlmBotTest extends AbstractLlmTest {
     }
 
     @test()
+    protected async willUpdateStateThrowingIsCaughtAndSentBackToAdapter() {
+        this.setupWithStateSchema('skill', carSchema)
+        await this.bot.getSkill()?.on('will-update-state', () => {
+            throw new Error('nope')
+        })
+
+        await this.sendMessageWithBadStateResponseAndGetErrorSentToAdapter({})
+    }
+
+    @test()
     protected async doesntEmitDidChangeOnSkillIfStateIsNotOnSkill() {
         const skill = this.setupBotWithSkill({})
 

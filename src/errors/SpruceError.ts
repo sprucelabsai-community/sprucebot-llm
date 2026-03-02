@@ -45,6 +45,10 @@ ${options.validCallbacks.map((name, idx) => `${idx + 1}: ${name}`).join('\n')}`
                 message = `SPRUCE_LLM_ADAPTER=${options.adapter} is not a valid adapter. Please set SPRUCE_LLM_ADAPTER to a valid adapter (OpenAi, Anthropic, Ollama) and try again.`
                 break
 
+            case 'STATE_UPDATE_FAILED':
+                message = 'A State Update Failed just happened!'
+                break
+
             default:
                 message = super.friendlyMessage()
         }
