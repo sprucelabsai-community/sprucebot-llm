@@ -235,6 +235,26 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
+    @test()
+    protected async returnsExpectedCallbackInstructions() {
+        const actual = this.parser.getFunctionCallInstructions()
+        assert.isEqual(
+            actual,
+            `A function call is done using the following syntax:\n@callback { "name": "callbackName", "options": {} }\nMake sure to json encode the options and include the name of the callback you want to call. You can call as many callbacks as you want in a single response by including multiple @callback lines.`,
+            'Expected proper instructions for function calls in V2 parser'
+        )
+    }
+
+    @test()
+    protected async returnsExpectedStateUpdateInstructions() {
+        const actual = this.parser.getStateUpdateInstructions()
+        assert.isEqual(
+            actual,
+            'Updating state works similar to all function calls. Use the following syntax:\n@updateState { "updates": "here" }\n. Make sure to json encode only the fields you want to change. You can update state once and do it at the end of any messages you send.',
+            'Expected proper instructions for state updates in V2 parser'
+        )
+    }
+
     private renderCallbackResults(options: Record<string, any>) {
         return `@results ${JSON.stringify(options)}\n`
     }
@@ -247,3 +267,5 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         return `\n@updateState ${JSON.stringify(input)}\n`
     }
 }
+
+//`Send updates to me in json format (something it can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by the State Boundary (${STATE_BOUNDARY}), like this:\n\n${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`

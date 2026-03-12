@@ -12,7 +12,6 @@ import {
     ChatCompletionMessageParam,
     ReasoningEffort,
 } from 'openai/resources'
-import { parserInstructions } from '../../../bots/adapters/MessageBuilder'
 import MessageSenderImpl from '../../../bots/adapters/MessageSender'
 import OpenAiAdapter, {
     MESSAGE_RESPONSE_ERROR_MESSAGE,
@@ -27,6 +26,7 @@ import {
     SendMessageOptions,
     SkillOptions,
 } from '../../../llm.types'
+import ResponseParserFactory from '../../../parsingResponses/ResponseParserFactory'
 import SpyLlmBot from '../../../tests/SpyLlmBot'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
 import { MockAbortController } from './MockAbortController'
@@ -45,6 +45,8 @@ export default class OpenAiTest extends AbstractLlmTest {
 
     protected async beforeEach() {
         await super.beforeEach()
+
+        ResponseParserFactory.version = 'v1'
 
         MockAbortController.instances = []
         MessageSenderImpl.AbortController = MockAbortController
@@ -1173,3 +1175,6 @@ function generateBodyOfLength(length: number): string {
 }
 
 type SetterStrategy = 'env' | 'direct' | 'constructor'
+
+export const parserInstructions = `A function call looks like this: <<FunctionName/>>. The API will respond with the results and then you can continue the conversation with your new knowledge. If the api call has parameters, call it like this: <<FunctionName>>{{parametersJsonEncoded}}<</FunctionName>>. Make sure to json encode the data and drop it between the function tags. Note: You can only make one API call at a time`
+export const stateUpdateInstructions = `Send updates to me in json format (something it can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by the State Boundary (${STATE_BOUNDARY}), like this:\n\n${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`

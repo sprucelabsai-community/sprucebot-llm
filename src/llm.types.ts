@@ -170,6 +170,8 @@ export type LllmReasoningEffort = ReasoningEffort
 
 export interface ResponseParser {
     parse(response: string, callbacks?: LlmCallbackMap): Promise<ParsedResponse>
+    getStateUpdateInstructions(): string
+    getFunctionCallInstructions(): string
 }
 
 export interface ParsedResponse {

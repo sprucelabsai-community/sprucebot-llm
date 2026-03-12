@@ -23,6 +23,7 @@ import AbstractResponseParserTest from './AbstractResponseParserTest'
 export default class ResponseParserTest extends AbstractResponseParserTest {
     protected async beforeEach() {
         await super.beforeEach()
+        ResponseParserFactory.version = 'v1'
         this.parser = ResponseParserFactory.getInstance()
     }
 
