@@ -21,7 +21,7 @@ jobs:
       - spruce/merge_auto_upgrade
   npm_publish:
     docker:
-      - image: cimg/node:lts
+      - image: cimg/node:22.14
     working_directory: /mnt/ramdisk
     steps:
       - run:
@@ -33,6 +33,12 @@ jobs:
       - checkout
       - spruce/check_and_skip_if_npm_publish
       - spruce/install_rsync
+      - run:
+          name: Prepare npm trusted publishing auth
+          command: |
+            echo 'unset NPM_TOKEN' >> "$BASH_ENV"
+            echo 'export NPM_CONFIG_PROVENANCE=true' >> "$BASH_ENV"
+            echo 'export NPM_ID_TOKEN=$(circleci run oidc get --claims '\''{"aud":"npm:registry.npmjs.org"}'\'')' >> "$BASH_ENV"
       - spruce/install_deps_build_dist_release
   upgrade:
     docker:
