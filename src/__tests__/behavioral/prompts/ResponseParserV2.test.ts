@@ -147,8 +147,13 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         })
 
         const callbackOptions = { input: generateId() }
-        await this.parse(
+        const results = await this.parse(
             this.renderCallback({ name: 'test', options: callbackOptions })
+        )
+
+        assert.isNull(
+            results.message,
+            'Expected message to be null when only text is callback'
         )
 
         assert.isEqualDeep(
@@ -255,12 +260,31 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
+    @test()
+    protected async stripsOutCallbacksFromMessage() {
+        this.setCallback('test', {
+            cb: () => {
+                return 'callback result'
+            },
+            useThisWhenever: 'you are asking for something.',
+        })
+
+        const message = `This is a message with a callback.${this.renderCallback({ name: 'test' })} Did it work?`
+        const results = await this.parse(message)
+
+        assert.isEqual(
+            results.message,
+            'This is a message with a callback.Did it work?',
+            'Expected callback to be stripped out of message'
+        )
+    }
+
     private renderCallbackResults(options: Record<string, any>) {
         return `@results ${JSON.stringify(options)}\n`
     }
 
     private renderCallback(options: Record<string, any>): string {
-        return `@callback ${JSON.stringify(options)}\n`
+        return `\n@callback ${JSON.stringify(options)}\n`
     }
 
     protected generateUpdateStateSchemaSyntax(input: Record<string, any>) {

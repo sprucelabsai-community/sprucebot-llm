@@ -490,7 +490,7 @@ export default class LlmBotTest extends AbstractLlmTest {
     @test()
     protected async botRespondingCallsMessageCallback() {
         this.setParserResponseMessage()
-        let passedMessage: string | undefined
+        let passedMessage: string | null = null
         await this.sendMessage(generateId(), (message) => {
             passedMessage = message
         })
@@ -520,7 +520,7 @@ export default class LlmBotTest extends AbstractLlmTest {
 
         let passedMessages: string[] = []
         const message = await this.sendRandomMessage((message) => {
-            passedMessages.push(message)
+            passedMessages.push(message!)
             this.setParserResponseCallbackResults(undefined)
             this.adapter.lastSendMessageResponse = response2
         })
@@ -587,7 +587,7 @@ export default class LlmBotTest extends AbstractLlmTest {
         this.setParserResponseMessage(parserResponse)
         this.parser.invalidParseErrorOnNextParse = error
         await this.sendMessage(generateId(), (message) => {
-            passedMessages.push(message)
+            passedMessages.push(message!)
         })
         assert.isEqual(this.messages[2].message, 'Error: ' + error)
         assert.isEqualDeep(passedMessages, [parserResponse])
@@ -601,7 +601,7 @@ export default class LlmBotTest extends AbstractLlmTest {
         this.setParserResponseMessage(parserResponse)
         this.parser.callbackErrorOnNextParse = error
         await this.sendMessage(generateId(), (message) => {
-            passedMessages.push(message)
+            passedMessages.push(message!)
         })
         assert.isEqual(
             this.messages[2].message,
@@ -726,11 +726,11 @@ export default class LlmBotTest extends AbstractLlmTest {
         this.parser.response.callbackResults = results
     }
 
-    private get parserResponse(): string | undefined {
+    private get parserResponse(): string | null | undefined {
         return this.parser.response.message
     }
 
-    private setParserResponseMessage(message?: string) {
+    private setParserResponseMessage(message?: string | null) {
         this.parser.response.message = message ?? generateId()
     }
 

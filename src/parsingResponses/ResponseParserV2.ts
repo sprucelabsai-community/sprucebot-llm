@@ -12,18 +12,20 @@ export default class ResponseParserV2 implements ResponseParser {
         response: string,
         callbacks?: LlmCallbackMap
     ): Promise<ParsedResponse> {
-        let message = response.replace(DONE_TOKEN, '').trim()
+        let message: string | null = response.replace(DONE_TOKEN, '').trim()
         let state: Record<string, any> | undefined = undefined
         let callbackResults: SendMessage | undefined = undefined
-
         const hasCallbacks = message.includes('@callback')
 
         if (hasCallbacks) {
-            callbackResults = await this.invokeCallbacks(message, callbacks)
+            const { callbackResults: c, message: m } =
+                await this.invokeCallbacks(message, callbacks)
+            callbackResults = c
+            message = m
         }
 
         const hasState = response.includes('@updateState')
-        if (hasState) {
+        if (hasState && message) {
             const stateMatch = message.match(/@updateState\s+({[\s\S]*?})\n?/)
             if (stateMatch && stateMatch[1]) {
                 state = JSON.parse(stateMatch[1])
@@ -42,13 +44,26 @@ export default class ResponseParserV2 implements ResponseParser {
     private async invokeCallbacks(
         message: string,
         callbacks: LlmCallbackMap | undefined
-    ) {
+    ): Promise<{
+        callbackResults: SendMessage | undefined
+        message: string | null
+    }> {
+        let callbackStrippedMessage = message
         let callbackResults = ''
 
         const matches = [...message.matchAll(/^@callback\s+({.*})$/gm)]
         for (const match of matches) {
             const callbackData = match && match[1] ? JSON.parse(match[1]) : null
             const { name, options } = callbackData || {}
+
+            debugger
+            if (match) {
+                const parts = callbackStrippedMessage.split(match[0])
+                callbackStrippedMessage = parts
+                    .map((s) => s.trim())
+                    .join('')
+                    .trim()
+            }
 
             try {
                 const callback = callbacks?.[name]
@@ -75,7 +90,13 @@ export default class ResponseParserV2 implements ResponseParser {
         }
 
         callbackResults = callbackResults.trim()
-        return callbackResults
+        return {
+            callbackResults,
+            message:
+                callbackStrippedMessage.length > 0
+                    ? callbackStrippedMessage
+                    : null,
+        }
     }
 
     public getStateUpdateInstructions(): string {

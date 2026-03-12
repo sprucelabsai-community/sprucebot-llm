@@ -28,7 +28,7 @@ export interface SprucebotLlmBot<
     sendMessage(
         message: SendMessage,
         responseCb?: MessageResponseCallback
-    ): Promise<string>
+    ): Promise<string | null>
     serialize(): SerializedBot<StateSchema, State>
     updateState(state: Partial<State>): Promise<void>
     setSkill(skill: SprucebotLLmSkill<any>): void
@@ -157,7 +157,7 @@ export type LlmCallbackParameter =
       }
     | (SelectFieldDefinition & { name: string; description?: string })
 
-export type MessageResponseCallback = (message: string) => void
+export type MessageResponseCallback = (message: string | null) => void
 
 export type SendMessage = string | SendMessageWithImage
 
@@ -177,6 +177,6 @@ export interface ResponseParser {
 export interface ParsedResponse {
     isDone: boolean
     state?: Record<string, any>
-    message: string
+    message: string | null
     callbackResults?: SendMessage
 }

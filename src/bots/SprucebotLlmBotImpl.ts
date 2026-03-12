@@ -80,7 +80,7 @@ export default class SprucebotLlmBotImpl<
     public async sendMessage(
         message: SendMessage,
         cb?: MessageResponseCallback
-    ): Promise<string> {
+    ): Promise<string | null> {
         assertOptions({ message }, ['message'])
 
         const llmMessage: LlmMessage = {

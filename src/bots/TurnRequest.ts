@@ -52,7 +52,7 @@ export default class TurnRequest {
     public async sendMessage(
         llmMessage: LlmMessage,
         cb?: MessageResponseCallback
-    ): Promise<string> {
+    ): Promise<string | null> {
         this.trackMessage(llmMessage)
 
         const { model, callbacks } = this.skill?.serialize() ?? {}
@@ -62,7 +62,7 @@ export default class TurnRequest {
             return ''
         }
 
-        let parsedMessage: string
+        let parsedMessage: string | null = null
         let isDone: boolean
         let state: Record<string, any> | undefined
         let callbackResults: SendMessage | undefined
