@@ -19,7 +19,7 @@ import AnthropicAdapter, {
     AnthropicAdapterOptions,
 } from '../../../bots/adapters/AnthropicAdapter'
 import MessageSenderImpl from '../../../bots/adapters/MessageSender'
-import OpenAiMessageBuilder from '../../../bots/adapters/OpenAiMessageBuilder'
+import MessageBuilder from '../../../bots/adapters/MessageBuilder'
 import {
     LllmReasoningEffort,
     SendMessageOptions,
@@ -34,7 +34,7 @@ export default class AthropicTest extends AbstractLlmTest {
     private bot!: SprucebotLlmBot
     private apiKey = generateId()
     private anthropic!: AnthropicAdapter
-    private messages!: OpenAiMessageBuilder
+    private messages!: MessageBuilder
     private maxTokens = Date.now() * Math.random()
     private model = 'claude-sonnet-4-5'
     private isThinkingEnabled = false
@@ -49,7 +49,7 @@ export default class AthropicTest extends AbstractLlmTest {
 
         this.anthropic = this.Anthropic()
         this.bot = this.Bot()
-        this.messages = OpenAiMessageBuilder.Builder(this.bot)
+        this.messages = MessageBuilder.Builder(this.bot)
     }
 
     @test()

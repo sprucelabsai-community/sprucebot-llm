@@ -1,17 +1,17 @@
-import {
-    normalizeSchemaValues,
-    Schema,
-    SchemaFieldDefinition,
-    SchemaFieldNames,
-    validateSchemaValues,
-} from '@sprucelabs/schema'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../bots/templates'
 import SpruceError from '../errors/SpruceError'
-import { LlmCallbackMap, SendMessage } from '../llm.types'
+import {
+    LlmCallback,
+    LlmCallbackMap,
+    ParsedResponse,
+    ResponseParser,
+    SendMessage,
+} from '../llm.types'
 import renderPlaceholder from './renderPlaceholder'
+import validateAndNormalizeCallbackOptions from './validateAndNormalizeCallbackOptions'
 
-export default class ResponseParser {
-    private static instance: ResponseParser = new ResponseParser()
+export default class ResponseParserV1 implements ResponseParser {
+    private static instance: ResponseParser = new ResponseParserV1()
 
     public static setInstance(parser: ResponseParser) {
         this.instance = parser
@@ -80,19 +80,10 @@ export default class ResponseParser {
                 try {
                     const callback = callbacks?.[key]
                     if (data) {
-                        const schema: Schema = {
-                            id: 'validationSchema',
-                            fields: {},
-                        }
-
-                        ;(callback?.parameters ?? []).forEach((param) => {
-                            const { name, ...rest } = param
-                            schema.fields![name as SchemaFieldNames<Schema>] =
-                                rest as SchemaFieldDefinition<Schema, never>
-                        })
-
-                        validateSchemaValues(schema, data)
-                        data = normalizeSchemaValues(schema, data)
+                        data = this.validateAndNormalizeCallbackOptions(
+                            callback,
+                            data
+                        )
                     }
                     callbackResults = await callback?.cb(data)
                     message = message.replace(xmlCallMatches[0], '').trim()
@@ -129,6 +120,17 @@ export default class ResponseParser {
             message,
             callbackResults: callbackResults ?? undefined,
         }
+    }
+
+    private validateAndNormalizeCallbackOptions(
+        callback: LlmCallback | undefined,
+        options: Record<string, any>
+    ) {
+        options = validateAndNormalizeCallbackOptions(
+            callback?.parameters ?? [],
+            options
+        )
+        return options
     }
 
     private findFirstBadCallback(message: string) {
@@ -179,10 +181,4 @@ export default class ResponseParser {
             })
         }
     }
-}
-export interface ParsedResponse {
-    isDone: boolean
-    state?: Record<string, any>
-    message: string
-    callbackResults?: SendMessage
 }

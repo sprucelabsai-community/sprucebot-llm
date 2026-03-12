@@ -8,7 +8,7 @@ import {
 } from 'openai/resources'
 import { SprucebotLlmBot, SendMessageOptions } from '../../llm.types'
 import { MESSAGE_RESPONSE_ERROR_MESSAGE } from './OpenAiAdapter'
-import OpenAiMessageBuilder from './OpenAiMessageBuilder'
+import MessageBuilder from './MessageBuilder'
 
 export default class MessageSenderImpl implements MessageSender {
     public static AbortController = AbortController
@@ -36,7 +36,7 @@ export default class MessageSenderImpl implements MessageSender {
     ): Promise<string> {
         const { memoryLimit, ...rest } = options
 
-        const messageBuilder = OpenAiMessageBuilder.Builder(bot, {
+        const messageBuilder = MessageBuilder.Builder(bot, {
             memoryLimit,
         })
 

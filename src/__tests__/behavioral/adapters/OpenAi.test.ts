@@ -12,6 +12,7 @@ import {
     ChatCompletionMessageParam,
     ReasoningEffort,
 } from 'openai/resources'
+import { parserInstructions } from '../../../bots/adapters/MessageBuilder'
 import MessageSenderImpl from '../../../bots/adapters/MessageSender'
 import OpenAiAdapter, {
     MESSAGE_RESPONSE_ERROR_MESSAGE,
@@ -21,6 +22,7 @@ import SpyOpenAiModule from '../../../bots/adapters/SpyOpenAiModule'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../../../bots/templates'
 import {
     LlmCallbackMap,
+    LlmCallbackParameter,
     LlmMessage,
     SendMessageOptions,
     SkillOptions,
@@ -355,6 +357,26 @@ export default class OpenAiTest extends AbstractLlmTest {
                         {
                             name: generateId(),
                             type: generateId(),
+                        },
+                    ],
+                },
+            }
+        )
+    }
+
+    @test()
+    protected async outputsArrayRelatedOptions() {
+        await this.setSkillSendMessageWithCallbacksAndAssertSystemMessagesEqualExpected(
+            {
+                callbackOne: {
+                    cb: async () => `hello`,
+                    useThisWhenever: generateId(),
+                    parameters: [
+                        {
+                            name: generateId(),
+                            type: 'number',
+                            isArray: true,
+                            minArrayLength: Math.floor(Math.random() * 10),
                         },
                     ],
                 },
@@ -954,30 +976,21 @@ export default class OpenAiTest extends AbstractLlmTest {
             if (callback.parameters) {
                 desc += `<Parameters>`
                 const parameters: string[] = []
-                for (const parameter of callback.parameters) {
+                for (const param of callback.parameters) {
                     let parameterChoices = ''
 
-                    if (parameter.type === 'select') {
-                        const choices = (parameter as SelectFieldDefinition)
-                            .options.choices
-                        parameterChoices = `<Choices>\n${choices
-                            .map(
-                                (c) => `
-    <Choice>
-        <Label>${c.label}</Label>
-        <Value>${c.value}</Value>
-    </Choice>`
-                            )
-                            .join('\n')}\n</Choices>`
+                    if (param.type === 'select') {
+                        parameterChoices = this.buildSelectChoices(param)
                     }
 
                     const parameterDefinition = `
-        <Parameter${parameter.isRequired ? ' required="true"' : ''}>
-            <Name>${parameter.name}</Name>
-            <Type>${parameter.type}</Type>
-            ${parameter.description ? `<Description>${parameter.description}</Description>` : ''}${parameterChoices}
+        <Parameter${param.isRequired ? ' required="true"' : ''}>
+            <Name>${param.name}</Name>
+            <Type>${param.type}</Type>
+            ${param.isArray ? '<IsArray>true</IsArray>' : ''}
+            ${'minArrayLength' in param ? `<MinArrayLength>${param.minArrayLength}</MinArrayLength>` : ''}
+            ${param.description ? `<Description>${param.description}</Description>` : ''}${parameterChoices}
         </Parameter>`
-
                     parameters.push(parameterDefinition)
                 }
 
@@ -992,14 +1005,28 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         const api = `<APIReference>\n\n${descriptions.join('\n\n')}</APIReference>`
 
-        const message = `You have an API available to you to lookup answers. When you need the response of the function call to proceed, you can call a function using a custom markup we created that looks like this: <<FunctionName/>>. The API will respond with the results and then you can continue the conversation with your new knowledge. If the api call has parameters, call it like this: <<FunctionName>>{{parametersJsonEncoded}}<</FunctionName>>. Make sure to json encode the data and drop it between the function tags. Note: You can only make one API call at a time. The API is as follows (in xml format):\n\n${api}`
+        const message = `You have an API available to you to lookup answers. When you need the response of the function call to proceed, you can call a function using a custom markup we created: ${parserInstructions}. The API is as follows (in xml format):\n\n${api}`
         return { role: 'system', content: message }
+    }
+
+    private buildSelectChoices(param: LlmCallbackParameter) {
+        const choices = (param as SelectFieldDefinition).options.choices
+        const parameterChoices = `<Choices>\n${choices
+            .map(
+                (c) => `
+    <Choice>
+        <Label>${c.label}</Label>
+        <Value>${c.value}</Value>
+    </Choice>`
+            )
+            .join('\n')}\n</Choices>`
+        return parameterChoices
     }
 
     private renderStateMessage(state: Record<string, any>): Message {
         return {
             role: 'system',
-            content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the state is being updated, send it back to me in json format (something in can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by the State Boundary (${STATE_BOUNDARY}), like this:\n\n${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`,
+            content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the conversation progresses and you need to update state, follow these instructions: Send updates to me in json format (something it can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by the State Boundary (${STATE_BOUNDARY}), like this:\n\n${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`,
         }
     }
 

@@ -15,26 +15,21 @@ import {
     LlmCallbackParameter,
 } from '../../../llm.types'
 import renderPlaceholder from '../../../parsingResponses/renderPlaceholder'
-import ResponseParser, {
-    ParsedResponse,
-} from '../../../parsingResponses/ResponseParser'
-import AbstractLlmTest from '../../support/AbstractLlmTest'
+import ResponseParserV1 from '../../../parsingResponses/ResponseParserV1'
+import AbstractResponseParserTest from './AbstractResponseParserTest'
 
 @suite()
-export default class ResponseParserTest extends AbstractLlmTest {
-    private parser!: ResponseParser
-    private callbacks: LlmCallbackMap = {}
+export default class ResponseParserTest extends AbstractResponseParserTest {
     protected async beforeEach() {
         await super.beforeEach()
-        this.parser = ResponseParser.getInstance()
-        this.callbacks = {}
+        this.parser = ResponseParserV1.getInstance()
     }
 
     @test()
     protected async canSetAndGetInstance() {
-        ResponseParser.setInstance(this.parser)
-        const match = ResponseParser.getInstance()
-        assert.isEqual(match, this.parser)
+        ResponseParserV1.setInstance(this.parser)
+        const match = ResponseParserV1.getInstance()
+        assert.isEqual(match, this.parser, 'did not set parser to instance')
     }
 
     @test()
@@ -50,9 +45,9 @@ export default class ResponseParserTest extends AbstractLlmTest {
 
     @test()
     protected async gettingInstanceWithoutOneSetReturnsFresh() {
-        const instance = ResponseParser.getInstance()
-        assert.isInstanceOf(instance, ResponseParser)
-        const instance2 = ResponseParser.getInstance()
+        const instance = ResponseParserV1.getInstance()
+        assert.isInstanceOf(instance, ResponseParserV1)
+        const instance2 = ResponseParserV1.getInstance()
         assert.isEqual(instance, instance2)
     }
 
@@ -63,14 +58,14 @@ export default class ResponseParserTest extends AbstractLlmTest {
         what: 'the??',
     })
     protected async parsesStateWithNothingElse(input: Record<string, any>) {
-        const state = this.generateStateSchema(input)
+        const state = this.generateUpdateStateSchemaSyntax(input)
         await this.parsingEquals(state, {
             isDone: false,
             state: input,
             message: '',
         })
 
-        const state2 = this.generateStateSchema(input, true)
+        const state2 = this.generateUpdateStateSchemaSyntax(input, true)
         await this.parsingEquals(state2, {
             isDone: false,
             state: input,
@@ -81,7 +76,7 @@ export default class ResponseParserTest extends AbstractLlmTest {
     @test('should remove state from response without boundary newlines', false)
     @test('should remove state from response with boundary newlines', true)
     protected async removesStateFromResponse(shouldNewlineBoundaries: boolean) {
-        const state = this.generateStateSchema(
+        const state = this.generateUpdateStateSchemaSyntax(
             { hello: 'world' },
             shouldNewlineBoundaries
         )
@@ -362,19 +357,18 @@ export default class ResponseParserTest extends AbstractLlmTest {
             useThisWhenever: generateId(),
             parameters: [
                 {
-                    name: 'locations',
-                    type: 'text',
-                    isArray: true,
+                    name: 'age',
+                    type: 'number',
                 },
             ],
         })
 
-        await this.parse(renderCallbackMarkup('setup', { locations: 'office' }))
+        await this.parse(renderCallbackMarkup('setup', { age: '20' }))
 
         assert.isEqualDeep(
             passedParams,
-            { locations: ['office'] },
-            'Expected parameters normalized to array'
+            { age: 20 },
+            'Expected parameters normalized to number'
         )
     }
 
@@ -634,6 +628,19 @@ export default class ResponseParserTest extends AbstractLlmTest {
         }
     }
 
+    protected generateUpdateStateSchemaSyntax(
+        input: Record<string, any>,
+        shouldNewlineBoundaries = false
+    ) {
+        if (shouldNewlineBoundaries) {
+            return `\n${STATE_BOUNDARY}\n${JSON.stringify(
+                input
+            )} \n${STATE_BOUNDARY}\n`
+        }
+
+        return `${STATE_BOUNDARY} ${JSON.stringify(input)} ${STATE_BOUNDARY}`
+    }
+
     private async parseAndAssertThrowsSchemaError(
         parameters: LlmCallbackParameter[],
         args: string
@@ -690,51 +697,6 @@ export default class ResponseParserTest extends AbstractLlmTest {
             useThisWhenever: generateId(),
         }
     }
-
-    private async parse(message: string, callbacks?: LlmCallbackMap) {
-        return await this.parser.parse(message, callbacks ?? this.callbacks)
-    }
-
-    private generateStateSchema(
-        input: Record<string, any>,
-        shouldNewlineBoundaries = false
-    ) {
-        if (shouldNewlineBoundaries) {
-            return `\n${STATE_BOUNDARY}\n${JSON.stringify(
-                input
-            )} \n${STATE_BOUNDARY}\n`
-        }
-
-        return `${STATE_BOUNDARY} ${JSON.stringify(input)} ${STATE_BOUNDARY}`
-    }
-
-    private async assertDone(message: string) {
-        await this.parsingEquals(message, {
-            isDone: true,
-            state: undefined,
-            message: removeTokens(message),
-        })
-    }
-
-    private async assertNotDone(message: string) {
-        await this.parsingEquals(message, {
-            isDone: false,
-            state: undefined,
-            message: removeTokens(message),
-        })
-    }
-
-    private async parsingEquals(message: string, expected: ParsedResponse) {
-        const results = await this.parse(message)
-        assert.isEqualDeep(results, { callbackResults: undefined, ...expected })
-    }
-
-    private setCallback(key: string, callback: LlmCallback) {
-        this.callbacks[key] = callback
-    }
-}
-function removeTokens(message: string): string {
-    return message.replace(DONE_TOKEN, '').trim()
 }
 
 function renderCallbackMarkup(name: string, data?: Record<string, any>) {

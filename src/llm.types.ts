@@ -167,3 +167,14 @@ export interface SendMessageWithImage {
 }
 
 export type LllmReasoningEffort = ReasoningEffort
+
+export interface ResponseParser {
+    parse(response: string, callbacks?: LlmCallbackMap): Promise<ParsedResponse>
+}
+
+export interface ParsedResponse {
+    isDone: boolean
+    state?: Record<string, any>
+    message: string
+    callbackResults?: SendMessage
+}

@@ -11,7 +11,7 @@ import {
 } from '../../llm.types'
 import { DONE_TOKEN, STATE_BOUNDARY } from '../templates'
 
-export default class OpenAiMessageBuilder {
+export default class MessageBuilder {
     private bot: SprucebotLlmBot
     private memoryLimit: number
 
@@ -192,6 +192,8 @@ export default class OpenAiMessageBuilder {
                         <Parameter${param.isRequired ? ' required="true"' : ''}>
                             <Name>${param.name}</Name>
                             <Type>${param.type}</Type>
+                            ${param.isArray ? '<IsArray>true</IsArray>' : ''}
+                            ${'minArrayLength' in param ? `<MinArrayLength>${param.minArrayLength}</MinArrayLength>` : ''}
                             ${param.description ? `<Description>${param.description}</Description>` : ''}${parameterChoices}
                         </Parameter>`
                 }
@@ -206,7 +208,7 @@ export default class OpenAiMessageBuilder {
 
         return {
             role: 'system',
-            content: `You have an API available to you to lookup answers. When you need the response of the function call to proceed, you can call a function using a custom markup we created that looks like this: <<FunctionName/>>. The API will respond with the results and then you can continue the conversation with your new knowledge. If the api call has parameters, call it like this: <<FunctionName>>{{parametersJsonEncoded}}<</FunctionName>>. Make sure to json encode the data and drop it between the function tags. Note: You can only make one API call at a time. The API is as follows (in xml format):\n\n${api}`,
+            content: `You have an API available to you to lookup answers. When you need the response of the function call to proceed, you can call a function using a custom markup we created: ${parserInstructions}. The API is as follows (in xml format):\n\n${api}`,
         }
     }
 
@@ -224,7 +226,7 @@ export default class OpenAiMessageBuilder {
     ): ChatCompletionMessageParam {
         return {
             role: 'system',
-            content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the state is being updated, send it back to me in json format (something in can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by the State Boundary (${STATE_BOUNDARY}), like this:\n\n${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`,
+            content: `The current state of this conversation is:\n\n${JSON.stringify(state)}. As the conversation progresses and you need to update state, follow these instructions: ${stateUpdateInstructions}`,
         }
     }
 
@@ -257,3 +259,6 @@ export default class OpenAiMessageBuilder {
 interface BuildMessageOptions {
     memoryLimit?: number
 }
+
+export const parserInstructions = `A function call looks like this: <<FunctionName/>>. The API will respond with the results and then you can continue the conversation with your new knowledge. If the api call has parameters, call it like this: <<FunctionName>>{{parametersJsonEncoded}}<</FunctionName>>. Make sure to json encode the data and drop it between the function tags. Note: You can only make one API call at a time`
+export const stateUpdateInstructions = `Send updates to me in json format (something it can JSON.parse()) at the end of each response (it's not meant for reading, but for parsing, so don't call it out, but send it as we progress), surrounded by the State Boundary (${STATE_BOUNDARY}), like this:\n\n${STATE_BOUNDARY} { "fieldName": "fieldValue" } ${STATE_BOUNDARY}`

@@ -8,7 +8,7 @@ import {
     SprucebotLlmBot,
     SprucebotLLmSkill,
 } from '../llm.types'
-import ResponseParser from '../parsingResponses/ResponseParser'
+import ResponseParserV1 from '../parsingResponses/ResponseParserV1'
 
 export default class TurnRequest {
     private trackMessage: (message: LlmMessage) => void
@@ -143,7 +143,7 @@ export default class TurnRequest {
     }
 
     private async parseResponse(response: string, callbacks?: LlmCallbackMap) {
-        const parser = ResponseParser.getInstance()
+        const parser = ResponseParserV1.getInstance()
         const parsed = await parser.parse(response, callbacks)
         return parsed
     }

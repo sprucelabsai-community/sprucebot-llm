@@ -7,21 +7,18 @@ import {
     generateId,
 } from '@sprucelabs/test-utils'
 import SprucebotLlmBotImpl from '../../bots/SprucebotLlmBotImpl'
-import SpruceError from '../../errors/SpruceError'
 import {
-    LlmCallbackMap,
     MessageResponseCallback,
     SendMessage,
     SkillOptions,
 } from '../../llm.types'
-import ResponseParser, {
-    ParsedResponse,
-} from '../../parsingResponses/ResponseParser'
+import ResponseParserV1 from '../../parsingResponses/ResponseParserV1'
 import SpyLlmBot from '../../tests/SpyLlmBot'
 import AbstractLlmTest from '../support/AbstractLlmTest'
 import { Car, carSchema } from '../support/schemas/carSchema'
 import { personSchema } from '../support/schemas/personSchema'
 import { personWithDefaultsSchema } from '../support/schemas/personWithDefaultsSchema'
+import FakeResponseParser from './FakeResponseParser'
 
 @suite()
 export default class LlmBotTest extends AbstractLlmTest {
@@ -35,7 +32,7 @@ export default class LlmBotTest extends AbstractLlmTest {
         })
 
         this.parser = new FakeResponseParser()
-        ResponseParser.setInstance(this.parser)
+        ResponseParserV1.setInstance(this.parser)
     }
 
     @test()
@@ -699,15 +696,15 @@ export default class LlmBotTest extends AbstractLlmTest {
     @test()
     protected async stateUpdatesAreNormalized() {
         this.bot = this.Bot({
-            stateSchema: personSchema,
+            stateSchema: carSchema,
         })
 
         await this.updateState({
-            nickNames: 'bob',
+            year: '2022',
         })
 
         const expected = {
-            nickNames: ['bob'],
+            year: 2022,
         }
 
         this.assertSerializedStateEquals(expected)
@@ -811,52 +808,5 @@ export default class LlmBotTest extends AbstractLlmTest {
             expected,
             'Serialized state does not match expected'
         )
-    }
-}
-
-class FakeResponseParser extends ResponseParser {
-    public response: Partial<ParsedResponse> = {
-        isDone: false,
-        state: undefined,
-    }
-    public lastMessage?: string
-    public lastCallbacks?: LlmCallbackMap
-    public invalidParseErrorOnNextParse?: string
-    public callbackErrorOnNextParse?: string
-
-    public async parse(
-        message: string,
-        callbacks?: LlmCallbackMap
-    ): Promise<ParsedResponse> {
-        if (this.invalidParseErrorOnNextParse) {
-            const invalidParse = this.invalidParseErrorOnNextParse
-            delete this.invalidParseErrorOnNextParse
-            throw new SpruceError({
-                code: 'INVALID_CALLBACK',
-                matchedCallback: generateId(),
-                validCallbacks: [],
-                friendlyMessage: invalidParse,
-            })
-        }
-
-        if (this.callbackErrorOnNextParse) {
-            delete this.callbackErrorOnNextParse
-            throw new SpruceError({
-                code: 'CALLBACK_ERROR',
-            })
-        }
-
-        this.lastMessage = message
-        this.lastCallbacks = callbacks
-
-        const results = {
-            message,
-            isDone: false,
-            ...this.response,
-        }
-
-        delete this.response.state
-
-        return results as ParsedResponse
     }
 }
