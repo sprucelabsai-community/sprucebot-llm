@@ -1,3 +1,7 @@
+## <small>15.0.3 (2026-03-12)</small>
+
+* patch: null response when nothing returned ([0a9ecb6](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0a9ecb6))
+
 ## <small>15.0.2 (2026-03-12)</small>
 
 * chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([bc2444c](https://github.com/sprucelabsai-community/sprucebot-llm/commit/bc2444c))
