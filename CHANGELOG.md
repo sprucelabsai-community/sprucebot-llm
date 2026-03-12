@@ -1,3 +1,8 @@
+## <small>15.0.1 (2026-03-12)</small>
+
+* chore(auto-upgrade): Upgrade Tests Passed [auto-merge] ([34503aa](https://github.com/sprucelabsai-community/sprucebot-llm/commit/34503aa))
+* chore(auto-upgrade): upgraded packages [upgrade-all] ([91eb1ea](https://github.com/sprucelabsai-community/sprucebot-llm/commit/91eb1ea))
+
 ## 15.0.0 (2026-03-12)
 
 * patch: bump ([bbd6f5e](https://github.com/sprucelabsai-community/sprucebot-llm/commit/bbd6f5e))
