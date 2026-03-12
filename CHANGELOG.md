@@ -1,3 +1,11 @@
+## 15.0.0 (2026-03-12)
+
+* patch: bump ([bbd6f5e](https://github.com/sprucelabsai-community/sprucebot-llm/commit/bbd6f5e))
+* patch: factory refactor progress ([116314f](https://github.com/sprucelabsai-community/sprucebot-llm/commit/116314f))
+* patch: lint fix ([b01e8f3](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b01e8f3))
+* patch: parser factory refactor progress ([ef8db5c](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ef8db5c))
+* major: new parser version, v2, multiple callbacks at once, different state and callback syntax, diff ([593be36](https://github.com/sprucelabsai-community/sprucebot-llm/commit/593be36))
+
 ## <small>14.3.4 (2026-03-02)</small>
 
 * patch: better handling of state throwing in will-update ([b26b594](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b26b594))
