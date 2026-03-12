@@ -15,6 +15,7 @@ import {
     LlmCallbackParameter,
 } from '../../../llm.types'
 import renderPlaceholder from '../../../parsingResponses/renderPlaceholder'
+import ResponseParserFactory from '../../../parsingResponses/ResponseParserFactory'
 import ResponseParserV1 from '../../../parsingResponses/ResponseParserV1'
 import AbstractResponseParserTest from './AbstractResponseParserTest'
 
@@ -22,13 +23,13 @@ import AbstractResponseParserTest from './AbstractResponseParserTest'
 export default class ResponseParserTest extends AbstractResponseParserTest {
     protected async beforeEach() {
         await super.beforeEach()
-        this.parser = ResponseParserV1.getInstance()
+        this.parser = ResponseParserFactory.getInstance()
     }
 
     @test()
     protected async canSetAndGetInstance() {
-        ResponseParserV1.setInstance(this.parser)
-        const match = ResponseParserV1.getInstance()
+        ResponseParserFactory.setInstance(this.parser)
+        const match = ResponseParserFactory.getInstance()
         assert.isEqual(match, this.parser, 'did not set parser to instance')
     }
 
@@ -45,10 +46,18 @@ export default class ResponseParserTest extends AbstractResponseParserTest {
 
     @test()
     protected async gettingInstanceWithoutOneSetReturnsFresh() {
-        const instance = ResponseParserV1.getInstance()
-        assert.isInstanceOf(instance, ResponseParserV1)
-        const instance2 = ResponseParserV1.getInstance()
-        assert.isEqual(instance, instance2)
+        const instance = ResponseParserFactory.getInstance()
+        assert.isInstanceOf(
+            instance,
+            ResponseParserV1,
+            'instance is not of type ResponseParserV1'
+        )
+        const instance2 = ResponseParserFactory.getInstance()
+        assert.isEqual(
+            instance,
+            instance2,
+            'getInstance did not return the same instance'
+        )
     }
 
     @test('parses state 1', {

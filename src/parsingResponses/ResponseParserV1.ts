@@ -11,16 +11,6 @@ import renderPlaceholder from './renderPlaceholder'
 import validateAndNormalizeCallbackOptions from './validateAndNormalizeCallbackOptions'
 
 export default class ResponseParserV1 implements ResponseParser {
-    private static instance: ResponseParser = new ResponseParserV1()
-
-    public static setInstance(parser: ResponseParser) {
-        this.instance = parser
-    }
-
-    public static getInstance() {
-        return this.instance
-    }
-
     public async parse(
         response: string,
         callbacks?: LlmCallbackMap

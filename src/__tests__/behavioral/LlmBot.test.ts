@@ -12,7 +12,7 @@ import {
     SendMessage,
     SkillOptions,
 } from '../../llm.types'
-import ResponseParserV1 from '../../parsingResponses/ResponseParserV1'
+import ResponseParserFactory from '../../parsingResponses/ResponseParserFactory'
 import SpyLlmBot from '../../tests/SpyLlmBot'
 import AbstractLlmTest from '../support/AbstractLlmTest'
 import { Car, carSchema } from '../support/schemas/carSchema'
@@ -32,7 +32,7 @@ export default class LlmBotTest extends AbstractLlmTest {
         })
 
         this.parser = new FakeResponseParser()
-        ResponseParserV1.setInstance(this.parser)
+        ResponseParserFactory.setInstance(this.parser)
     }
 
     @test()
