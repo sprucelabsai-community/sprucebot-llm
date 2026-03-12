@@ -7,8 +7,8 @@ import {
     ChatCompletionCreateParamsNonStreaming,
 } from 'openai/resources'
 import { SprucebotLlmBot, SendMessageOptions } from '../../llm.types'
-import { MESSAGE_RESPONSE_ERROR_MESSAGE } from './OpenAiAdapter'
 import MessageBuilder from './MessageBuilder'
+import { MESSAGE_RESPONSE_ERROR_MESSAGE } from './OpenAiAdapter'
 
 export default class MessageSenderImpl implements MessageSender {
     public static AbortController = AbortController

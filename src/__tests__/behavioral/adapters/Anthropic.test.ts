@@ -18,8 +18,8 @@ import {
 import AnthropicAdapter, {
     AnthropicAdapterOptions,
 } from '../../../bots/adapters/AnthropicAdapter'
-import MessageSenderImpl from '../../../bots/adapters/MessageSender'
 import MessageBuilder from '../../../bots/adapters/MessageBuilder'
+import MessageSenderImpl from '../../../bots/adapters/MessageSender'
 import {
     LllmReasoningEffort,
     SendMessageOptions,
