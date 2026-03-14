@@ -4,6 +4,7 @@ import {
     LlmCallbackMap,
     ParsedResponse,
     SendMessage,
+    LmmCallbackResponse,
 } from '../llm.types'
 import validateAndNormalizeCallbackOptions from './validateAndNormalizeCallbackOptions'
 
@@ -28,7 +29,17 @@ export default class ResponseParserV2 implements ResponseParser {
         if (hasState && message) {
             const stateMatch = message.match(/@updateState\s+({[\s\S]*?})\n?/)
             if (stateMatch && stateMatch[1]) {
-                state = JSON.parse(stateMatch[1])
+                try {
+                    state = JSON.parse(stateMatch[1])
+                } catch (err) {
+                    if (!callbackResults) {
+                        callbackResults = ''
+                    }
+                    callbackResults += this.renderCallbackResults({
+                        error: err,
+                        name: 'updateState',
+                    })
+                }
                 message = message.replace(stateMatch[0], '').trim()
             }
         }
@@ -77,15 +88,15 @@ export default class ResponseParserV2 implements ResponseParser {
 
                 const results = await callback?.cb(options)
 
-                callbackResults += `@results ${JSON.stringify({
+                callbackResults += this.renderCallbackResults({
                     name,
                     results,
-                })}\n`
+                })
             } catch (err) {
-                callbackResults += `@results ${JSON.stringify({
+                callbackResults += this.renderCallbackResults({
                     name,
                     error: err,
-                })}\n`
+                })
             }
         }
 
@@ -97,6 +108,14 @@ export default class ResponseParserV2 implements ResponseParser {
                     ? callbackStrippedMessage
                     : null,
         }
+    }
+
+    private renderCallbackResults(callbackOptions: {
+        name: any
+        results?: LmmCallbackResponse | undefined
+        error?: any
+    }) {
+        return `@results ${JSON.stringify(callbackOptions)}\n`
     }
 
     public getStateUpdateInstructions(): string {

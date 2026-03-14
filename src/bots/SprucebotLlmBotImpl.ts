@@ -77,6 +77,11 @@ export default class SprucebotLlmBotImpl<
         }
     }
 
+    public unserialize(serialized: SerializedBot<StateSchema, State>): void {
+        this.state = serialized.state
+        serialized.skill && this.skill?.unserialize(serialized.skill)
+    }
+
     public async sendMessage(
         message: SendMessage,
         cb?: MessageResponseCallback

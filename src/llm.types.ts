@@ -30,6 +30,7 @@ export interface SprucebotLlmBot<
         responseCb?: MessageResponseCallback
     ): Promise<string | null>
     serialize(): SerializedBot<StateSchema, State>
+    unserialize(serialized: SerializedBot<StateSchema, State>): void
     updateState(state: Partial<State>): Promise<void>
     setSkill(skill: SprucebotLLmSkill<any>): void
     clearMessageHistory(): void
@@ -117,6 +118,7 @@ export interface SprucebotLLmSkill<
 > extends MercuryEventEmitter<LlmEventContract> {
     getState(): Partial<State> | undefined
     serialize(): SerializedSkill<StateSchema, State>
+    unserialize(serialized: SerializedSkill<StateSchema, State>): void
     updateState(state: Partial<State>): Promise<void>
     setModel(model: string): void
 }

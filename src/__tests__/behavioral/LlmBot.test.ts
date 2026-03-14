@@ -710,6 +710,33 @@ export default class LlmBotTest extends AbstractLlmTest {
         this.assertSerializedStateEquals(expected)
     }
 
+    @test()
+    protected async canUnserialize() {
+        const bot1 = this.Bot({
+            skill: this.Skill({
+                stateSchema: personSchema,
+            }),
+        })
+
+        await bot1.getSkill()?.updateState({
+            firstName: 'world',
+        })
+
+        const bot2 = this.Bot({
+            skill: this.Skill({
+                stateSchema: personSchema,
+            }),
+        })
+
+        bot2.unserialize(bot1.serialize())
+
+        assert.isEqualDeep(
+            bot2.serialize(),
+            bot1.serialize(),
+            'unserialized bot does not match original'
+        )
+    }
+
     private setupWithStateSchema(skillOrBot: string, schema: Schema) {
         if (skillOrBot === 'skill') {
             this.setupBotWithSkill({

@@ -61,4 +61,10 @@ export default class SprucebotLlmSkillImpl<
     public getStateSchema() {
         return this.stateSchema
     }
+
+    public unserialize(serialized: SerializedSkill<StateSchema, State>): void {
+        const { state, ...options } = serialized
+        this.state = state
+        this.options = options
+    }
 }
