@@ -1,3 +1,9 @@
+## 15.1.0 (2026-03-14)
+
+* minor: unserialize to restor things, better handling of bad state updates ([6ff3693](https://github.com/sprucelabsai-community/sprucebot-llm/commit/6ff3693))
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([6fbbf03](https://github.com/sprucelabsai-community/sprucebot-llm/commit/6fbbf03))
+* patch: prompt update ([c40e91e](https://github.com/sprucelabsai-community/sprucebot-llm/commit/c40e91e))
+
 ## <small>15.0.3 (2026-03-12)</small>
 
 * patch: null response when nothing returned ([0a9ecb6](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0a9ecb6))
