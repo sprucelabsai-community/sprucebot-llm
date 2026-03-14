@@ -1,3 +1,7 @@
+## <small>15.1.1 (2026-03-14)</small>
+
+* patch: strengthen single-line JSON instruction in ResponseParserV2 to prevent LLM multi-line output  ([3bd877a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3bd877a))
+
 ## 15.1.0 (2026-03-14)
 
 * minor: unserialize to restor things, better handling of bad state updates ([6ff3693](https://github.com/sprucelabsai-community/sprucebot-llm/commit/6ff3693))
