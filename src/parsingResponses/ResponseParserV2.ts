@@ -119,10 +119,10 @@ export default class ResponseParserV2 implements ResponseParser {
     }
 
     public getStateUpdateInstructions(): string {
-        return 'Updating state works similar to all function calls. Use the following syntax:\n@updateState { "updates": "here" }\n. Make sure to json encode only the fields you want to change. You can update state once and do it at the end of any messages you send. NOTE: Keep json on a single line to avoid parsing issues.'
+        return 'Updating state works similar to all function calls. Use the following syntax:\n@updateState { "updates": "here" }\n. Make sure to json encode only the fields you want to change. You can update state once and do it at the end of any messages you send. IMPORTANT: JSON must be on a single line. Do NOT use multi-line or formatted JSON.'
     }
 
     public getFunctionCallInstructions(): string {
-        return `A function call is done using the following syntax:\n@callback { "name": "callbackName", "options": {} }\nMake sure to json encode the options and include the name of the callback you want to call. You can call as many callbacks as you want in a single response by including multiple @callback lines. NOTE: Keep json on a single line to avoid parsing issues.`
+        return `A function call is done using the following syntax:\n@callback { "name": "callbackName", "options": {} }\nMake sure to json encode the options and include the name of the callback you want to call. You can call as many callbacks as you want in a single response by including multiple @callback lines. IMPORTANT: JSON must be on a single line. Do NOT use multi-line or formatted JSON.`
     }
 }
