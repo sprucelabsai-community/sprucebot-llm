@@ -1,3 +1,7 @@
+## <small>15.1.2 (2026-03-15)</small>
+
+* patch: more prompting improevements ([ff8bc2e](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ff8bc2e))
+
 ## <small>15.1.1 (2026-03-14)</small>
 
 * patch: strengthen single-line JSON instruction in ResponseParserV2 to prevent LLM multi-line output  ([3bd877a](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3bd877a))
