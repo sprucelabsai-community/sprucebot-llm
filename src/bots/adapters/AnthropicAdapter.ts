@@ -110,9 +110,9 @@ export default class AnthropicAdapter implements LlmAdapter {
             sendOptions as RequestOptions
         )
 
+        const { usage } = response
         this.log?.info(
-            'Received response from Anthropic',
-            JSON.stringify(response, null, 2)
+            `[TOKEN USAGE] input=${usage.input_tokens} cache_create=${usage.cache_creation_input_tokens ?? 0} cache_read=${usage.cache_read_input_tokens ?? 0} output=${usage.output_tokens}`
         )
 
         const text = response.content
