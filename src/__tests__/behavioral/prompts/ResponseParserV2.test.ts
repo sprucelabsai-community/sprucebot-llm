@@ -245,7 +245,7 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         const actual = this.parser.getFunctionCallInstructions()
         assert.isEqual(
             actual,
-            `A function call is done using the following syntax:\n@callback { "name": "callbackName", "options": {} }\nMake sure to json encode the options and include the name of the callback you want to call. You can call as many callbacks as you want in a single response by including multiple @callback lines. IMPORTANT: JSON must be on a single line. Do NOT use multi-line or formatted JSON.`,
+            `A function call is done using the following syntax:\n@callback { "name": "callbackName", "options": {} }\nMake sure to json encode the options and include the name of the callback you want to call. You can call as many callbacks as you want in a single response by including multiple @callback lines. IMPORTANT: JSON must be on a single line. Do NOT use multi-line or formatted JSON. Also, do NOT call something like @myCallback. You would call it like this: @callback { "name": "myCallback", "options": {} }`,
             'Expected proper instructions for function calls in V2 parser'
         )
     }
