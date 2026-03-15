@@ -1,3 +1,7 @@
+## <small>15.1.4 (2026-03-15)</small>
+
+* patch: replace verbose full-response log with concise [TOKEN USAGE] line ([1021f7b](https://github.com/sprucelabsai-community/sprucebot-llm/commit/1021f7b))
+
 ## <small>15.1.3 (2026-03-15)</small>
 
 * patch: anthropic caching!! ([fa7a01b](https://github.com/sprucelabsai-community/sprucebot-llm/commit/fa7a01b))
