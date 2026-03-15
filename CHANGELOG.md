@@ -1,3 +1,7 @@
+## <small>15.1.3 (2026-03-15)</small>
+
+* patch: anthropic caching!! ([fa7a01b](https://github.com/sprucelabsai-community/sprucebot-llm/commit/fa7a01b))
+
 ## <small>15.1.2 (2026-03-15)</small>
 
 * patch: more prompting improevements ([ff8bc2e](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ff8bc2e))
