@@ -15,10 +15,13 @@ import {
     Usage,
 } from '@anthropic-ai/sdk/resources/messages'
 
+import { ChatCompletionMessageParam } from 'openai/resources'
 import AnthropicAdapter, {
     AnthropicAdapterOptions,
 } from '../../../bots/adapters/AnthropicAdapter'
-import MessageBuilder from '../../../bots/adapters/MessageBuilder'
+import MessageBuilder, {
+    MessageBuilderCacheMarker,
+} from '../../../bots/adapters/MessageBuilder'
 import MessageSenderImpl from '../../../bots/adapters/MessageSender'
 import {
     LllmReasoningEffort,
@@ -26,6 +29,7 @@ import {
     SprucebotLlmBot,
 } from '../../../llm.types'
 import AbstractLlmTest from '../../support/AbstractLlmTest'
+import { personSchema } from '../../support/schemas/personSchema'
 import { MockAbortController, StubAbortSignal } from './MockAbortController'
 import MockMessegeSender from './MockMessageSender'
 
@@ -38,6 +42,7 @@ export default class AthropicTest extends AbstractLlmTest {
     private maxTokens = Date.now() * Math.random()
     private model = 'claude-sonnet-4-5'
     private isThinkingEnabled = false
+    private isUsingState = false
 
     protected async beforeEach() {
         await super.beforeEach()
@@ -79,7 +84,6 @@ export default class AthropicTest extends AbstractLlmTest {
     @test()
     protected async passesExpectedMessageToCreate() {
         await this.sendMessage()
-
         this.assertSentExpectedBodyToCreate()
     }
 
@@ -241,6 +245,24 @@ export default class AthropicTest extends AbstractLlmTest {
         await this.sendMessage()
     }
 
+    @test()
+    protected async rendersExpectedMessageWithCacheWithState() {
+        this.bot = this.Bot({
+            skill: this.Skill({
+                stateSchema: personSchema,
+                state: {
+                    firstName: generateId(),
+                },
+            }),
+        })
+
+        this.messages = MessageBuilder.Builder(this.bot)
+        this.isUsingState = true
+
+        await this.sendMessage()
+        this.assertSentExpectedBodyToCreate()
+    }
+
     private setResponseContent(content: ContentBlock[]) {
         this.mockAnthropic.setResponseContent(content)
     }
@@ -276,9 +298,17 @@ export default class AthropicTest extends AbstractLlmTest {
     }
 
     private get expectedMessages() {
-        const openAiMessages = this.messages.buildMessages()
+        const openAiMessages = this.messages
+            .buildMessages()
+            .filter(
+                (m) => !(m as MessageBuilderCacheMarker).cache_marker
+            ) as ChatCompletionMessageParam[]
 
         const expected: MessageParam[] = []
+
+        const totalSystemMessages = openAiMessages.filter(
+            (msg) => msg.role === 'system'
+        ).length
 
         for (const msg of openAiMessages) {
             expected.push({
@@ -286,6 +316,23 @@ export default class AthropicTest extends AbstractLlmTest {
                 content: msg.content as string,
             })
         }
+
+        let lastCachedIdx = totalSystemMessages - 1
+
+        if (this.isUsingState) {
+            lastCachedIdx -= 1
+        }
+
+        expected[lastCachedIdx].content = [
+            {
+                type: 'text',
+                text: expected[lastCachedIdx].content as string,
+                cache_control: {
+                    type: 'ephemeral',
+                },
+            },
+        ]
+
         return expected
     }
 

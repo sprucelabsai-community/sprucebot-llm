@@ -3,15 +3,19 @@ import { Log } from '@sprucelabs/spruce-skill-utils'
 import Anthropic from '@anthropic-ai/sdk'
 import { RequestOptions } from '@anthropic-ai/sdk/internal/request-options'
 import { MessageParam } from '@anthropic-ai/sdk/resources'
-import OpenAI from 'openai'
 import { RequestOptions as OpenAiRequestOptions } from 'openai/internal/request-options'
+import { ChatCompletionMessageParam } from 'openai/resources'
 import {
     LlmAdapter,
     SprucebotLlmBot,
     SendMessageOptions,
     LllmReasoningEffort,
 } from '../../llm.types'
-import MessageSenderImpl, { MessageSender } from './MessageSender'
+import { MessageBuilderCacheMarker } from './MessageBuilder'
+import MessageSenderImpl, {
+    MessageHandlerSendHandlerParams,
+    MessageSender,
+} from './MessageSender'
 
 export default class AnthropicAdapter implements LlmAdapter {
     public static Class?: new (
@@ -62,16 +66,36 @@ export default class AnthropicAdapter implements LlmAdapter {
     }
 
     private async sendHandler(
-        params: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming,
+        params: MessageHandlerSendHandlerParams,
         sendOptions: OpenAiRequestOptions
     ) {
         const { messages: openAiMessages, model } = params
         const messages: MessageParam[] = []
+
+        const cacheMarkerIdx = openAiMessages.findIndex(
+            (msg) => (msg as MessageBuilderCacheMarker).cache_marker
+        )
+
         for (const msg of openAiMessages) {
-            messages.push({
-                role: msg.role === 'assistant' ? 'assistant' : 'user',
-                content: msg.content as string,
-            })
+            if (!(msg as MessageBuilderCacheMarker).cache_marker) {
+                const m = msg as ChatCompletionMessageParam
+                messages.push({
+                    role: m.role === 'assistant' ? 'assistant' : 'user',
+                    content: m.content as string,
+                })
+            }
+        }
+
+        if (cacheMarkerIdx > -1) {
+            messages[cacheMarkerIdx - 1].content = [
+                {
+                    type: 'text',
+                    text: messages[cacheMarkerIdx - 1].content as string,
+                    cache_control: {
+                        type: 'ephemeral',
+                    },
+                },
+            ]
         }
 
         const response = await this.api.messages.create(

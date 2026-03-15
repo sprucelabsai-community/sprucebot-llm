@@ -35,11 +35,18 @@ export default class MessageBuilder {
     public buildMessages() {
         const values = this.bot.serialize()
 
-        const allMessages = [
+        const allMessages: MessageBuilderMessage[] = [
             this.buildFirstMessage(values.youAre),
             ...this.buildSkillMessages(values.skill),
             ...this.buildChatHistoryMessages(values.messages),
         ]
+
+        if (!values.skill) {
+            const first = allMessages[0]
+            allMessages.shift()
+            allMessages.unshift({ cache_marker: true })
+            allMessages.unshift(first)
+        }
 
         return allMessages
     }
@@ -129,12 +136,12 @@ export default class MessageBuilder {
 
     private buildSkillMessages(
         skill: SerializedBot<Schema>['skill']
-    ): ChatCompletionMessageParam[] {
+    ): MessageBuilderMessage[] {
         if (!skill) {
             return []
         }
 
-        const messages: ChatCompletionMessageParam[] = []
+        const messages: MessageBuilderMessage[] = []
 
         messages.push(
             this.buildYourJobMessage(skill.yourJobIfYouChooseToAcceptItIs)
@@ -142,10 +149,6 @@ export default class MessageBuilder {
 
         if (skill.stateSchema) {
             messages.push(this.buildStateSchemaMessage(skill.stateSchema))
-        }
-
-        if (skill.state) {
-            messages.push(this.buildStateMessage(skill.state))
         }
 
         if (skill.weAreDoneWhen) {
@@ -160,6 +163,12 @@ export default class MessageBuilder {
             messages.push(
                 this.buildPleaseKeepInMindMessage(skill.pleaseKeepInMindThat)
             )
+        }
+
+        messages.push({ cache_marker: true })
+
+        if (skill.state) {
+            messages.push(this.buildStateMessage(skill.state))
         }
 
         return messages
@@ -264,3 +273,11 @@ export default class MessageBuilder {
 interface BuildMessageOptions {
     memoryLimit?: number
 }
+
+export interface MessageBuilderCacheMarker {
+    cache_marker: true
+}
+
+export type MessageBuilderMessage =
+    | ChatCompletionMessageParam
+    | MessageBuilderCacheMarker

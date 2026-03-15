@@ -2,13 +2,20 @@ import { assertOptions } from '@sprucelabs/schema'
 import { Log } from '@sprucelabs/spruce-skill-utils'
 import OpenAI from 'openai'
 import { RequestOptions } from 'openai/internal/request-options'
-import { ReasoningEffort } from 'openai/resources'
+import {
+    ChatCompletionCreateParamsNonStreaming,
+    ReasoningEffort,
+} from 'openai/resources'
 import {
     LlmAdapter,
     SendMessageOptions,
     SprucebotLlmBot,
 } from '../../llm.types'
-import MessageSenderImpl, { MessageSender } from './MessageSender'
+import { MessageBuilderCacheMarker } from './MessageBuilder'
+import MessageSenderImpl, {
+    MessageHandlerSendHandlerParams,
+    MessageSender,
+} from './MessageSender'
 
 export default class OpenAiAdapter implements LlmAdapter {
     public static Class?: new (
@@ -51,11 +58,17 @@ export default class OpenAiAdapter implements LlmAdapter {
     }
 
     private async sendHandler(
-        params: OpenAI.Chat.Completions.ChatCompletionCreateParamsNonStreaming,
+        params: MessageHandlerSendHandlerParams,
         sendOptions: RequestOptions
     ) {
+        const { messages } = params
+
+        params.messages = messages.filter(
+            (msg) => !(msg as MessageBuilderCacheMarker).cache_marker
+        )
+
         const response = await this.api.chat.completions.create(
-            params,
+            params as ChatCompletionCreateParamsNonStreaming,
             sendOptions
         )
         const responseMessage = response.choices?.[0]?.message?.content?.trim()

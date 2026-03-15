@@ -1,13 +1,13 @@
 import { Log } from '@sprucelabs/spruce-skill-utils'
 import { APIUserAbortError as AnthropicAbortError } from '@anthropic-ai/sdk'
-import OpenAI, { APIUserAbortError } from 'openai'
+import { APIUserAbortError } from 'openai'
 import { RequestOptions } from 'openai/internal/request-options'
 import {
     ReasoningEffort,
     ChatCompletionCreateParamsNonStreaming,
 } from 'openai/resources'
 import { SprucebotLlmBot, SendMessageOptions } from '../../llm.types'
-import MessageBuilder from './MessageBuilder'
+import MessageBuilder, { MessageBuilderMessage } from './MessageBuilder'
 import { MESSAGE_RESPONSE_ERROR_MESSAGE } from './OpenAiAdapter'
 
 export default class MessageSenderImpl implements MessageSender {
@@ -77,7 +77,7 @@ export default class MessageSenderImpl implements MessageSender {
         const { abortController, reasoningEffort, ...restOptions } = options
 
         const params: ChatCompletionCreateParamsNonStreaming = {
-            ...restOptions,
+            ...(restOptions as ChatCompletionCreateParamsNonStreaming),
         }
 
         if (reasoningEffort) {
@@ -93,14 +93,19 @@ export default class MessageSenderImpl implements MessageSender {
 }
 
 export type MessageSenderSendOptions = SendMessageOptions & {
-    messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[]
+    messages: MessageBuilderMessage[]
     reasoningEffort?: ReasoningEffort
     model: string
     abortController: AbortController
 }
 
+export interface MessageHandlerSendHandlerParams {
+    model: string
+    messages: MessageBuilderMessage[]
+}
+
 export type MessageSenderSendHandler = (
-    params: ChatCompletionCreateParamsNonStreaming,
+    params: MessageHandlerSendHandlerParams,
     options: RequestOptions
 ) => Promise<string | undefined>
 
