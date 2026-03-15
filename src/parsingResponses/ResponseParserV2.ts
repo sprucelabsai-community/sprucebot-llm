@@ -16,7 +16,12 @@ export default class ResponseParserV2 implements ResponseParser {
         let message: string | null = response.replace(DONE_TOKEN, '').trim()
         let state: Record<string, any> | undefined = undefined
         let callbackResults: SendMessage | undefined = undefined
-        const hasCallbacks = message.includes('@callback')
+        const hasCallbacks =
+            message.includes('@callback') ||
+            (callbacks != null &&
+                Object.keys(callbacks).some((name) =>
+                    message!.includes(`@${name}`)
+                ))
 
         if (hasCallbacks) {
             const { callbackResults: c, message: m } =
@@ -62,23 +67,29 @@ export default class ResponseParserV2 implements ResponseParser {
         let callbackStrippedMessage = message
         let callbackResults = ''
 
-        const matches = [...message.matchAll(/^@callback\s+({.*})$/gm)]
+        const reserved = new Set(['updateState', 'results'])
+        const matches = [...message.matchAll(/^@(\w+)\s+({.*})$/gm)]
         for (const match of matches) {
-            const callbackData = match && match[1] ? JSON.parse(match[1]) : null
-            const { name, options } = callbackData || {}
+            if (reserved.has(match[1])) {
+                continue
+            }
+            const parsed = JSON.parse(match[2])
+            const isCanonical = match[1] === 'callback'
+            const name = isCanonical ? parsed.name : match[1]
+            const options = isCanonical ? parsed.options : parsed
+            const callback = callbacks?.[name]
 
-            debugger
-            if (match) {
-                const parts = callbackStrippedMessage.split(match[0])
-                callbackStrippedMessage = parts
-                    .map((s) => s.trim())
-                    .join('')
-                    .trim()
+            if (!isCanonical && !callback) {
+                continue
             }
 
-            try {
-                const callback = callbacks?.[name]
+            const parts = callbackStrippedMessage.split(match[0])
+            callbackStrippedMessage = parts
+                .map((s) => s.trim())
+                .join('')
+                .trim()
 
+            try {
                 if (callback?.parameters) {
                     validateAndNormalizeCallbackOptions(
                         callback.parameters,
@@ -88,10 +99,7 @@ export default class ResponseParserV2 implements ResponseParser {
 
                 const results = await callback?.cb(options)
 
-                callbackResults += this.renderCallbackResults({
-                    name,
-                    results,
-                })
+                callbackResults += this.renderCallbackResults({ name, results })
             } catch (err) {
                 callbackResults += this.renderCallbackResults({
                     name,
@@ -126,3 +134,5 @@ export default class ResponseParserV2 implements ResponseParser {
         return `A function call is done using the following syntax:\n@callback { "name": "callbackName", "options": {} }\nMake sure to json encode the options and include the name of the callback you want to call. You can call as many callbacks as you want in a single response by including multiple @callback lines. IMPORTANT: JSON must be on a single line. Do NOT use multi-line or formatted JSON. Also, do NOT call something like @myCallback. You would call it like this: @callback { "name": "myCallback", "options": {} }`
     }
 }
+
+export type ParserCallbackStyle = '@callback' | '@functionCall'

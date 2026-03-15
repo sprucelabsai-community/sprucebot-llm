@@ -1,11 +1,15 @@
 import { Schema, SelectChoice, validateSchemaValues } from '@sprucelabs/schema'
 import { test, suite, assert, generateId } from '@sprucelabs/test-utils'
 import { DONE_TOKEN } from '../../../bots/templates'
-import ResponseParserV2 from '../../../parsingResponses/ResponseParserV2'
+import ResponseParserV2, {
+    ParserCallbackStyle,
+} from '../../../parsingResponses/ResponseParserV2'
 import AbstractResponseParserTest from './AbstractResponseParserTest'
 
 @suite()
 export default class ResponseParserV2Test extends AbstractResponseParserTest {
+    private callbackStyle: ParserCallbackStyle = '@callback'
+
     protected async beforeEach() {
         await super.beforeEach()
         this.parser = new ResponseParserV2()
@@ -69,8 +73,10 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
-    @test()
-    protected async returnsCallbackResults() {
+    @test('returns callback results with style @callback', '@callback')
+    @test('returns callback results with style @functionCall', '@functionCall')
+    protected async returnsCallbackResults(callbackStyle: ParserCallbackStyle) {
+        this.setCallbackStyle(callbackStyle)
         this.setCallback('test', {
             cb: () => {
                 return 'Here are your results!'
@@ -90,8 +96,15 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
-    @test()
-    protected async canCallMultipleCallbacksInSameCallback() {
+    @test('cav call multiple callbacks in same message', '@callback')
+    @test(
+        'can call multiple callbacks in same message with style @functionCall',
+        '@functionCall'
+    )
+    protected async canCallMultipleCallbacksInSameMessage(
+        callbackStyle: ParserCallbackStyle
+    ) {
+        this.setCallbackStyle(callbackStyle)
         this.setCallback('first', {
             cb: () => {
                 return 'first result'
@@ -128,8 +141,15 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
-    @test()
-    protected async canPassOptionsToCallbacks() {
+    @test('can pass options to callbacks', '@callback')
+    @test(
+        'can pass options to callbacks with style @functionCall',
+        '@functionCall'
+    )
+    protected async canPassOptionsToCallbacks(
+        callbackStyle: ParserCallbackStyle
+    ) {
+        this.setCallbackStyle(callbackStyle)
         let passedOptions: Record<string, any> | undefined = undefined
 
         this.setCallback('test', {
@@ -163,8 +183,15 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
-    @test()
-    protected async validatesOptionsToCallback() {
+    @test('validates options passed to callbacks', '@callback')
+    @test(
+        'validates options passed to callbacks with style @functionCall',
+        '@functionCall'
+    )
+    protected async validatesOptionsToCallback(
+        callbackStyle: ParserCallbackStyle
+    ) {
+        this.setCallbackStyle(callbackStyle)
         const choices: SelectChoice[] = [
             {
                 value: 'red',
@@ -346,11 +373,19 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
+    private setCallbackStyle(callbackStyle: ParserCallbackStyle) {
+        this.callbackStyle = callbackStyle
+    }
+
     private renderCallbackResults(options: Record<string, any>) {
         return `@results ${JSON.stringify(options)}\n`
     }
 
     private renderCallback(options: Record<string, any>): string {
+        if (this.callbackStyle === '@functionCall') {
+            const { name, options: cbOptions, ...rest } = options
+            return `\n@${name} ${JSON.stringify(cbOptions ?? rest)}\n`
+        }
         return `\n@callback ${JSON.stringify(options)}\n`
     }
 
