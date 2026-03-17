@@ -1,3 +1,7 @@
+## <small>15.1.7 (2026-03-17)</small>
+
+* patch: readme update ([3a79468](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3a79468))
+
 ## <small>15.1.6 (2026-03-17)</small>
 
 * fix: update callback invocation format docs to V2 (@callback syntax) ([54b343b](https://github.com/sprucelabsai-community/sprucebot-llm/commit/54b343b))
