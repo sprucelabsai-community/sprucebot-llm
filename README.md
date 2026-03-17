@@ -18,6 +18,7 @@ A TypeScript library for leveraging large language models to do... anything!
     * Leverage Skills to get your bot to complete any task!
 * Multiple adapter support
     * [OpenAI](#openai-adapter-configuration) - GPT-4o, o1, and other OpenAI models
+    * [Anthropic](#anthropic-adapter) - Claude models with prompt caching support
     * [Ollama](#ollama-adapter) - Run local models like Llama, Mistral, etc.
     * [Custom adapters](#custom-adapters) - Implement your own
 * Fully typed
@@ -193,6 +194,46 @@ adapter.setReasoningEffort('low')
 - `OpenAiAdapter.OpenAI`: assign a custom OpenAI client class (useful for tests).
 
 Requests are sent via `openai.chat.completions.create(...)` with messages built by the adapter from the Bot state and history.
+
+### Anthropic adapter
+
+Use Claude models from Anthropic. Requires `@anthropic-ai/sdk` and an Anthropic API key.
+
+```ts
+import { AnthropicAdapter, SprucebotLlmFactory } from '@sprucelabs/sprucebot-llm'
+
+const adapter = AnthropicAdapter.Adapter(process.env.ANTHROPIC_API_KEY!, {
+    maxTokens: 4096,           // required
+    model: 'claude-sonnet-4-5', // default
+    log: yourLogger,           // optional
+    memoryLimit: 10,           // optional
+    thinking: false,           // optional: enable extended thinking mode
+})
+
+const bots = SprucebotLlmFactory.Factory(adapter)
+```
+
+**Anthropic adapter options:**
+
+| Option | Type | Required | Description |
+|--------|------|----------|-------------|
+| `maxTokens` | `number` | yes | Maximum tokens for the model response |
+| `model` | `string` | no | Model to use (default: `'claude-sonnet-4-5'`) |
+| `log` | `Log` | no | Optional logger instance |
+| `memoryLimit` | `number` | no | Limit how many tracked messages are sent |
+| `thinking` | `boolean` | no | Enable extended thinking (`thinking: adaptive`) |
+
+#### Anthropic prompt caching
+
+The Anthropic adapter automatically enables [prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) by inserting an `ephemeral` cache breakpoint after the system prompt. This allows Anthropic to cache the static portion of the prompt (your `youAre` + skill instructions) and only re-process the changing chat history on each turn — reducing latency and cost on long conversations.
+
+Token usage (including cache creation and cache read tokens) is logged at the `info` level on each request:
+
+```
+[TOKEN USAGE] input=1234 cache_create=800 cache_read=400 output=256
+```
+
+No configuration is required — caching is applied automatically.
 
 ### Ollama adapter
 
@@ -426,6 +467,35 @@ const bookingBot = bots.Bot({
 
 If you are using reasoning models that accept `reasoning_effort`, you can set it via `OPENAI_REASONING_EFFORT` or `adapter.setReasoningEffort(...)`.
 
+## Serialization and Persistence
+
+You can snapshot a bot's full state — including message history, skill configuration, and any accumulated state — and later restore it. This is useful for persisting conversations across process restarts, saving/loading sessions, or transferring bot state.
+
+```ts
+// Save bot state (e.g. to a database or file)
+const snapshot = bot.serialize()
+// snapshot: { youAre, stateSchema, state, messages, skill }
+
+// Later, recreate the bot and restore state
+const bot2 = bots.Bot({
+    skill: mySkill,
+    youAre: 'a helpful assistant',
+})
+bot2.unserialize(snapshot)
+// bot2 now has the same message history and state as bot had when serialized
+```
+
+The skill's state is also preserved through serialization:
+
+```ts
+const skillSnapshot = skill.serialize()
+// skillSnapshot: { yourJobIfYouChooseToAcceptItIs, state, stateSchema, ... }
+
+skill.unserialize(skillSnapshot)
+```
+
+`unserialize` restores `state` and skill options but does not reconnect callback handlers — those are defined in code. Re-attach any callbacks when recreating the skill.
+
 ## API Reference
 
 ### Bot methods
@@ -439,6 +509,7 @@ If you are using reasoning models that accept `reasoning_effort`, you can set it
 | `updateState(partialState)` | Update state and emit `did-update-state` |
 | `setSkill(skill)` | Swap the active skill |
 | `serialize()` | Snapshot of bot's current state, skill, and history |
+| `unserialize(serialized)` | Restore state from a previous `serialize()` snapshot |
 
 ### Skill methods
 
@@ -447,7 +518,8 @@ If you are using reasoning models that accept `reasoning_effort`, you can set it
 | `updateState(partialState)` | Update skill state |
 | `getState()` | Get current state |
 | `setModel(model)` | Change the model this skill uses |
-| `serialize()` | Snapshot of skill configuration |
+| `serialize()` | Snapshot of skill configuration and state |
+| `unserialize(serialized)` | Restore skill state from a previous `serialize()` snapshot |
 
 ### Factory helpers
 
