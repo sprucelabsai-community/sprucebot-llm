@@ -362,16 +362,21 @@ const skill = bots.Skill({
 ```
 
 #### Callback invocation format
-When using the `OpenAiAdapter`, the model is instructed to call callbacks using one of these formats:
+The model is instructed to invoke callbacks using the following syntax (V2 format):
 
 ```text
-<<functionName/>>
-<<functionName>>{"param":"value"}<</functionName>>
+@callback { "name": "callbackName", "options": {} }
 ```
 
-Only one callback invocation per model response is supported. Callbacks can return either a `string` or an image message shaped like `{ imageBase64, imageDescription }` (see the "Sending images" section below).
+Multiple callbacks can be included in a single response, one per line. JSON must be on a single line — do not use multi-line or formatted JSON.
 
-Legacy placeholder format (`xxxxx callbackName xxxxx`) is still supported by the response parser for older prompt templates.
+As a shorthand, you can also invoke a named callback directly:
+
+```text
+@myCallback { "param": "value" }
+```
+
+Callbacks can return either a `string` or an image message shaped like `{ imageBase64, imageDescription }` (see the "Sending images" section below).
 
 Callback parameters can include basic types (e.g. `text`, `number`, `boolean`, `dateMs`, `dateTimeMs`) and `select` fields with choices from `@sprucelabs/schema`.
 
