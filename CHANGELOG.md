@@ -1,3 +1,7 @@
+## <small>15.1.6 (2026-03-17)</small>
+
+* fix: update callback invocation format docs to V2 (@callback syntax) ([54b343b](https://github.com/sprucelabsai-community/sprucebot-llm/commit/54b343b))
+
 ## <small>15.1.5 (2026-03-15)</small>
 
 * patch: add shorthand @functionName {json} callback syntax to ResponseParserV2 ([4cd6b41](https://github.com/sprucelabsai-community/sprucebot-llm/commit/4cd6b41))
