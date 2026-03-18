@@ -123,7 +123,11 @@ export default class ResponseParserV2 implements ResponseParser {
         results?: LmmCallbackResponse | undefined
         error?: any
     }) {
-        return `@results ${JSON.stringify(callbackOptions)}\n`
+        const serializable = { ...callbackOptions }
+        if (serializable.error instanceof Error) {
+            serializable.error = { message: serializable.error.message }
+        }
+        return `@results ${JSON.stringify(serializable)}\n`
     }
 
     public getStateUpdateInstructions(): string {
