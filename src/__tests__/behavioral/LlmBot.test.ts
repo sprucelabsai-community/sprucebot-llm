@@ -8,6 +8,7 @@ import {
 } from '@sprucelabs/test-utils'
 import SprucebotLlmBotImpl from '../../bots/SprucebotLlmBotImpl'
 import {
+    LlmMessage,
     MessageResponseCallback,
     SendMessage,
     SkillOptions,
@@ -713,8 +714,12 @@ export default class LlmBotTest extends AbstractLlmTest {
     @test()
     protected async canUnserialize() {
         const bot1 = this.Bot({
+            youAre: generateId(),
             skill: this.Skill({
                 stateSchema: personSchema,
+                weAreDoneWhen: generateId(),
+                pleaseKeepInMindThat: [generateId()],
+                yourJobIfYouChooseToAcceptItIs: generateId(),
             }),
         })
 
@@ -734,6 +739,32 @@ export default class LlmBotTest extends AbstractLlmTest {
             bot2.serialize(),
             bot1.serialize(),
             'unserialized bot does not match original'
+        )
+    }
+
+    @test()
+    protected async unserializingCapturesMessageHistory() {
+        const bot1 = this.Bot({
+            skill: this.Skill({
+                stateSchema: personSchema,
+            }),
+        })
+
+        const bot2 = this.Bot({
+            skill: this.Skill({
+                stateSchema: personSchema,
+            }),
+        })
+
+        const messages: LlmMessage[] = [{ from: 'Me', message: generateId() }]
+
+        bot1.setMessages(messages)
+        bot2.unserialize(bot1.serialize())
+
+        assert.isEqualDeep(
+            bot2.getMessages(),
+            messages,
+            'unserialized bot does not capture message history'
         )
     }
 

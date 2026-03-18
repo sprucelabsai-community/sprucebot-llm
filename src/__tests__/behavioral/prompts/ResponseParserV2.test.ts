@@ -373,6 +373,20 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
+    @test()
+    protected async detectsAndStripsUpdateStateThatFailedInProd() {
+        const results = await this
+            .parse(`Good news, Taylor — HAN-1116 is wrapped up. Slack DMs went out to Taylor Romero, Jeff Porter, and Taylor Pearce. Dagmara got the email. The current work doc is updated for the 4th QA submission. No more objectives in the queue — Handbid Dev is just waiting on your next direction.
+
+@updateState {"stepsRemaining":["Awaiting user direction"],"memoryBank":"User name: My Dude (Taylor). 6th boot.\n\nBUGS REPORTED TO TAYLOR: 1) updateEffort definedProcess not persisting to localDefinedProcess when SOP attached. 2) removeTacticalAdvice/removeGuardrails should reject SOP-provided matches when changeTarget is effort-local.\n\nCOMPLETED EFFORTS: Remote Access Setup, Browser, Handbid Dev (HAN-1116 4th QA submission complete — Slack DMs to Taylor Romero, Jeff Porter, Taylor Pearce; email to Dagmara dherter@nicmangroup.com), Handbid Release (API token partner docs — archived).\n\nSOPs: Browser Service (sop-3) — attached to KB Audit. Slack Bot Service (sop-4). Handbid DevOps (sop-1). Handbid Triage SOP (sop-2). Handbid Linear SOP (repo-based). Slack Notification SOP (sop-5).\n\nHANDBID DEV: ALIVE, awaiting-guidance, no current objective. 100% progress. Ready for next direction.\n\nSLACK BOT EFFORT: PAUSED. Progress: 100%. No current objective.\n\nOTHER PAUSED EFFORTS:\n1) Web App Redesign — PAUSED.\n2) KB Audit — PAUSED. ~93%.\n3) Triage — PAUSED. Waiting on Kari re HAN-1083.\n\nPENDING CLEANUP: consolidate SOP tactics on sop-4, remove local tactic #4 from Triage.","runningEfforts":[]}`)
+
+        assert.isEqual(
+            results.message,
+            `Good news, Taylor — HAN-1116 is wrapped up. Slack DMs went out to Taylor Romero, Jeff Porter, and Taylor Pearce. Dagmara got the email. The current work doc is updated for the 4th QA submission. No more objectives in the queue — Handbid Dev is just waiting on your next direction.`,
+            'Expected message to be parsed correctly with failed updateState'
+        )
+    }
+
     private setCallbackStyle(callbackStyle: ParserCallbackStyle) {
         this.callbackStyle = callbackStyle
     }
