@@ -1,3 +1,8 @@
+## <small>15.1.8 (2026-03-18)</small>
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([b0a51a0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b0a51a0))
+* patch: better serialization work ([e69c216](https://github.com/sprucelabsai-community/sprucebot-llm/commit/e69c216))
+
 ## <small>15.1.7 (2026-03-17)</small>
 
 * patch: readme update ([3a79468](https://github.com/sprucelabsai-community/sprucebot-llm/commit/3a79468))
