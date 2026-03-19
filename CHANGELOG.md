@@ -1,3 +1,7 @@
+## <small>15.1.9 (2026-03-19)</small>
+
+* patch: better docs ([a7a2795](https://github.com/sprucelabsai-community/sprucebot-llm/commit/a7a2795))
+
 ## <small>15.1.8 (2026-03-18)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([b0a51a0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b0a51a0))
