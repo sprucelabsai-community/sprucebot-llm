@@ -130,6 +130,7 @@ export default class ResponseParserV2 implements ResponseParser {
         return `Updating state works similar to all function calls. Use the following syntax:
 @updateState { "field1": "value1", "field2": "value2" }
 Make sure to json encode only the fields you want to change. You can update state once and do it at the end of any messages you send. IMPORTANT: JSON must be on a single line. Do NOT use multi-line or formatted JSON.
+Your user-facing message is always sent to the user, even if @updateState fails. If @updateState fails later, do not repeat the same message. Only send the specific @updateState needed to fix the missing state change.
 Good example:
 @updateState { "favoriteColor": "blue", "firstName": "Taylor" }
 Bad examples:
@@ -145,6 +146,7 @@ Bad examples:
         return `A function call is done using the following syntax:
 @callback { "name": "callbackName", "options": {} }
 Make sure to json encode the options and include the name of the callback you want to call. You can call as many callbacks as you want in a single response by including multiple @callback lines. IMPORTANT: JSON must be on a single line. Do NOT use multi-line or formatted JSON. Also, do NOT call something like @myCallback. You would call it like this: @callback { "name": "myCallback", "options": {} }
+Your user-facing message is always sent to the user, even if a callback fails. Successful callbacks have already run successfully. If a callback fails later, do not repeat the same message and do not repeat successful callbacks. Only call the specific callback needed to fix the failed gap.
 Good example:
 @callback { "name": "lookupWeather", "options": { "zip": "80524" } }
 Bad examples:
