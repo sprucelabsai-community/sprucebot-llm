@@ -16,6 +16,7 @@ A TypeScript library for leveraging large language models to do... anything!
 * Unlimited use cases
     * Skill architecture for extensibility
     * Leverage Skills to get your bot to complete any task!
+    * [Swap skills mid-conversation](#swapping-skills) to chain multi-step flows
 * Multiple adapter support
     * [OpenAI](#openai-adapter-configuration) - GPT-4o, o1, and other OpenAI models
     * [Anthropic](#anthropic-adapter) - Claude models with prompt caching support
@@ -466,6 +467,127 @@ const bookingBot = bots.Bot({
 ```
 
 If you are using reasoning models that accept `reasoning_effort`, you can set it via `OPENAI_REASONING_EFFORT` or `adapter.setReasoningEffort(...)`.
+
+## Swapping Skills
+
+You can replace the active skill on a bot at any time — even mid-conversation — by calling `bot.setSkill(newSkill)`. This is useful for multi-step flows where each phase of the conversation has a different job, state schema, or set of callbacks.
+
+```ts
+const greetingSkill = bots.Skill({
+    yourJobIfYouChooseToAcceptItIs: 'to greet the user and ask for their name',
+    weAreDoneWhen: 'you have collected the user\'s name',
+    stateSchema: buildSchema({
+        id: 'greeting',
+        fields: {
+            firstName: { type: 'text', label: 'First name' },
+        },
+    }),
+})
+
+const bookingSkill = bots.Skill({
+    yourJobIfYouChooseToAcceptItIs: 'to book an appointment for the user',
+    weAreDoneWhen: 'the appointment is booked',
+    callbacks: {
+        book: {
+            cb: async (options) => {
+                await bookAppointment(options)
+                return 'Appointment booked!'
+            },
+            useThisWhenever: 'you are ready to book the appointment',
+        },
+    },
+})
+
+const bot = bots.Bot({
+    youAre: 'a helpful scheduling assistant',
+    skill: greetingSkill,
+})
+
+// Listen for the greeting phase to complete, then swap to booking
+await greetingSkill.on('did-update-state', async () => {
+    if (greetingSkill.getState()?.firstName) {
+        bot.setSkill(bookingSkill)
+    }
+})
+```
+
+### Pre-populating state before swapping
+
+Skills manage their own state independently of the bot. You can create a skill, set its initial state, and then hand it to the bot — useful when you already know some context going into the next phase:
+
+```ts
+const bookingSkill = bots.Skill({
+    yourJobIfYouChooseToAcceptItIs: 'to book an appointment',
+    weAreDoneWhen: 'the appointment is booked',
+    stateSchema: buildSchema({
+        id: 'booking',
+        fields: {
+            guestName: { type: 'text', label: 'Guest name' },
+            time: { type: 'text', label: 'Appointment time' },
+        },
+    }),
+})
+
+// Pre-load state from the previous phase before the bot ever uses this skill
+await bookingSkill.updateState({
+    guestName: greetingSkill.getState()?.firstName,
+})
+
+// Now swap — the LLM will already know guestName when it starts
+bot.setSkill(bookingSkill)
+```
+
+You can also read and update a skill's state at any point, regardless of whether it's active:
+
+```ts
+// Check what the skill has collected so far
+console.log(bookingSkill.getState())
+// { guestName: 'Taylor', time: undefined }
+
+// Inject external data directly (e.g. from your own API)
+await bookingSkill.updateState({ time: '10am' })
+```
+
+`updateState` merges — it only overwrites the fields you pass, leaving others intact. And since skills are plain objects, you can maintain references to them alongside the bot and keep them in sync independently.
+
+### Key behaviors when swapping skills
+
+**`getIsDone()` resets to `false`** — swapping in a new skill always marks the bot as not done, so the conversation continues even if the previous skill had completed:
+
+```ts
+bot.markAsDone()
+console.log(bot.getIsDone()) // true
+
+bot.setSkill(bookingSkill)
+console.log(bot.getIsDone()) // false — ready for the next phase
+```
+
+**Message history is preserved** — the full conversation history carries over. Only the active skill (its instructions, state schema, callbacks, and model) changes:
+
+```ts
+// Before swap: greeting skill active
+await bot.sendMessage('Hi there!')
+
+// Swap to a new skill mid-conversation
+bot.setSkill(bookingSkill)
+
+// After swap: booking skill active, but previous messages still in history
+await bot.sendMessage('I\'d like to book for Tuesday')
+```
+
+**The new skill's state replaces the old one** — after a swap, `bot.serialize().skill` reflects the new skill's full configuration:
+
+```ts
+const skill2 = bots.Skill({
+    stateSchema: carSchema,
+    yourJobIfYouChooseToAcceptItIs: 'to help the user pick a car',
+})
+
+bot.setSkill(skill2)
+
+// bot.serialize().skill now reflects skill2's schema and state
+console.log(bot.serialize().skill)
+```
 
 ## Serialization and Persistence
 

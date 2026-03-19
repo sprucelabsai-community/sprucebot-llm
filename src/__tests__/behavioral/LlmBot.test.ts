@@ -768,6 +768,37 @@ export default class LlmBotTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected async canDropInNewSkill() {
+        const bot1 = this.Bot({
+            skill: this.Skill({
+                stateSchema: personSchema,
+                weAreDoneWhen: generateId(),
+                pleaseKeepInMindThat: [generateId()],
+                yourJobIfYouChooseToAcceptItIs: generateId(),
+            }),
+        })
+
+        const skill2 = this.Skill({
+            stateSchema: carSchema,
+            weAreDoneWhen: generateId(),
+            pleaseKeepInMindThat: [generateId()],
+            yourJobIfYouChooseToAcceptItIs: generateId(),
+        })
+
+        const bot2 = this.Bot({
+            skill: skill2,
+        })
+
+        bot1.setSkill(skill2)
+
+        assert.isEqualDeep(
+            bot1.serialize(),
+            bot2.serialize(),
+            'after dropping in new skill, bots should be the same'
+        )
+    }
+
     private setupWithStateSchema(skillOrBot: string, schema: Schema) {
         if (skillOrBot === 'skill') {
             this.setupBotWithSkill({
