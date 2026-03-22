@@ -30,7 +30,7 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
     @test('parses out state 1', { hello: 'world' })
     @test('parses out state 2', { what: 'the', is: 'going', on: 'here' })
     protected async parsesState(input: Record<string, any>) {
-        const state = this.generateUpdateStateSchemaSyntax(input)
+        const state = this.renderUpdateState(input)
         await this.parsingEquals(state, {
             isDone: false,
             state: input,
@@ -40,7 +40,7 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
 
     @test()
     protected async canUpdateStateWithMessagesAroundIt() {
-        const state = this.generateUpdateStateSchemaSyntax({ hello: 'world' })
+        const state = this.renderUpdateState({ hello: 'world' })
         const message = `hey there!!!${state}what the!?`
         await this.parsingEquals(message, {
             isDone: false,
@@ -411,6 +411,17 @@ Bad examples:
         )
     }
 
+    @test()
+    protected async canUpdateStateTwiceInOneMessage() {
+        const message = `hey there!!!\nwhat the!?\n${this.renderUpdateState({ taco: 'one' })}\n${this.renderUpdateState({ taco: 'two' })}\n`
+        const results = await this.parse(message)
+        assert.isEqualDeep(
+            results.state,
+            { taco: 'two' },
+            'Expected second state update to overwrite first'
+        )
+    }
+
     private setCallbackStyle(callbackStyle: ParserCallbackStyle) {
         this.callbackStyle = callbackStyle
     }
@@ -427,7 +438,7 @@ Bad examples:
         return `\n@callback ${JSON.stringify(options)}\n`
     }
 
-    protected generateUpdateStateSchemaSyntax(input: Record<string, any>) {
+    protected renderUpdateState(input: Record<string, any>) {
         return `\n@updateState ${JSON.stringify(input)}\n`
     }
 }

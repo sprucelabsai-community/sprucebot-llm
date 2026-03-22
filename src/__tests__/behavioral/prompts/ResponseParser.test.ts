@@ -68,14 +68,14 @@ export default class ResponseParserTest extends AbstractResponseParserTest {
         what: 'the??',
     })
     protected async parsesStateWithNothingElse(input: Record<string, any>) {
-        const state = this.generateUpdateStateSchemaSyntax(input)
+        const state = this.renderUpdateState(input)
         await this.parsingEquals(state, {
             isDone: false,
             state: input,
             message: '',
         })
 
-        const state2 = this.generateUpdateStateSchemaSyntax(input, true)
+        const state2 = this.renderUpdateState(input, true)
         await this.parsingEquals(state2, {
             isDone: false,
             state: input,
@@ -86,7 +86,7 @@ export default class ResponseParserTest extends AbstractResponseParserTest {
     @test('should remove state from response without boundary newlines', false)
     @test('should remove state from response with boundary newlines', true)
     protected async removesStateFromResponse(shouldNewlineBoundaries: boolean) {
-        const state = this.generateUpdateStateSchemaSyntax(
+        const state = this.renderUpdateState(
             { hello: 'world' },
             shouldNewlineBoundaries
         )
@@ -638,7 +638,7 @@ export default class ResponseParserTest extends AbstractResponseParserTest {
         }
     }
 
-    protected generateUpdateStateSchemaSyntax(
+    protected renderUpdateState(
         input: Record<string, any>,
         shouldNewlineBoundaries = false
     ) {

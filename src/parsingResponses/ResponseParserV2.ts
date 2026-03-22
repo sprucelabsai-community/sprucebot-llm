@@ -32,8 +32,10 @@ export default class ResponseParserV2 implements ResponseParser {
 
         const hasState = response.includes('@updateState')
         if (hasState && message) {
-            const stateMatch = message.match(/@updateState\s+({[\s\S]*?})\n?/)
-            if (stateMatch && stateMatch[1]) {
+            const stateMatches = [
+                ...message.matchAll(/@updateState\s+({[\s\S]*?})\n?/g),
+            ]
+            for (const stateMatch of stateMatches) {
                 try {
                     state = JSON.parse(stateMatch[1])
                 } catch (err) {
@@ -119,7 +121,7 @@ export default class ResponseParserV2 implements ResponseParser {
     }
 
     private renderCallbackResults(callbackOptions: {
-        name: any
+        name: string
         results?: LmmCallbackResponse | undefined
         error?: any
     }) {

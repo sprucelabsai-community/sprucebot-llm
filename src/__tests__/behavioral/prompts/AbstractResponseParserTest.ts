@@ -37,7 +37,7 @@ export default abstract class AbstractResponseParserTest extends AbstractLlmTest
         return await this.parser.parse(message, callbacks ?? this.callbacks)
     }
 
-    protected abstract generateUpdateStateSchemaSyntax(
+    protected abstract renderUpdateState(
         input: Record<string, any>,
         shouldNewlineBoundaries?: boolean
     ): string
