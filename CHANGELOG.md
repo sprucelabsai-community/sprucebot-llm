@@ -1,3 +1,7 @@
+## <small>15.1.11 (2026-03-22)</small>
+
+* patch: can update state multiplet times ([f0f3498](https://github.com/sprucelabsai-community/sprucebot-llm/commit/f0f3498))
+
 ## <small>15.1.10 (2026-03-19)</small>
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([7189741](https://github.com/sprucelabsai-community/sprucebot-llm/commit/7189741))
