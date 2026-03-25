@@ -1066,7 +1066,11 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         await this.setAndSendMessage(message)
 
-        const hasFunctionSyntax = !!(skillOptions.callbacks || skillOptions.state || skillOptions.stateSchema)
+        const hasFunctionSyntax = !!(
+            skillOptions.callbacks ||
+            skillOptions.state ||
+            skillOptions.stateSchema
+        )
         this.assertLastCompletionEquals([
             {
                 role: 'system',
