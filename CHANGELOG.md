@@ -1,3 +1,8 @@
+## <small>15.1.12 (2026-03-25)</small>
+
+* patch: lint formatting fix ([af48cb3](https://github.com/sprucelabsai-community/sprucebot-llm/commit/af48cb3))
+* patch: switch callback and state syntax to JS-style @functionName({}) format ([ddc5cfa](https://github.com/sprucelabsai-community/sprucebot-llm/commit/ddc5cfa))
+
 ## <small>15.1.11 (2026-03-22)</small>
 
 * patch: can update state multiplet times ([f0f3498](https://github.com/sprucelabsai-community/sprucebot-llm/commit/f0f3498))
