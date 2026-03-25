@@ -1066,11 +1066,20 @@ export default class OpenAiTest extends AbstractLlmTest {
 
         await this.setAndSendMessage(message)
 
+        const hasFunctionSyntax = !!(skillOptions.callbacks || skillOptions.state || skillOptions.stateSchema)
         this.assertLastCompletionEquals([
             {
                 role: 'system',
                 content: `For this interaction, your job is ${this.skillJob}.`,
             },
+            ...(hasFunctionSyntax
+                ? [
+                      {
+                          role: 'system' as const,
+                          content: `Throughout this conversation, all function calls and state updates use JavaScript-style syntax: @functionName({ "key": "value" }). The function name follows the @ symbol, and the single argument is a JSON object wrapped in parentheses. All JSON must be on a single line.`,
+                      },
+                  ]
+                : []),
             ...messages,
             {
                 role: 'user',

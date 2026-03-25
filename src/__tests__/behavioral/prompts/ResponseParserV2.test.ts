@@ -1,15 +1,11 @@
 import { Schema, SelectChoice, validateSchemaValues } from '@sprucelabs/schema'
 import { test, suite, assert, generateId } from '@sprucelabs/test-utils'
 import { DONE_TOKEN } from '../../../bots/templates'
-import ResponseParserV2, {
-    ParserCallbackStyle,
-} from '../../../parsingResponses/ResponseParserV2'
+import ResponseParserV2 from '../../../parsingResponses/ResponseParserV2'
 import AbstractResponseParserTest from './AbstractResponseParserTest'
 
 @suite()
 export default class ResponseParserV2Test extends AbstractResponseParserTest {
-    private callbackStyle: ParserCallbackStyle = '@callback'
-
     protected async beforeEach() {
         await super.beforeEach()
         this.parser = new ResponseParserV2()
@@ -73,10 +69,8 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
-    @test('returns callback results with style @callback', '@callback')
-    @test('returns callback results with style @functionCall', '@functionCall')
-    protected async returnsCallbackResults(callbackStyle: ParserCallbackStyle) {
-        this.setCallbackStyle(callbackStyle)
+    @test()
+    protected async returnsCallbackResults() {
         this.setCallback('test', {
             cb: () => {
                 return 'Here are your results!'
@@ -96,15 +90,8 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
-    @test('cav call multiple callbacks in same message', '@callback')
-    @test(
-        'can call multiple callbacks in same message with style @functionCall',
-        '@functionCall'
-    )
-    protected async canCallMultipleCallbacksInSameMessage(
-        callbackStyle: ParserCallbackStyle
-    ) {
-        this.setCallbackStyle(callbackStyle)
+    @test()
+    protected async canCallMultipleCallbacksInSameMessage() {
         this.setCallback('first', {
             cb: () => {
                 return 'first result'
@@ -141,15 +128,8 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
-    @test('can pass options to callbacks', '@callback')
-    @test(
-        'can pass options to callbacks with style @functionCall',
-        '@functionCall'
-    )
-    protected async canPassOptionsToCallbacks(
-        callbackStyle: ParserCallbackStyle
-    ) {
-        this.setCallbackStyle(callbackStyle)
+    @test()
+    protected async canPassOptionsToCallbacks() {
         let passedOptions: Record<string, any> | undefined = undefined
 
         this.setCallback('test', {
@@ -183,15 +163,8 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         )
     }
 
-    @test('validates options passed to callbacks', '@callback')
-    @test(
-        'validates options passed to callbacks with style @functionCall',
-        '@functionCall'
-    )
-    protected async validatesOptionsToCallback(
-        callbackStyle: ParserCallbackStyle
-    ) {
-        this.setCallbackStyle(callbackStyle)
+    @test()
+    protected async validatesOptionsToCallback() {
         const choices: SelectChoice[] = [
             {
                 value: 'red',
@@ -273,18 +246,17 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
         assert.isEqual(
             actual,
             `A function call is done using the following syntax:
-@callback { "name": "callbackName", "options": {} }
-Make sure to json encode the options and include the name of the callback you want to call. You can call as many callbacks as you want in a single response by including multiple @callback lines. IMPORTANT: JSON must be on a single line. Do NOT use multi-line or formatted JSON. Also, do NOT call something like @myCallback. You would call it like this: @callback { "name": "myCallback", "options": {} }
+@callbackName({ "key": "value" })
+Make sure to json encode the options. You can call as many callbacks as you want in a single response by including multiple @functionName() lines. IMPORTANT: JSON must be on a single line. Do NOT use multi-line or formatted JSON.
 Your user-facing message is always sent to the user, even if a callback fails. Successful callbacks have already run successfully. If a callback fails later, do not repeat the same message and do not repeat successful callbacks. Only call the specific callback needed to fix the failed gap.
 Good example:
-@callback { "name": "lookupWeather", "options": { "zip": "80524" } }
+@lookupWeather({ "zip": "80524" })
 Bad examples:
 @lookupWeather { "zip": "80524" }
-@callback
-{ "name": "lookupWeather", "options": { "zip": "80524" } }
-@callback { "name": "lookupWeather", "options": {
-  "zip": "80524"
-} }`,
+@lookupWeather(
+{ "zip": "80524" }
+)
+@lookupWeather({ zip: "80524" })`,
             'Expected proper instructions for function calls in V2 parser'
         )
     }
@@ -295,18 +267,18 @@ Bad examples:
         assert.isEqual(
             actual,
             `Updating state works similar to all function calls. Use the following syntax:
-@updateState { "field1": "value1", "field2": "value2" }
+@updateState({ "field1": "value1", "field2": "value2" })
 Make sure to json encode only the fields you want to change. You can update state once and do it at the end of any messages you send. IMPORTANT: JSON must be on a single line. Do NOT use multi-line or formatted JSON.
 Your user-facing message is always sent to the user, even if @updateState fails. If @updateState fails later, do not repeat the same message. Only send the specific @updateState needed to fix the missing state change.
 Good example:
-@updateState { "favoriteColor": "blue", "firstName": "Taylor" }
+@updateState({ "favoriteColor": "blue", "firstName": "Taylor" })
 Bad examples:
 @updateState
 { "favoriteColor": "blue" }
-@updateState {
+@updateState({
   "favoriteColor": "blue"
-}
-@updateState { favoriteColor: "blue" }`,
+})
+@updateState({ favoriteColor: "blue" })`,
             'Expected proper instructions for state updates in V2 parser'
         )
     }
@@ -352,7 +324,7 @@ Bad examples:
 
     @test()
     protected async badStateUpdatesAreHandledGracefully() {
-        const message = `hey there!!!\nwhat the!?\n@updateState {"taco" - "waka"}\n`
+        const message = `hey there!!!\nwhat the!?\n@updateState({"taco" - "waka"})\n`
         const results = await this.parse(message)
         let expectedCallback = ''
 
@@ -387,7 +359,7 @@ Bad examples:
             useThisWhenever: 'you are asking for something.',
         })
 
-        const message = `hey there!!!\nwhat the!?\n@updateState {"taco" - one}\n${this.renderCallback({ name: 'test' })}`
+        const message = `hey there!!!\nwhat the!?\n@updateState({"taco" - one})\n${this.renderCallback({ name: 'test' })}`
         const results = await this.parse(message)
 
         assert.doesInclude(
@@ -402,7 +374,7 @@ Bad examples:
         const results = await this
             .parse(`Good news, Taylor — HAN-1116 is wrapped up. Slack DMs went out to Taylor Romero, Jeff Porter, and Taylor Pearce. Dagmara got the email. The current work doc is updated for the 4th QA submission. No more objectives in the queue — Handbid Dev is just waiting on your next direction.
 
-@updateState {"stepsRemaining":["Awaiting user direction"],"memoryBank":"User name: My Dude (Taylor). 6th boot.\n\nBUGS REPORTED TO TAYLOR: 1) updateEffort definedProcess not persisting to localDefinedProcess when SOP attached. 2) removeTacticalAdvice/removeGuardrails should reject SOP-provided matches when changeTarget is effort-local.\n\nCOMPLETED EFFORTS: Remote Access Setup, Browser, Handbid Dev (HAN-1116 4th QA submission complete — Slack DMs to Taylor Romero, Jeff Porter, Taylor Pearce; email to Dagmara dherter@nicmangroup.com), Handbid Release (API token partner docs — archived).\n\nSOPs: Browser Service (sop-3) — attached to KB Audit. Slack Bot Service (sop-4). Handbid DevOps (sop-1). Handbid Triage SOP (sop-2). Handbid Linear SOP (repo-based). Slack Notification SOP (sop-5).\n\nHANDBID DEV: ALIVE, awaiting-guidance, no current objective. 100% progress. Ready for next direction.\n\nSLACK BOT EFFORT: PAUSED. Progress: 100%. No current objective.\n\nOTHER PAUSED EFFORTS:\n1) Web App Redesign — PAUSED.\n2) KB Audit — PAUSED. ~93%.\n3) Triage — PAUSED. Waiting on Kari re HAN-1083.\n\nPENDING CLEANUP: consolidate SOP tactics on sop-4, remove local tactic #4 from Triage.","runningEfforts":[]}`)
+@updateState({"stepsRemaining":["Awaiting user direction"],"memoryBank":"User name: My Dude (Taylor). 6th boot.\n\nBUGS REPORTED TO TAYLOR: 1) updateEffort definedProcess not persisting to localDefinedProcess when SOP attached. 2) removeTacticalAdvice/removeGuardrails should reject SOP-provided matches when changeTarget is effort-local.\n\nCOMPLETED EFFORTS: Remote Access Setup, Browser, Handbid Dev (HAN-1116 4th QA submission complete — Slack DMs to Taylor Romero, Jeff Porter, Taylor Pearce; email to Dagmara dherter@nicmangroup.com), Handbid Release (API token partner docs — archived).\n\nSOPs: Browser Service (sop-3) — attached to KB Audit. Slack Bot Service (sop-4). Handbid DevOps (sop-1). Handbid Triage SOP (sop-2). Handbid Linear SOP (repo-based). Slack Notification SOP (sop-5).\n\nHANDBID DEV: ALIVE, awaiting-guidance, no current objective. 100% progress. Ready for next direction.\n\nSLACK BOT EFFORT: PAUSED. Progress: 100%. No current objective.\n\nOTHER PAUSED EFFORTS:\n1) Web App Redesign — PAUSED.\n2) KB Audit — PAUSED. ~93%.\n3) Triage — PAUSED. Waiting on Kari re HAN-1083.\n\nPENDING CLEANUP: consolidate SOP tactics on sop-4, remove local tactic #4 from Triage.","runningEfforts":[]})`)
 
         assert.isEqual(
             results.message,
@@ -422,23 +394,16 @@ Bad examples:
         )
     }
 
-    private setCallbackStyle(callbackStyle: ParserCallbackStyle) {
-        this.callbackStyle = callbackStyle
-    }
-
     private renderCallbackResults(options: Record<string, any>) {
         return `@results ${JSON.stringify(options)}\n`
     }
 
     private renderCallback(options: Record<string, any>): string {
-        if (this.callbackStyle === '@functionCall') {
-            const { name, options: cbOptions, ...rest } = options
-            return `\n@${name} ${JSON.stringify(cbOptions ?? rest)}\n`
-        }
-        return `\n@callback ${JSON.stringify(options)}\n`
+        const { name, options: cbOptions } = options
+        return `\n@${name}(${JSON.stringify(cbOptions ?? {})})\n`
     }
 
     protected renderUpdateState(input: Record<string, any>) {
-        return `\n@updateState ${JSON.stringify(input)}\n`
+        return `\n@updateState(${JSON.stringify(input)})\n`
     }
 }

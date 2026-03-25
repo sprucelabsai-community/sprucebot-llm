@@ -147,6 +147,10 @@ export default class MessageBuilder {
             this.buildYourJobMessage(skill.yourJobIfYouChooseToAcceptItIs)
         )
 
+        if (skill.callbacks || skill.state || skill.stateSchema) {
+            messages.push(this.buildFunctionSyntaxMessage())
+        }
+
         if (skill.stateSchema) {
             messages.push(this.buildStateSchemaMessage(skill.stateSchema))
         }
@@ -172,6 +176,13 @@ export default class MessageBuilder {
         }
 
         return messages
+    }
+
+    private buildFunctionSyntaxMessage(): ChatCompletionMessageParam {
+        return {
+            role: 'system',
+            content: `Throughout this conversation, all function calls and state updates use JavaScript-style syntax: @functionName({ "key": "value" }). The function name follows the @ symbol, and the single argument is a JSON object wrapped in parentheses. All JSON must be on a single line.`,
+        }
     }
 
     private buildCallbacksMessage(
