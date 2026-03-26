@@ -304,6 +304,22 @@ Bad examples:
     }
 
     @test()
+    protected async canCallCallbackWithNoArguments() {
+        let wasHit = false
+
+        this.setCallback('test', {
+            cb: () => {
+                wasHit = true
+            },
+            useThisWhenever: 'you need to do something with no arguments.',
+        })
+
+        await this.parse(`\n@test()\n`)
+
+        assert.isTrue(wasHit, 'Callback was not hit when called with no arguments')
+    }
+
+    @test()
     protected async stripsOutCallbacksFromMessage() {
         this.setCallback('test', {
             cb: () => {

@@ -69,12 +69,12 @@ export default class ResponseParserV2 implements ResponseParser {
         let callbackResults = ''
 
         const reserved = new Set(['updateState', 'results'])
-        const matches = [...message.matchAll(/^@(\w+)\(({.*})\)$/gm)]
+        const matches = [...message.matchAll(/^@(\w+)\(({.*})?\)$/gm)]
         for (const match of matches) {
             if (reserved.has(match[1])) {
                 continue
             }
-            const parsed = JSON.parse(match[2])
+            const parsed = match[2] ? JSON.parse(match[2]) : undefined
             const name = match[1]
             const options = parsed
             const callback = callbacks?.[name]
