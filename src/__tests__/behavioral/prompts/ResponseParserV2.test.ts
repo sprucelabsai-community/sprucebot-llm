@@ -316,7 +316,10 @@ Bad examples:
 
         await this.parse(`\n@test()\n`)
 
-        assert.isTrue(wasHit, 'Callback was not hit when called with no arguments')
+        assert.isTrue(
+            wasHit,
+            'Callback was not hit when called with no arguments'
+        )
     }
 
     @test()
