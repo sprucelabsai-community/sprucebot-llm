@@ -1,3 +1,8 @@
+## <small>15.1.13 (2026-03-26)</small>
+
+* patch: lint ([16ce616](https://github.com/sprucelabsai-community/sprucebot-llm/commit/16ce616))
+* patch: support @callbacks() with no arguments in ResponseParserV2 ([0e79670](https://github.com/sprucelabsai-community/sprucebot-llm/commit/0e79670))
+
 ## <small>15.1.12 (2026-03-25)</small>
 
 * patch: lint formatting fix ([af48cb3](https://github.com/sprucelabsai-community/sprucebot-llm/commit/af48cb3))
