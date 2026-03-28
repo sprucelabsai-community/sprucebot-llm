@@ -1,3 +1,7 @@
+## 15.2.0 (2026-03-28)
+
+* minor: can update job description ([8651938](https://github.com/sprucelabsai-community/sprucebot-llm/commit/8651938))
+
 ## <small>15.1.13 (2026-03-26)</small>
 
 * patch: lint ([16ce616](https://github.com/sprucelabsai-community/sprucebot-llm/commit/16ce616))
