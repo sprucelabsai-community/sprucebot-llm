@@ -293,6 +293,24 @@ export default class SkillTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected async canUpdateJobDescription() {
+        this.skill = this.Skill({
+            yourJobIfYouChooseToAcceptItIs: 'Old Job',
+        })
+
+        const newJob = generateId()
+        this.skill.updateJobDescription(newJob)
+
+        const serialized = this.serialize()
+
+        assert.isEqual(
+            serialized.yourJobIfYouChooseToAcceptItIs,
+            newJob,
+            'job description was not updated in serialized skill'
+        )
+    }
+
     private async sendRandomMessage() {
         const bot = this.Bot({
             skill: this.skill,

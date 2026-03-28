@@ -116,6 +116,7 @@ export interface SprucebotLLmSkill<
     StateSchema extends Schema = Schema,
     State extends SchemaValues<StateSchema> = SchemaValues<StateSchema>,
 > extends MercuryEventEmitter<LlmEventContract> {
+    updateJobDescription(prompt: string): void
     getState(): Partial<State> | undefined
     serialize(): SerializedSkill<StateSchema, State>
     unserialize(serialized: SerializedSkill<StateSchema, State>): void

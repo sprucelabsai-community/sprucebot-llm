@@ -62,6 +62,10 @@ export default class SprucebotLlmSkillImpl<
         return this.stateSchema
     }
 
+    public updateJobDescription(prompt: string) {
+        this.options.yourJobIfYouChooseToAcceptItIs = prompt
+    }
+
     public unserialize(serialized: SerializedSkill<StateSchema, State>): void {
         const { state, ...options } = serialized
         this.state = state
