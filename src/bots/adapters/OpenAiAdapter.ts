@@ -86,7 +86,7 @@ export default class OpenAiAdapter implements LlmAdapter {
         this.model = model
     }
 
-    public setMessageMemoryLimit(limit: number) {
+    public setMemoryLimit(limit: number) {
         this.memoryLimit = limit
     }
 

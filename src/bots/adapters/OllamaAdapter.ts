@@ -40,8 +40,13 @@ export default class OllamaAdapter implements LlmAdapter {
     public setModel(model: string): void {
         this.openai.setModel(model)
     }
+
     public setReasoningEffort(effort: LllmReasoningEffort): void {
         this.think = effort === 'high'
+    }
+
+    public setMemoryLimit(_limit: number): void {
+        throw new Error('Method not implemented.')
     }
 }
 

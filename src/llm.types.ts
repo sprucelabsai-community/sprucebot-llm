@@ -43,6 +43,7 @@ export interface LlmAdapter {
     ): Promise<string>
     setModel(model: string): void
     setReasoningEffort(effort: LllmReasoningEffort): void
+    setMemoryLimit(limit: number): void
 }
 
 export interface PromptOptions<

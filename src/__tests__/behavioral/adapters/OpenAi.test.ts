@@ -929,7 +929,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         if (setterStrategy === 'env') {
             process.env.OPENAI_MESSAGE_MEMORY_LIMIT = limit.toString()
         } else if (setterStrategy === 'direct') {
-            this.openAi.setMessageMemoryLimit(limit)
+            this.openAi.setMemoryLimit(limit)
         } else if (setterStrategy === 'constructor') {
             this.openAi = this.OpenAi(undefined, {
                 memoryLimit: limit,

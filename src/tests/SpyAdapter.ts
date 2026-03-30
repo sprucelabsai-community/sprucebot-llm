@@ -49,4 +49,5 @@ export default class SpyLlmAdapter implements LlmAdapter {
     }
 
     public setReasoningEffort(_effort: LllmReasoningEffort): void {}
+    public setMemoryLimit(_limit: number): void {}
 }

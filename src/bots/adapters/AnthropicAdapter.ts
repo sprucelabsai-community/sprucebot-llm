@@ -131,6 +131,10 @@ export default class AnthropicAdapter implements LlmAdapter {
     public setReasoningEffort(effort: LllmReasoningEffort): void {
         this.isThinkingEnabled = effort !== 'none'
     }
+
+    public setMemoryLimit(limit: number) {
+        this.memoryLimit = limit
+    }
 }
 
 export interface AnthropicAdapterOptions {

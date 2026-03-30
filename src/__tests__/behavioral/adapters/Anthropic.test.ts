@@ -49,6 +49,7 @@ export default class AthropicTest extends AbstractLlmTest {
         AnthropicAdapter.Anthropic = MockAthropicModule
         MockAbortController.instances = []
         MessageSenderImpl.AbortController = MockAbortController
+
         delete MessageSenderImpl.Class
         delete MockAthropicModule.errorToThrowOnCreate
 
@@ -131,15 +132,25 @@ export default class AthropicTest extends AbstractLlmTest {
 
     @test()
     protected async passesThroughMemoryLimitToModuleFromConstructor() {
-        MessageSenderImpl.Class = MockMessegeSender
         const memoryLimit = Math.round(Date.now() * Math.random())
+        MessageSenderImpl.Class = MockMessegeSender
         this.anthropic = this.Anthropic({
             memoryLimit,
         })
 
         await this.sendMessage()
 
-        MockMessegeSender.instance.assertSendReceivedMemoryLimit(memoryLimit)
+        this.assertMessageSentWithMemoryLimit(memoryLimit)
+    }
+
+    @test()
+    protected async canSetMemoryLimit() {
+        const memoryLimit = Math.round(Date.now() * Math.random())
+        MessageSenderImpl.Class = MockMessegeSender
+        this.anthropic = this.Anthropic({})
+        this.anthropic.setMemoryLimit(memoryLimit)
+        await this.sendMessage()
+        this.assertMessageSentWithMemoryLimit(memoryLimit)
     }
 
     @test()
@@ -265,6 +276,10 @@ export default class AthropicTest extends AbstractLlmTest {
 
     private setResponseContent(content: ContentBlock[]) {
         this.mockAnthropic.setResponseContent(content)
+    }
+
+    private assertMessageSentWithMemoryLimit(memoryLimit: number) {
+        MockMessegeSender.instance.assertSendReceivedMemoryLimit(memoryLimit)
     }
 
     private async sendMessageAndAssertResponseEquals(expected: string) {
