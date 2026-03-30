@@ -1,3 +1,7 @@
+## 16.0.0 (2026-03-30)
+
+* major: memory limit setting ([8f71bf2](https://github.com/sprucelabsai-community/sprucebot-llm/commit/8f71bf2))
+
 ## 15.2.0 (2026-03-28)
 
 * minor: can update job description ([8651938](https://github.com/sprucelabsai-community/sprucebot-llm/commit/8651938))
