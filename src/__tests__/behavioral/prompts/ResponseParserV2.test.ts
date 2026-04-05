@@ -413,8 +413,32 @@ Bad examples:
         )
     }
 
+    @test()
+    protected async nativeCallbackErrorsSerializeWithMessageNotEmptyObject() {
+        this.setCallback('nativeErrorCb', {
+            cb: () => {
+                throw new TypeError('fetch failed — network unreachable')
+            },
+            useThisWhenever: 'you want to test native error serialization',
+        })
+
+        const results = await this.parse(
+            this.renderCallback({ name: 'nativeErrorCb' })
+        )
+
+        assert.doesInclude(
+            results.callbackResults ?? '',
+            'fetch failed — network unreachable',
+            'A native Error thrown from a callback must serialize its message, not produce an empty {} error object'
+        )
+    }
+
     private renderCallbackResults(options: Record<string, any>) {
-        return `@results ${JSON.stringify(options)}\n`
+        const serializable = { ...options }
+        if (serializable.error instanceof Error) {
+            serializable.error = { message: serializable.error.message }
+        }
+        return `@results ${JSON.stringify(serializable)}\n`
     }
 
     private renderCallback(options: Record<string, any>): string {
