@@ -1,3 +1,8 @@
+## <small>16.0.1 (2026-04-09)</small>
+
+* chore: fix TypeScript 6 compatibility in tsconfig and test types ([e04aab0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/e04aab0))
+* chore: upgrade dependencies including TypeScript 6 ([d087979](https://github.com/sprucelabsai-community/sprucebot-llm/commit/d087979))
+
 ## 16.0.0 (2026-03-30)
 
 * major: memory limit setting ([8f71bf2](https://github.com/sprucelabsai-community/sprucebot-llm/commit/8f71bf2))
