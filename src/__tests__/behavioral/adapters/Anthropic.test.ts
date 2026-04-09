@@ -385,6 +385,7 @@ class MockAthropicModule extends Anthropic {
         model: generateId(),
         stop_reason: null,
         stop_sequence: null,
+        stop_details: null,
         role: 'assistant',
         type: 'message',
         usage: {} as Usage,
