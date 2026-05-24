@@ -22,6 +22,9 @@ A TypeScript library for leveraging large language models to do... anything!
     * [Anthropic](#anthropic-adapter) - Claude models with prompt caching support
     * [Ollama](#ollama-adapter) - Run local models like Llama, Mistral, etc.
     * [Custom adapters](#custom-adapters) - Implement your own
+* [Track token usage](#tracking-token-usage)
+    * Read cumulative input/output/total tokens from any adapter
+    * Includes Anthropic prompt-cache token counts
 * Fully typed
 	* Built in modern TypeScript
 	* Fully typed schema-based state management (powered by `@sprucelabs/schema`)
@@ -192,6 +195,7 @@ adapter.setReasoningEffort('low')
 - `adapter.setModel(model)`: set a default model for all requests unless a Skill overrides it.
 - `adapter.setMessageMemoryLimit(limit)`: limit how many tracked messages are sent to OpenAI.
 - `adapter.setReasoningEffort(effort)`: set `reasoning_effort` for models that support it.
+- `adapter.getTokenUsage()`: returns cumulative [token usage](#tracking-token-usage) for this adapter. The OpenAI adapter currently returns zeros (not yet implemented).
 - `OpenAiAdapter.OpenAI`: assign a custom OpenAI client class (useful for tests).
 
 Requests are sent via `openai.chat.completions.create(...)` with messages built by the adapter from the Bot state and history.
@@ -234,6 +238,8 @@ Token usage (including cache creation and cache read tokens) is logged at the `i
 [TOKEN USAGE] input=1234 cache_create=800 cache_read=400 output=256
 ```
 
+The same numbers are also available programmatically via [`adapter.getTokenUsage()`](#tracking-token-usage).
+
 No configuration is required — caching is applied automatically.
 
 ### Ollama adapter
@@ -270,6 +276,48 @@ await bot.sendMessage('Hello!')
 
 The Ollama adapter connects to `http://localhost:11434/v1` by default (Ollama's OpenAI-compatible endpoint).
 
+### Tracking token usage
+
+Every adapter implements `getTokenUsage()`, which returns the **cumulative** token usage for that adapter instance since it was created:
+
+```ts
+import { LmmTokenUsage } from '@sprucelabs/sprucebot-llm'
+
+await bot.sendMessage('Hello!')
+
+const usage: LmmTokenUsage = adapter.getTokenUsage()
+// {
+//   inputTokens: 1234,
+//   outputTokens: 256,
+//   totalTokens: 1490,
+//   cacheCreationTokens: 800, // Anthropic only
+//   cacheReadTokens: 400,     // Anthropic only
+// }
+```
+
+The `LmmTokenUsage` shape:
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `inputTokens` | `number` | Prompt / input tokens |
+| `outputTokens` | `number` | Completion / output tokens |
+| `totalTokens` | `number` | `inputTokens + outputTokens` |
+| `cacheCreationTokens` | `number` (optional) | Anthropic only — tokens written to the prompt cache |
+| `cacheReadTokens` | `number` (optional) | Anthropic only — tokens served from the prompt cache |
+
+**Adapter support:**
+
+| Adapter | `getTokenUsage()` |
+|---------|-------------------|
+| Anthropic | ✅ Fully tracked, including cache tokens |
+| OpenAI | ⚠️ Returns zeros — not yet implemented |
+| Ollama | ⚠️ Returns zeros — not yet implemented |
+
+**Things to know:**
+
+- **Cumulative, not per-call.** Totals accumulate across every `sendMessage` call on the adapter, and there is no reset method. To measure a single call, read `getTokenUsage()` before and after and diff the values.
+- **Per adapter, not per bot.** Usage lives on the adapter instance. If you share one adapter across multiple bots (e.g. through a single `SprucebotLlmFactory`), the totals aggregate across all of them.
+
 ### Custom adapters
 
 You can bring your own adapter by implementing the `LlmAdapter` interface and passing it to `SprucebotLlmFactory.Factory(...)`:
@@ -277,6 +325,8 @@ You can bring your own adapter by implementing the `LlmAdapter` interface and pa
 ```ts
 import {
 	LlmAdapter,
+	LllmReasoningEffort,
+	LmmTokenUsage,
 	SprucebotLlmBot,
 	SprucebotLlmFactory,
 } from '@sprucelabs/sprucebot-llm'
@@ -287,6 +337,15 @@ class MyAdapter implements LlmAdapter {
 		const { messages } = bot.serialize()
 		// Send to your model and return the model response as a string
 		return `echo: ${messages[messages.length - 1]?.message ?? ''}`
+	}
+
+	setModel(_model: string) {}
+	setReasoningEffort(_effort: LllmReasoningEffort) {}
+	setMemoryLimit(_limit: number) {}
+
+	// Return cumulative token usage for this adapter (zeros if you don't track it)
+	getTokenUsage(): LmmTokenUsage {
+		return { inputTokens: 0, outputTokens: 0, totalTokens: 0 }
 	}
 }
 
