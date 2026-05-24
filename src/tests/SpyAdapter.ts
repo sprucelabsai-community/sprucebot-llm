@@ -3,6 +3,7 @@ import { OpenAiAdapterOptions } from '../bots/adapters/OpenAiAdapter'
 import {
     LllmReasoningEffort,
     LlmAdapter,
+    LmmTokenUsage,
     SendMessageOptions,
     SprucebotLlmBot,
 } from '../llm.types'
@@ -50,4 +51,11 @@ export default class SpyLlmAdapter implements LlmAdapter {
 
     public setReasoningEffort(_effort: LllmReasoningEffort): void {}
     public setMemoryLimit(_limit: number): void {}
+    public getTokenUsage(): LmmTokenUsage {
+        return {
+            inputTokens: 0,
+            outputTokens: 0,
+            totalTokens: 0,
+        }
+    }
 }

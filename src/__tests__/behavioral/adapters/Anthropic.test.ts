@@ -274,6 +274,98 @@ export default class AthropicTest extends AbstractLlmTest {
         this.assertSentExpectedBodyToCreate()
     }
 
+    @test()
+    protected async startsAtNoTokenUsage() {
+        this.assertTokenUsageEquals({
+            inputTokens: 0,
+            outputTokens: 0,
+            totalTokens: 0,
+            cacheCreationTokens: 0,
+            cacheReadTokens: 0,
+        })
+    }
+
+    @test()
+    protected async getsFirstMessagesTokenUsage() {
+        const usage = {
+            input_tokens: 1,
+            output_tokens: 2,
+            cache_creation_input_tokens: 3,
+            cache_read_input_tokens: 4,
+        }
+        this.setTokenUsage(usage)
+
+        await this.sendMessage()
+
+        this.assertTokenUsageEquals({
+            inputTokens: 1,
+            outputTokens: 2,
+            totalTokens: 3,
+            cacheCreationTokens: 3,
+            cacheReadTokens: 4,
+        })
+    }
+
+    @test()
+    protected async getsDifferentUsageForMessage() {
+        this.mockAnthropic.setTokenUsage({
+            input_tokens: 5,
+            output_tokens: 6,
+            cache_creation_input_tokens: 7,
+            cache_read_input_tokens: 8,
+        })
+
+        await this.sendMessage()
+
+        this.assertTokenUsageEquals({
+            inputTokens: 5,
+            outputTokens: 6,
+            totalTokens: 11,
+            cacheCreationTokens: 7,
+            cacheReadTokens: 8,
+        })
+    }
+
+    @test()
+    protected async accumulatesTokenUsage() {
+        this.mockAnthropic.setTokenUsage({
+            input_tokens: 1,
+            output_tokens: 2,
+            cache_creation_input_tokens: 3,
+            cache_read_input_tokens: 4,
+        })
+
+        await this.sendMessage()
+        await this.sendMessage()
+
+        this.assertTokenUsageEquals({
+            inputTokens: 2,
+            outputTokens: 4,
+            totalTokens: 6,
+            cacheCreationTokens: 6,
+            cacheReadTokens: 8,
+        })
+    }
+
+    private setTokenUsage(usage: PartialUsage) {
+        this.mockAnthropic.setTokenUsage(usage)
+    }
+
+    private assertTokenUsageEquals(expected: {
+        inputTokens: number
+        outputTokens: number
+        totalTokens: number
+        cacheCreationTokens: number
+        cacheReadTokens: number
+    }) {
+        const usage = this.anthropic.getTokenUsage()
+        assert.isEqualDeep(
+            usage,
+            expected,
+            'Expected initial token usage to be 0'
+        )
+    }
+
     private setResponseContent(content: ContentBlock[]) {
         this.mockAnthropic.setResponseContent(content)
     }
@@ -376,6 +468,14 @@ export default class AthropicTest extends AbstractLlmTest {
     }
 }
 
+type PartialUsage = Pick<
+    Usage,
+    | 'input_tokens'
+    | 'output_tokens'
+    | 'cache_creation_input_tokens'
+    | 'cache_read_input_tokens'
+>
+
 class MockAthropicModule extends Anthropic {
     public static instance: MockAthropicModule
     public static errorToThrowOnCreate?: Error
@@ -388,7 +488,12 @@ class MockAthropicModule extends Anthropic {
         stop_details: null,
         role: 'assistant',
         type: 'message',
-        usage: {} as Usage,
+        usage: {
+            input_tokens: 0,
+            output_tokens: 0,
+            cache_creation_input_tokens: 0,
+            cache_read_input_tokens: 0,
+        } as Usage,
         container: null,
     }
     private constructorOptions?: ClientOptions
@@ -458,5 +563,12 @@ class MockAthropicModule extends Anthropic {
             expected,
             'Expected to pass the AbortController signal to messages.create()'
         )
+    }
+
+    public setTokenUsage(usage: PartialUsage) {
+        this.fakedResponse.usage = {
+            ...this.fakedResponse.usage,
+            ...usage,
+        }
     }
 }

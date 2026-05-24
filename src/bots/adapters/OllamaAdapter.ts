@@ -5,6 +5,7 @@ import {
     SprucebotLlmBot,
     SendMessageOptions,
     LllmReasoningEffort,
+    LmmTokenUsage,
 } from '../../llm.types'
 import OpenAiAdapter from './OpenAiAdapter'
 
@@ -47,6 +48,14 @@ export default class OllamaAdapter implements LlmAdapter {
 
     public setMemoryLimit(_limit: number): void {
         throw new Error('Method not implemented.')
+    }
+
+    public getTokenUsage(): LmmTokenUsage {
+        return {
+            inputTokens: 0,
+            outputTokens: 0,
+            totalTokens: 0,
+        }
     }
 }
 

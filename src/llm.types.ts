@@ -44,6 +44,15 @@ export interface LlmAdapter {
     setModel(model: string): void
     setReasoningEffort(effort: LllmReasoningEffort): void
     setMemoryLimit(limit: number): void
+    getTokenUsage(): LmmTokenUsage
+}
+
+export interface LmmTokenUsage {
+    inputTokens: number
+    outputTokens: number
+    totalTokens: number
+    cacheCreationTokens?: number // Anthropic only
+    cacheReadTokens?: number // Anthropic only
 }
 
 export interface PromptOptions<

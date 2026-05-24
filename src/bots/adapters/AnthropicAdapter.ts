@@ -10,6 +10,7 @@ import {
     SprucebotLlmBot,
     SendMessageOptions,
     LllmReasoningEffort,
+    LmmTokenUsage,
 } from '../../llm.types'
 import { MessageBuilderCacheMarker } from './MessageBuilder'
 import MessageSenderImpl, {
@@ -30,6 +31,13 @@ export default class AnthropicAdapter implements LlmAdapter {
     private memoryLimit?: number
     private isThinkingEnabled = false
     private log?: Log
+    private usage: LmmTokenUsage = {
+        inputTokens: 0,
+        outputTokens: 0,
+        totalTokens: 0,
+        cacheCreationTokens: 0,
+        cacheReadTokens: 0,
+    }
 
     private constructor(apiKey: string, options: AnthropicAdapterOptions) {
         assertOptions({ apiKey, maxTokens: options?.maxTokens }, [
@@ -115,6 +123,21 @@ export default class AnthropicAdapter implements LlmAdapter {
             `[TOKEN USAGE] input=${usage.input_tokens} cache_create=${usage.cache_creation_input_tokens ?? 0} cache_read=${usage.cache_read_input_tokens ?? 0} output=${usage.output_tokens}`
         )
 
+        this.usage = {
+            inputTokens: this.usage.inputTokens + usage.input_tokens,
+            outputTokens: this.usage.outputTokens + usage.output_tokens,
+            totalTokens:
+                this.usage.totalTokens +
+                usage.input_tokens +
+                usage.output_tokens,
+            cacheCreationTokens:
+                (this.usage.cacheCreationTokens ?? 0) +
+                (usage.cache_creation_input_tokens ?? 0),
+            cacheReadTokens:
+                (this.usage.cacheReadTokens ?? 0) +
+                (usage.cache_read_input_tokens ?? 0),
+        }
+
         const text = response.content
             .filter((block) => block.type === 'text')
             ?.map((block) => block.text)
@@ -134,6 +157,10 @@ export default class AnthropicAdapter implements LlmAdapter {
 
     public setMemoryLimit(limit: number) {
         this.memoryLimit = limit
+    }
+
+    public getTokenUsage(): LmmTokenUsage {
+        return this.usage
     }
 }
 

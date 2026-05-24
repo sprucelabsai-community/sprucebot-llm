@@ -11,7 +11,7 @@
     "error"
   ],
   "regressionproof": {
-    "enabled": false,
+    "enabled": true,
     "projectName": "sprucebot-llm"
   }
 }

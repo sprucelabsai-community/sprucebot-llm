@@ -8,6 +8,7 @@ import {
 } from 'openai/resources'
 import {
     LlmAdapter,
+    LmmTokenUsage,
     SendMessageOptions,
     SprucebotLlmBot,
 } from '../../llm.types'
@@ -92,6 +93,14 @@ export default class OpenAiAdapter implements LlmAdapter {
 
     public setReasoningEffort(effort: ReasoningEffort) {
         this.reasoningEffort = effort
+    }
+
+    public getTokenUsage(): LmmTokenUsage {
+        return {
+            inputTokens: 0,
+            outputTokens: 0,
+            totalTokens: 0,
+        }
     }
 }
 
