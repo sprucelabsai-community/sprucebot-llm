@@ -1,3 +1,8 @@
+## 18.0.0 (2026-05-24)
+
+* Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([44844b5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/44844b5))
+* major: anthropic spelling fix ([40bd013](https://github.com/sprucelabsai-community/sprucebot-llm/commit/40bd013))
+
 ## 17.0.0 (2026-05-24)
 
 * major: llm usage stats, anthropic implemented ([e77db61](https://github.com/sprucelabsai-community/sprucebot-llm/commit/e77db61))
