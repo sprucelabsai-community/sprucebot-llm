@@ -1,3 +1,7 @@
+## 17.0.0 (2026-05-24)
+
+* major: llm usage stats, anthropic implemented ([e77db61](https://github.com/sprucelabsai-community/sprucebot-llm/commit/e77db61))
+
 ## <small>16.0.1 (2026-04-09)</small>
 
 * chore: fix TypeScript 6 compatibility in tsconfig and test types ([e04aab0](https://github.com/sprucelabsai-community/sprucebot-llm/commit/e04aab0))
