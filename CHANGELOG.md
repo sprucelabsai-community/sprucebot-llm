@@ -1,3 +1,7 @@
+## <small>18.0.1 (2026-06-03)</small>
+
+* patch: anthropic caching ttl to 1h ([b5048b5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b5048b5))
+
 ## 18.0.0 (2026-05-24)
 
 * Merge branch 'master' of https://github.com/sprucelabsai/sprucebot-llm ([44844b5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/44844b5))
