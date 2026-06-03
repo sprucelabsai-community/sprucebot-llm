@@ -101,6 +101,7 @@ export default class AnthropicAdapter implements LlmAdapter {
                     text: messages[cacheMarkerIdx - 1].content as string,
                     cache_control: {
                         type: 'ephemeral',
+                        ttl: '1h',
                     },
                 },
             ]

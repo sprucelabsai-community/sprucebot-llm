@@ -436,6 +436,7 @@ export default class AthropicTest extends AbstractLlmTest {
                 text: expected[lastCachedIdx].content as string,
                 cache_control: {
                     type: 'ephemeral',
+                    ttl: '1h',
                 },
             },
         ]
