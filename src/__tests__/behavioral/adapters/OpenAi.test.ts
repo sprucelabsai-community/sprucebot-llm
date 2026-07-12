@@ -775,7 +775,7 @@ export default class OpenAiTest extends AbstractLlmTest {
         )
 
         assert.isEqualDeep(
-            SpyOpenAiModule.lastCompletionOptions,
+            this.lastCompletionOptions,
             {
                 signal: this.abortControllers[0].signal,
             },
@@ -828,6 +828,36 @@ export default class OpenAiTest extends AbstractLlmTest {
     protected async doesNotThrowIfAbortErrorThrown() {
         SpyOpenAiModule.errorToThrowOnCreate = new APIUserAbortError()
         await this.sendMessage()
+    }
+
+    @test()
+    protected async canSetCustomHeaders() {
+        await this.sendMessageAndAssertHeadersEqual({
+            go: 'dogs',
+        })
+
+        await this.sendMessageAndAssertHeadersEqual({
+            'another-dog': 'but-what',
+            ok: 'dude',
+        })
+    }
+
+    private async sendMessageAndAssertHeadersEqual(
+        headers: Record<string, string>
+    ) {
+        await this.sendMessage({
+            headers,
+        })
+
+        assert.isEqualDeep(
+            this.lastCompletionOptions?.headers,
+            headers,
+            'Custom headers should be passed to OpenAi module'
+        )
+    }
+
+    private get lastCompletionOptions() {
+        return SpyOpenAiModule.lastCompletionOptions
     }
 
     private get firstAbortController() {

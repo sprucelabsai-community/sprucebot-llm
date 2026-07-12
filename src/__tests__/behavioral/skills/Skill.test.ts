@@ -257,16 +257,42 @@ export default class SkillTest extends AbstractLlmTest {
     @test()
     protected async canUpdateModel() {
         const model = generateId()
-        this.skill.setModel(model)
+        this.setModel(model)
         await this.sendRandomMessage()
         this.assertModelSentToAdapterEquals(model)
+        assert.isFalse(
+            'headers' in (this.lastSendMessageOptions || {}),
+            'Should not have headers in options when not set on skill'
+        )
     }
 
     @test()
     protected async notSettingModelOnSkillDoesNotPassUndefined() {
         await this.sendRandomMessage()
-        const isIn = 'model' in (this.adapter.lastSendMessageOptions || {})
+        const isIn = 'model' in (this.lastSendMessageOptions || {})
         assert.isFalse(isIn, 'model was passed when it should not have been')
+    }
+
+    @test()
+    protected async canPassHeadersAndModel() {
+        const headers = {
+            [generateId()]: generateId(),
+        }
+        const bot = this.Bot({
+            skill: this.skill,
+            headers,
+        })
+
+        const model = generateId()
+        this.setModel(model)
+        await bot.sendMessage(generateId())
+        this.assertModelSentToAdapterEquals(model)
+
+        assert.isEqualDeep(
+            this.lastSendMessageOptions?.headers,
+            headers,
+            'headers were not passed correctly'
+        )
     }
 
     @test()
@@ -311,6 +337,10 @@ export default class SkillTest extends AbstractLlmTest {
         )
     }
 
+    private setModel(model: string) {
+        this.skill.setModel(model)
+    }
+
     private async sendRandomMessage() {
         const bot = this.Bot({
             skill: this.skill,
@@ -320,10 +350,14 @@ export default class SkillTest extends AbstractLlmTest {
     }
     private assertModelSentToAdapterEquals(model: string) {
         assert.isEqual(
-            this.adapter.lastSendMessageOptions?.model,
+            this.lastSendMessageOptions?.model,
             model,
             'model sent to adapter does not match expected'
         )
+    }
+
+    private get lastSendMessageOptions() {
+        return this.adapter.lastSendMessageOptions
     }
 
     private serialize() {

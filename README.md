@@ -73,7 +73,7 @@ Here are the contents of that file for you to review now, rather than needing to
 import { stdin as input, stdout as output } from 'node:process'
 import * as readline from 'node:readline/promises'
 import dotenv from 'dotenv'
-import OpenAiAdapter from './bots/adapters/OpenAi'
+import OpenAiAdapter from './bots/adapters/OpenAiAdapter'
 import SprucebotLlmFactory from './bots/SprucebotLlmFactory'
 import buildCallbackSkill from './examples/buildCallbackSkill'
 import buildFileTransformerSkill from './examples/buildFileTransformerSkill'
@@ -131,7 +131,7 @@ void (async () => {
 There are two different limits to be aware of:
 
 - `SprucebotLlmBotImpl.messageMemoryLimit` (default: `10`) controls how many messages are kept in the in-memory history on the Bot. Once the limit is hit, old messages are dropped and can no longer be sent to any adapter.
-- `OPENAI_MESSAGE_MEMORY_LIMIT` or `OpenAiAdapter.setMessageMemoryLimit(limit)` controls how many of those tracked messages are included when sending a request to OpenAI. `0` (the default) means "no additional limit" beyond the Bot history.
+- `OPENAI_MESSAGE_MEMORY_LIMIT` or `adapter.setMemoryLimit(limit)` controls how many of those tracked messages are included when sending a request to OpenAI. `0` (the default) means "no additional limit" beyond the Bot history.
 
 To change the Bot history limit:
 
@@ -147,6 +147,28 @@ Additional OpenAI context controls:
 - `OPENAI_SHOULD_REMEMBER_IMAGES=false` omits images from older messages to save context, keeping only the most recent image and replacing older ones with `[Image omitted to save context]`.
 
 ## Adapters
+
+### Custom request headers
+
+You can attach custom HTTP headers to every underlying provider request a bot makes — useful for gateways, request tracing, or provider beta feature flags. Headers are threaded through the Bot's normal `sendMessage(...)` flow, so you set them once on the Bot.
+
+Set them when constructing the bot:
+
+```ts
+const bot = bots.Bot({
+    youAre: 'a helpful assistant',
+    skill: mySkill,
+    headers: { 'x-my-trace-id': '1234' },
+})
+```
+
+Or update them at any time (e.g. to rotate a trace id per conversation):
+
+```ts
+bot.setHeaders({ 'x-my-trace-id': '5678' })
+```
+
+The headers flow through to the underlying OpenAI / Anthropic request on the next `sendMessage`. Adapters also accept them per-call via `SendMessageOptions` if you call `adapter.sendMessage(bot, { model, headers })` directly.
 
 ### OpenAI adapter configuration
 
@@ -178,7 +200,7 @@ const adapter = OpenAiAdapter.Adapter(process.env.OPEN_AI_API_KEY!, {
 
 // Or set after creation
 adapter.setModel('gpt-4o')
-adapter.setMessageMemoryLimit(10)
+adapter.setMemoryLimit(10)
 adapter.setReasoningEffort('low')
 ```
 
@@ -193,7 +215,7 @@ adapter.setReasoningEffort('low')
   - `reasoningEffort` - for reasoning models (`'low'`, `'medium'`, `'high'`)
   - `baseUrl` - custom API endpoint
 - `adapter.setModel(model)`: set a default model for all requests unless a Skill overrides it.
-- `adapter.setMessageMemoryLimit(limit)`: limit how many tracked messages are sent to OpenAI.
+- `adapter.setMemoryLimit(limit)`: limit how many tracked messages are sent to OpenAI.
 - `adapter.setReasoningEffort(effort)`: set `reasoning_effort` for models that support it.
 - `adapter.getTokenUsage()`: returns cumulative [token usage](#tracking-token-usage) for this adapter. The OpenAI adapter currently returns zeros (not yet implemented).
 - `OpenAiAdapter.OpenAI`: assign a custom OpenAI client class (useful for tests).
@@ -230,7 +252,7 @@ const bots = SprucebotLlmFactory.Factory(adapter)
 
 #### Anthropic prompt caching
 
-The Anthropic adapter automatically enables [prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) by inserting an `ephemeral` cache breakpoint after the system prompt. This allows Anthropic to cache the static portion of the prompt (your `youAre` + skill instructions) and only re-process the changing chat history on each turn — reducing latency and cost on long conversations.
+The Anthropic adapter automatically enables [prompt caching](https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching) by inserting an `ephemeral` cache breakpoint (with a `1h` TTL) after the system prompt. This allows Anthropic to cache the static portion of the prompt (your `youAre` + skill instructions) and only re-process the changing chat history on each turn — reducing latency and cost on long conversations.
 
 Token usage (including cache creation and cache read tokens) is logged at the `info` level on each request:
 
@@ -689,6 +711,7 @@ skill.unserialize(skillSnapshot)
 | `clearMessageHistory()` | Drop all tracked messages |
 | `updateState(partialState)` | Update state and emit `did-update-state` |
 | `setSkill(skill)` | Swap the active skill |
+| `setHeaders(headers)` | Set custom HTTP headers attached to subsequent provider requests |
 | `serialize()` | Snapshot of bot's current state, skill, and history |
 | `unserialize(serialized)` | Restore state from a previous `serialize()` snapshot |
 
@@ -698,6 +721,7 @@ skill.unserialize(skillSnapshot)
 |--------|-------------|
 | `updateState(partialState)` | Update skill state |
 | `getState()` | Get current state |
+| `updateJobDescription(prompt)` | Change the skill's job description (`yourJobIfYouChooseToAcceptItIs`) |
 | `setModel(model)` | Change the model this skill uses |
 | `serialize()` | Snapshot of skill configuration and state |
 | `unserialize(serialized)` | Restore skill state from a previous `serialize()` snapshot |

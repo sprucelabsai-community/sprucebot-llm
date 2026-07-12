@@ -36,9 +36,10 @@ export default class SprucebotLlmBotImpl<
     protected messages: LlmMessage[] = []
     protected skill?: SprucebotLLmSkill
     private activeTurn?: TurnRequest
+    private headers?: Record<string, string>
 
     public constructor(options: BotOptions<StateSchema, State>) {
-        const { adapter, youAre, stateSchema, state, skill } = options
+        const { adapter, youAre, stateSchema, state, skill, headers } = options
 
         super(llmEventContract)
 
@@ -46,6 +47,7 @@ export default class SprucebotLlmBotImpl<
         this.youAre = youAre
         this.stateSchema = stateSchema
         this.skill = skill
+        this.headers = headers
         this.state = stateSchema
             ? ({
                   ...defaultSchemaValues(stateSchema),
@@ -112,6 +114,7 @@ export default class SprucebotLlmBotImpl<
             setDone: (isDone) => (this.isDone = isDone),
             skill: this.skill,
             trackMessage: this.trackMessage.bind(this),
+            headers: this.headers,
         })
 
         return this.activeTurn.sendMessage(llmMessage, cb)
@@ -153,5 +156,9 @@ export default class SprucebotLlmBotImpl<
 
     public silentlySetState(state: Partial<State>) {
         this.state = state
+    }
+
+    public setHeaders(headers: Record<string, string>) {
+        this.headers = headers
     }
 }

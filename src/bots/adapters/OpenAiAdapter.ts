@@ -79,8 +79,7 @@ export default class OpenAiAdapter implements LlmAdapter {
 
     private getReasoningEffort() {
         return (this.reasoningEffort ?? process.env.OPENAI_REASONING_EFFORT) as
-            | ReasoningEffort
-            | undefined
+            ReasoningEffort | undefined
     }
 
     public setModel(model: string) {

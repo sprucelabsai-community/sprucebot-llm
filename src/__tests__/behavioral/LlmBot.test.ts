@@ -799,6 +799,35 @@ export default class LlmBotTest extends AbstractLlmTest {
         )
     }
 
+    @test()
+    protected async canSetHeadersToGoToAdapter() {
+        await this.assertHeadersSentWithMessage({ 'x-my-header': 'value' })
+        await this.assertHeadersSentWithMessage({
+            'x-another-header': 'another value',
+            'to-the': 'adapter',
+        })
+    }
+
+    private async assertHeadersSentWithMessage(
+        headers: Record<string, string>
+    ) {
+        this.setHeaders(headers)
+        await this.sendRandomMessage()
+        this.assertHeadersEqual(headers)
+    }
+
+    private assertHeadersEqual(headers: Record<string, string>) {
+        assert.isEqualDeep(
+            this.adapter.lastSendMessageOptions?.headers,
+            headers,
+            'Headers not passed to adapter correctly'
+        )
+    }
+
+    private setHeaders(headers: Record<string, string>) {
+        this.bot.setHeaders(headers)
+    }
+
     private setupWithStateSchema(skillOrBot: string, schema: Schema) {
         if (skillOrBot === 'skill') {
             this.setupBotWithSkill({

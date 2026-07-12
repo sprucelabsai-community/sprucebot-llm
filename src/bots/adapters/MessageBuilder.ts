@@ -290,5 +290,4 @@ export interface MessageBuilderCacheMarker {
 }
 
 export type MessageBuilderMessage =
-    | ChatCompletionMessageParam
-    | MessageBuilderCacheMarker
+    ChatCompletionMessageParam | MessageBuilderCacheMarker

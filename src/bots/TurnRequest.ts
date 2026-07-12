@@ -5,6 +5,7 @@ import {
     LlmMessage,
     MessageResponseCallback,
     SendMessage,
+    SendMessageOptions,
     SprucebotLlmBot,
     SprucebotLLmSkill,
 } from '../llm.types'
@@ -20,6 +21,7 @@ export default class TurnRequest {
     ) => Promise<void>
     private bot: SprucebotLlmBot
     private isCancelled = false
+    private headers?: Record<string, string>
 
     public constructor(options: {
         trackMessage: (message: LlmMessage) => void
@@ -28,6 +30,7 @@ export default class TurnRequest {
         skill?: SprucebotLLmSkill
         adapter: LlmAdapter
         optionallyUpdateState: (state?: Record<string, any>) => Promise<void>
+        headers?: Record<string, string>
     }) {
         const {
             trackMessage,
@@ -36,6 +39,7 @@ export default class TurnRequest {
             adapter,
             setDone,
             optionallyUpdateState,
+            headers,
         } = options
         this.trackMessage = trackMessage
         this.skill = skill
@@ -43,6 +47,7 @@ export default class TurnRequest {
         this.setDone = setDone
         this.bot = bot
         this.optionallyUpdateState = optionallyUpdateState
+        this.headers = headers
     }
 
     public cancel() {
@@ -132,14 +137,21 @@ export default class TurnRequest {
     }
 
     private async sendMessageToAdapter(model: string | undefined) {
-        return await this.adapter.sendMessage(
-            this.bot,
-            model
-                ? {
-                      model,
-                  }
-                : undefined
-        )
+        let options: SendMessageOptions | undefined = undefined
+
+        if (model) {
+            options = {
+                model,
+            }
+        }
+
+        if (this.headers) {
+            options = options
+                ? { ...options, headers: this.headers }
+                : { headers: this.headers }
+        }
+
+        return await this.adapter.sendMessage(this.bot, options)
     }
 
     private async parseResponse(response: string, callbacks?: LlmCallbackMap) {

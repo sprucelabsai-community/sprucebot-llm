@@ -74,7 +74,8 @@ export default class MessageSenderImpl implements MessageSender {
     }
 
     private async send(options: MessageSenderSendOptions) {
-        const { abortController, reasoningEffort, ...restOptions } = options
+        const { abortController, reasoningEffort, headers, ...restOptions } =
+            options
 
         const params: ChatCompletionCreateParamsNonStreaming = {
             ...(restOptions as ChatCompletionCreateParamsNonStreaming),
@@ -84,9 +85,15 @@ export default class MessageSenderImpl implements MessageSender {
             params.reasoning_effort = reasoningEffort
         }
 
-        const response = await this.sendHandler(params, {
+        const request: RequestOptions = {
             signal: abortController.signal,
-        })
+        }
+
+        if (headers) {
+            request.headers = headers
+        }
+
+        const response = await this.sendHandler(params, request)
 
         return response
     }
@@ -120,4 +127,5 @@ export type MessageSenderSendMessageOptions = SendMessageOptions & {
     memoryLimit?: number
     reasoningEffort?: ReasoningEffort
     model: string
+    headers?: Record<string, string>
 }

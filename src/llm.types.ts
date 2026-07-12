@@ -17,6 +17,7 @@ export interface BotOptions<
     adapter: LlmAdapter
     Class?: new (...opts: any[]) => SprucebotLlmBot<Schema, State>
     skill?: SprucebotLLmSkill<Schema>
+    headers?: Record<string, string>
 }
 
 export interface SprucebotLlmBot<
@@ -33,6 +34,7 @@ export interface SprucebotLlmBot<
     unserialize(serialized: SerializedBot<StateSchema, State>): void
     updateState(state: Partial<State>): Promise<void>
     setSkill(skill: SprucebotLLmSkill<any>): void
+    setHeaders(headers: Record<string, string>): void
     clearMessageHistory(): void
 }
 
@@ -70,6 +72,7 @@ export interface PromptOptions<
 
 export interface SendMessageOptions {
     model?: string
+    headers?: Record<string, string>
 }
 
 export interface SerializedBot<
