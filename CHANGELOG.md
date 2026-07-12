@@ -1,3 +1,7 @@
+## 18.1.0 (2026-07-12)
+
+* minor: can send custom headers to openai messages ([dafede5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/dafede5))
+
 ## <small>18.0.1 (2026-06-03)</small>
 
 * patch: anthropic caching ttl to 1h ([b5048b5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/b5048b5))
