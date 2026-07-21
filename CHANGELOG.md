@@ -1,3 +1,9 @@
+## <small>18.1.1 (2026-07-21)</small>
+
+* patch: export package.json for durable dependency version resolution ([3ce9331](https://github.com/[secure]ai-community/[secure]-llm/commit/3ce9331))
+* patch: fix prettier formatting for ResponseParserV2 CI lint ([5927e80](https://github.com/[secure]ai-community/[secure]-llm/commit/5927e80))
+* patch: ResponseParserV2 silent-failure hardening + serializable errors ([5b8e410](https://github.com/[secure]ai-community/[secure]-llm/commit/5b8e410))
+
 ## 18.1.0 (2026-07-12)
 
 * minor: can send custom headers to openai messages ([dafede5](https://github.com/sprucelabsai-community/sprucebot-llm/commit/dafede5))
