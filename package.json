@@ -26,7 +26,8 @@
         "types": "./build/index.d.ts",
         "default": "./build/index.js"
       }
-    }
+    },
+    "./package.json": "./package.json"
   },
   "keywords": [
     "llm",
