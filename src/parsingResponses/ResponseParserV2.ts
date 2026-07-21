@@ -202,7 +202,9 @@ export default class ResponseParserV2 implements ResponseParser {
         const hasCallShape = message != null && /^[ \t]*@\w+\(/m.test(message)
         const hasRegisteredName =
             callbacks != null &&
-            Object.keys(callbacks).some((name) => message!.includes(`@${name}(`))
+            Object.keys(callbacks).some((name) =>
+                message!.includes(`@${name}(`)
+            )
         const hasCallbacks = hasCallShape || hasRegisteredName
 
         if (hasCallbacks) {

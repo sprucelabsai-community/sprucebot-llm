@@ -429,9 +429,7 @@ Bad examples:
             useThisWhenever: 'good',
         })
 
-        const results = await this.parse(
-            `\n@bad({not json})\n@good({})\n`
-        )
+        const results = await this.parse(`\n@bad({not json})\n@good({})\n`)
 
         assert.isTrue(siblingHit, 'Sibling callback must still execute')
         assert.doesInclude(
