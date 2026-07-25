@@ -121,6 +121,67 @@ export default class ResponseParserV2Test extends AbstractResponseParserTest {
             expected.trim(),
             'Did not return expected callback results with multiple callbacks'
         )
+
+        assert.isNull(results.message, 'should have stripped out all callbacks')
+    }
+
+    @test()
+    protected async canCallFourCallbacksInSameMessage() {
+        this.setCallback('getUsersName', {
+            cb: () => {
+                return 'user name result'
+            },
+            useThisWhenever: "you are asking for the user's name.",
+        })
+
+        this.setCallback('listEfforts', {
+            cb: () => {
+                return 'list efforts result'
+            },
+            useThisWhenever: 'you are asking for the list of efforts.',
+        })
+
+        this.setCallback('getEffortStatus', {
+            cb: () => {
+                return 'effort status result'
+            },
+            useThisWhenever: 'you are asking for the status of an effort.',
+            parameters: [
+                {
+                    name: 'effortId',
+                    type: 'text',
+                    isRequired: true,
+                },
+            ],
+        })
+
+        this.setCallback('updateEffort', {
+            cb: () => {
+                return 'update state result'
+            },
+            useThisWhenever: 'you are updating the state.',
+            parameters: [
+                {
+                    name: 'state',
+                    type: 'raw',
+                },
+            ],
+        })
+
+        const results = await this.parse(
+            this.renderCallback({ name: 'getUsersName' }) +
+                this.renderCallback({ name: 'listEfforts' }) +
+                this.renderCallback({
+                    name: 'getEffortStatus',
+                    options: { effortId: '123' },
+                }) +
+                this.renderCallback({
+                    name: 'updateEffort',
+                    options: { state: { field1: 'value1' } },
+                })
+        )
+
+        assert.isNull(results.message, 'should have stripped out all callbacks')
     }
 
     @test()

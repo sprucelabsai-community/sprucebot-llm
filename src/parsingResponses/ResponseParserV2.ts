@@ -264,7 +264,7 @@ export default class ResponseParserV2 implements ResponseParser {
             // Always strip the call from the user-facing message once recognized.
             callbackStrippedMessage = stripCallFromMessage(
                 callbackStrippedMessage,
-                span.fullMatch
+                span.fullMatch.trim()
             )
 
             let options: any
