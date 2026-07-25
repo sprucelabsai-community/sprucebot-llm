@@ -1,3 +1,7 @@
+## <small>18.1.2 (2026-07-25)</small>
+
+* patch: better handling of back-to-back callbacks ([1a64b9c](https://github.com/[secure]ai-community/[secure]-llm/commit/1a64b9c))
+
 ## <small>18.1.1 (2026-07-21)</small>
 
 * patch: export package.json for durable dependency version resolution ([3ce9331](https://github.com/[secure]ai-community/[secure]-llm/commit/3ce9331))
