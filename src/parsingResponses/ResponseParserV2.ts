@@ -291,7 +291,7 @@ export default class ResponseParserV2 implements ResponseParser {
                 if (callback?.parameters) {
                     validateAndNormalizeCallbackOptions(
                         callback.parameters,
-                        options
+                        options ?? {}
                     )
                 }
                 const results = await callback?.cb(options)

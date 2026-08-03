@@ -587,6 +587,28 @@ Bad examples:
         )
     }
 
+    @test()
+    protected async allOptionalParametersDoesntRequireCallbackOptions() {
+        this.setCallback('optional', {
+            cb: () => 'ok-optional',
+            useThisWhenever: 'optional',
+            parameters: [
+                {
+                    type: 'text',
+                    name: 'optionalParam',
+                },
+            ],
+        })
+
+        const results = await this.parse(`@optional()`)
+
+        assert.doesInclude(
+            results.callbackResults ?? '',
+            'ok-optional',
+            'Callback with all optional parameters must not require options'
+        )
+    }
+
     private renderCallback(options: Record<string, any>): string {
         const { name, options: cbOptions } = options
         return `\n@${name}(${JSON.stringify(cbOptions ?? {})})\n`
