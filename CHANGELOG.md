@@ -1,3 +1,7 @@
+## <small>18.1.3 (2026-08-03)</small>
+
+* patch: callbacks gracefully handle no arguments ([360488b](https://github.com/[secure]ai-community/[secure]-llm/commit/360488b))
+
 ## <small>18.1.2 (2026-07-25)</small>
 
 * patch: better handling of back-to-back callbacks ([1a64b9c](https://github.com/[secure]ai-community/[secure]-llm/commit/1a64b9c))
