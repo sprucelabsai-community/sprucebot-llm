@@ -503,7 +503,7 @@ class MockAthropicModule extends Anthropic {
     private sendMessageOptions?: RequestOptions
 
     public constructor(options?: ClientOptions) {
-        super({})
+        super({ apiKey: options?.apiKey ?? generateId() })
         this.constructorOptions = options
         MockAthropicModule.instance = this
 
