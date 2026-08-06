@@ -1,3 +1,7 @@
+## <small>18.1.4 (2026-08-06)</small>
+
+* patch: export canonical message builder ([8316b9c](https://github.com/[secure]ai-community/[secure]-llm/commit/8316b9c))
+
 ## <small>18.1.3 (2026-08-03)</small>
 
 * patch: callbacks gracefully handle no arguments ([360488b](https://github.com/[secure]ai-community/[secure]-llm/commit/360488b))
