@@ -523,6 +523,21 @@ Bad examples:
     }
 
     @test()
+    protected async returnsErrorIfPassesArgumentNotJson() {
+        this.setCallback('withoutProperArgs', {
+            cb: () => 'should-not-run',
+            useThisWhenever: 'withoutProperArgs',
+        })
+
+        const results = await this.parse(`@withoutProperArgs("1")`)
+
+        assert.isEqual(
+            results.callbackResults,
+            `@results ${JSON.stringify({ name: 'withoutProperArgs', error: 'Arguments not valid JSON' })}\n`.trim()
+        )
+    }
+
+    @test()
     protected async multilineStringResultEmittedRawWithRealNewlines() {
         this.setCallback('snap', {
             cb: () => 'line1\nline2\nline3',

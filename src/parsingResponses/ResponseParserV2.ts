@@ -143,8 +143,12 @@ function extractCallbackSpans(message: string): CallSpan[] {
             }
             closeParen = j
         } else {
-            re.lastIndex = openParen + 1
-            continue
+            closeParen = message.indexOf(')', i)
+            if (closeParen === -1) {
+                re.lastIndex = openParen + 1
+                continue
+            }
+            argsJson = message.slice(i, closeParen)
         }
 
         let end = closeParen! + 1
@@ -274,6 +278,19 @@ export default class ResponseParserV2 implements ResponseParser {
                 callbackResults += this.renderCallbackResults({
                     name,
                     error: `Invalid JSON arguments for @${name}: ${err?.message ?? String(err)}. Arguments must be valid JSON object.`,
+                })
+                continue
+            }
+
+            if (
+                options !== undefined &&
+                (options === null ||
+                    Array.isArray(options) ||
+                    typeof options !== 'object')
+            ) {
+                callbackResults += this.renderCallbackResults({
+                    name,
+                    error: 'Arguments not valid JSON',
                 })
                 continue
             }
