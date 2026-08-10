@@ -1,3 +1,7 @@
+## <small>18.1.5 (2026-08-10)</small>
+
+* patch: returns error when callback passed string literal instead of json ([4c898ff](https://github.com/[secure]ai-community/[secure]-llm/commit/4c898ff))
+
 ## <small>18.1.4 (2026-08-06)</small>
 
 * patch: export canonical message builder ([8316b9c](https://github.com/[secure]ai-community/[secure]-llm/commit/8316b9c))
