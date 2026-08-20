@@ -1,3 +1,7 @@
+## <small>18.1.6 (2026-08-20)</small>
+
+* patch: missing parens error ([6989575](https://github.com/[secure]ai-community/[secure]-llm/commit/6989575))
+
 ## <small>18.1.5 (2026-08-10)</small>
 
 * patch: returns error when callback passed string literal instead of json ([4c898ff](https://github.com/[secure]ai-community/[secure]-llm/commit/4c898ff))
