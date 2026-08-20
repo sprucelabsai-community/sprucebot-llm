@@ -1,5 +1,6 @@
 import { Schema, SelectChoice, validateSchemaValues } from '@sprucelabs/schema'
 import { test, suite, assert, generateId } from '@sprucelabs/test-utils'
+import { SendMessage } from '../../..'
 import { DONE_TOKEN } from '../../../bots/templates'
 import ResponseParserV2, {
     serializeCallbackError,
@@ -602,6 +603,96 @@ Bad examples:
         )
     }
 
+    @test('missing parents throws expected error 1', 'properFormat')
+    @test('missing parentheses throws expected error 2', 'missing')
+    protected async missingParensThrowsExpectedError(name: string) {
+        this.setCallback('name', {
+            cb: () => 'go',
+            useThisWhenever: 'name',
+        })
+
+        await this.assertPromptReturnsMissingParens(`@${name} {}`, name)
+    }
+
+    @test()
+    protected async missingParensCatchesWithArgs() {
+        this.setCallback('functionCall', {
+            cb: () => 'done',
+            useThisWhenever: 'functionCall',
+            parameters: [
+                {
+                    name: 'first',
+                    type: 'text',
+                },
+            ],
+        })
+
+        await this.assertPromptReturnsMissingParens(
+            `@functionCall ${JSON.stringify({ first: 'value' })}`,
+            'functionCall'
+        )
+    }
+
+    @test()
+    protected async missingParensErrorPersistsWithOtherErrors() {
+        this.setCallback('functionCall', {
+            cb: () => 'done',
+            useThisWhenever: 'functionCall',
+            parameters: [
+                {
+                    name: 'first',
+                    type: 'text',
+                },
+            ],
+        })
+
+        const results = await this.parse(
+            `@functionCall ${JSON.stringify({ first: 'value' })}${this.renderCallback(
+                {
+                    name: 'otherError',
+                    error: 'Some other error',
+                }
+            )}`
+        )
+
+        const includes = this.renderMissingParensError('functionCall')
+        assert.doesInclude(
+            results.callbackResults ?? '',
+            includes,
+            'Missing parentheses error must persist with other errors'
+        )
+    }
+
+    @test()
+    protected async missingParensOnMultipleCallbacks() {
+        this.setCallback('callback1', {
+            cb: () => 'go',
+            useThisWhenever: 'callback1',
+        })
+
+        this.setCallback('callback2', {
+            cb: () => 'go',
+            useThisWhenever: 'callback2',
+        })
+
+        const results = await this.parse(`@callback1 {}\n@callback2 {}`)
+
+        const expected1 = this.renderMissingParensError('callback1')
+        const expected2 = this.renderMissingParensError('callback2')
+
+        assert.doesInclude(
+            results.callbackResults ?? '',
+            expected1,
+            'Missing parentheses error must be included for callback1'
+        )
+
+        assert.doesInclude(
+            results.callbackResults ?? '',
+            expected2,
+            'Missing parentheses error must be included for callback2'
+        )
+    }
+
     @test()
     protected async allOptionalParametersDoesntRequireCallbackOptions() {
         this.setCallback('optional', {
@@ -622,6 +713,22 @@ Bad examples:
             'ok-optional',
             'Callback with all optional parameters must not require options'
         )
+    }
+
+    private async assertPromptReturnsMissingParens(
+        prompt: string,
+        name: string
+    ) {
+        const results = await this.parse(prompt)
+
+        assert.isEqual(
+            results.callbackResults,
+            this.renderMissingParensError(name)
+        )
+    }
+
+    private renderMissingParensError(name: string): SendMessage {
+        return `@results ${JSON.stringify({ name, error: `Missing parentheses for @${name}()` })}\n`.trim()
     }
 
     private renderCallback(options: Record<string, any>): string {

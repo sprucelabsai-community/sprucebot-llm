@@ -200,6 +200,15 @@ export default class ResponseParserV2 implements ResponseParser {
         let message: string | null = response.replace(DONE_TOKEN, '').trim()
         let state: Record<string, any> | undefined = undefined
         let callbackResults: SendMessage | undefined = undefined
+        const missingParens = message.matchAll(/^@(\w+) \{.*\}/gm)
+        for (const match of missingParens) {
+            const name = match[1]
+            const error = this.renderCallbackResults({
+                name,
+                error: `Missing parentheses for @${name}()`,
+            }).trim()
+            callbackResults = `${callbackResults ?? ''}\n${error}`.trim()
+        }
 
         // Enter the pass when any @name( call shape is present (incl. typos)
         // or when a registered callback name appears as a call prefix.
@@ -214,7 +223,8 @@ export default class ResponseParserV2 implements ResponseParser {
         if (hasCallbacks) {
             const { callbackResults: c, message: m } =
                 await this.invokeCallbacks(message!, callbacks)
-            callbackResults = c
+            callbackResults =
+                `${callbackResults ?? ''}\n${c ?? ''}`.trim() || undefined
             message = m
         }
 
