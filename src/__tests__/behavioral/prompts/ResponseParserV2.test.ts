@@ -715,6 +715,33 @@ Bad examples:
         )
     }
 
+    @test('cant respond with @results', 'results')
+    protected async agentCantRespondWithBuiltInCallback(name: string) {
+        const results = await this.parse(`@${name}({})`)
+        assert.isEqual(
+            results.callbackResults,
+            this.renderResults({
+                name,
+                error: `Agent cannot respond with built-in response callback @${name}()`,
+            })
+        )
+    }
+
+    @test()
+    protected async callingResultsDoesntSupressOtherCallbackResults() {
+        this.setCallback('callback1', {
+            cb: () => 'hit it',
+            useThisWhenever: 'you test',
+        })
+
+        const results = await this.parse(`@callback1()\n@results({})`)
+        assert.doesInclude(
+            results.callbackResults,
+            'hit it',
+            'Callback1 result must be included even when @results() is called'
+        )
+    }
+
     private async assertPromptReturnsMissingParens(
         prompt: string,
         name: string
@@ -723,12 +750,20 @@ Bad examples:
 
         assert.isEqual(
             results.callbackResults,
-            this.renderMissingParensError(name)
+            this.renderMissingParensError(name),
+            `Expected missing parentheses error for @${name}()`
         )
     }
 
     private renderMissingParensError(name: string): SendMessage {
-        return `@results ${JSON.stringify({ name, error: `Missing parentheses for @${name}()` })}\n`.trim()
+        return this.renderResults({
+            name,
+            error: `Missing parentheses for @${name}()`,
+        })
+    }
+
+    private renderResults(results: Record<string, any>): SendMessage {
+        return `@results ${JSON.stringify(results)}\n`.trim()
     }
 
     private renderCallback(options: Record<string, any>): string {

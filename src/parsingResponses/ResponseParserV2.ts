@@ -269,13 +269,20 @@ export default class ResponseParserV2 implements ResponseParser {
 
         const spans = extractCallbackSpans(message)
         for (const span of spans) {
-            if (RESERVED_CALLBACK_NAMES.has(span.name)) {
+            const name = span.name
+
+            if (name === 'results') {
+                callbackResults += this.renderCallbackResults({
+                    name,
+                    error: `Agent cannot respond with built-in response callback @results()`,
+                })
                 continue
             }
 
-            const name = span.name
+            if (RESERVED_CALLBACK_NAMES.has(name)) {
+                continue
+            }
 
-            // Always strip the call from the user-facing message once recognized.
             callbackStrippedMessage = stripCallFromMessage(
                 callbackStrippedMessage,
                 span.fullMatch.trim()
