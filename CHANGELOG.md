@@ -1,3 +1,7 @@
+## <small>18.1.7 (2026-10-21)</small>
+
+* patch: don't let an agent responde with @results ([312788d](https://github.com/[secure]ai-community/[secure]-llm/commit/312788d))
+
 ## <small>18.1.6 (2026-08-20)</small>
 
 * patch: missing parens error ([6989575](https://github.com/[secure]ai-community/[secure]-llm/commit/6989575))
